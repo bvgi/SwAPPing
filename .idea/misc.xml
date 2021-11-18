@@ -7,6 +7,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.2526041666666667" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.23645833333333333" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.29483695652173914" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.3532608695652174" />
         <entry key="app/src/main/res/layout/fragment_adding.xml" value="0.40942028985507245" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.40942028985507245" />
         <entry key="app/src/main/res/layout/fragment_home.xml" value="0.23645833333333333" />
@@ -15,6 +16,7 @@
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.23645833333333333" />
         <entry key="app/src/main/res/layout/fragment_searching.xml" value="0.40942028985507245" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.23645833333333333" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.4296875" />
       </map>
     </option>
   </component>

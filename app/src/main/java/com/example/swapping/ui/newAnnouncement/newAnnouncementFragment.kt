@@ -23,7 +23,7 @@ class NewAnnouncementFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         newAnnouncementViewModel =
                 ViewModelProvider(this).get(NewAnnouncementViewModel::class.java)
 
