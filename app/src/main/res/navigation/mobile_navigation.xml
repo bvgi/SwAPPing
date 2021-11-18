@@ -6,20 +6,33 @@
     app:startDestination="@+id/navigation_home">
 
     <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.swapping.ui.profile.ProfileFragment"
+        android:label="@string/title_profile"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.swapping.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.example.swapping.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        android:id="@+id/navigation_new_announcement"
+        android:name="com.example.swapping.ui.newAnnouncement.NewAnnouncementFragment"
+        android:label="@string/title_new_announcement"
+        tools:layout="@layout/fragment_new_announcement" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.swapping.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.example.swapping.ui.searching.SearchingFragment"
+        android:label="@string/title_searching"
+        tools:layout="@layout/fragment_searching" />
+
 </navigation>

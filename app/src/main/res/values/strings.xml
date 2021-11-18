@@ -1,6 +1,12 @@
 <resources>
     <string name="app_name">SwAPPing</string>
     <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="title_searching">Searching</string>
+    <string name="title_new_announcement">New Announcement</string>
+    <string name="title_profile">Profile</string>
+    <string name="makeAccount">Utwórz konto</string>
+    <string name="promptEmail">Adres e-mail</string>
+    <string name="promptPassword">Hasło</string>
+    <string name="ButtonLogin">Zaloguj</string>
 </resources>

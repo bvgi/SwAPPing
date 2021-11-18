@@ -1,4 +1,4 @@
-package com.example.swapping.ui.dashboard
+package com.example.swapping.ui.newAnnouncement
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,13 +8,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.swapping.R
-import com.example.swapping.databinding.FragmentDashboardBinding
+import com.example.swapping.databinding.FragmentNewAnnouncementBinding
 
-class DashboardFragment : Fragment() {
+class NewAnnouncementFragment : Fragment() {
 
-    private lateinit var dashboardViewModel: DashboardViewModel
-    private var _binding: FragmentDashboardBinding? = null
+    private lateinit var newAnnouncementViewModel: NewAnnouncementViewModel
+    private var _binding: FragmentNewAnnouncementBinding? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -24,15 +23,15 @@ class DashboardFragment : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
-        dashboardViewModel =
-                ViewModelProvider(this).get(DashboardViewModel::class.java)
+    ): View {
+        newAnnouncementViewModel =
+                ViewModelProvider(this).get(NewAnnouncementViewModel::class.java)
 
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        _binding = FragmentNewAnnouncementBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner, Observer {
+        val textView: TextView = binding.textNewAnnouncement
+        newAnnouncementViewModel.text.observe(viewLifecycleOwner, Observer {
             textView.text = it
         })
         return root
