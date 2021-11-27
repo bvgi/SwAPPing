@@ -17,4 +17,7 @@
     <string name="dateOfBirth">Data urodzenia <font color='#FF0000'>*</font></string>
     <string name="city">Miejsce zamieszkania </string>
     <string name="permission"><font color='#FF0000'>*</font> Wyrażam zgodę na przetwarzanie moich danych w celu korzystania z aplikacji „swAPPing”.</string>
+    <string name="promptParentEmail">Adres e-mail rodzica/opiekuna<font color='#FF0000'>*</font></string>
+    <string name="info">infotext</string>
+    <string name="RegisterActivity">Rejestracja</string>
 </resources>

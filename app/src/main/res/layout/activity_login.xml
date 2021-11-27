@@ -7,9 +7,10 @@
 
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/login_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,11 +22,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="5dp"
+            android:layout_margin="10dp"
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailError"
+                android:id="@+id/emailLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -38,14 +39,15 @@
                     android:layout_marginTop="10dp"
                     android:importantForAutofill="no"
                     android:inputType="textEmailAddress"
-                    android:singleLine="true"
                     android:maxLines="1"
-                    android:text="@string/promptEmail"
+                    android:singleLine="true"
+                    android:hint="@string/promptEmail"
+                    app:hintEnabled = "true"
                     android:textColor="#616161" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/passError"
+                android:id="@+id/passLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
@@ -58,6 +60,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:hint="@string/promptPassword"
+                    app:hintEnabled = "true"
                     android:importantForAutofill="no"
                     android:inputType="textPassword"
                     android:maxLines="1"
@@ -67,6 +70,16 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/verifyLoginData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_margin="5dp"
+                android:text="@string/info"
+                android:textColor="@color/red"
+                android:textSize="14sp"
+                android:visibility="gone" />
             <Button
                 android:id="@+id/buttonLogin"
                 android:layout_width="wrap_content"
@@ -83,10 +96,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="5dp"
+                android:layout_margin="10dp"
                 android:text="@string/makeAccount"
                 android:textColor="@color/yellow_700"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
