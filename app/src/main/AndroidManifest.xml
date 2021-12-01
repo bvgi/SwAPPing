@@ -11,10 +11,15 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SwAPPing">
+        android:theme="@style/Theme.SwAPPing"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.userLogin.RegisterActivity"
-            android:parentActivityName=".ui.userLogin.LoginActivity" />
+            android:parentActivityName=".ui.userLogin.LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.userLogin.LoginActivity" />
+        </activity>
         <activity
             android:name=".MainActivity"/>
         <activity
