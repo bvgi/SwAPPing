@@ -1,18 +1,21 @@
 package com.example.swapping.Models
 
-class Announcement( val user: Int,
-                    title: String,
-                    description: String,
-                    voivodeship: String,
-                    city: String,
-                    category: String,
-                    status: String,
-                    genre: String,
-                    year: String,
-                    negotiation: Int,
-                    archived: Boolean,
-                    purchaser_id: Int,
-                    image: Byte,
-                    published_date: Int
+
+class Announcement(
+    var ID: Int = 0,
+    val user: Int,
+    var title: String,
+    var description: String,
+    var voivodeship: String,
+    var city: String,
+    var category: String,
+    var status: String,
+    var genre: String,
+    var year: String,
+    var negotiation: Int = 0,
+    var archived: Int = 0,
+    var purchaser_id: Int,
+    var image: ByteArray,
+    val published_date: Int
 ) {
 }

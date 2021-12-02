@@ -67,8 +67,6 @@ class LoginActivity : AppCompatActivity() {
 //        LoginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 //        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_login)
-        SingletonManager.init(applicationContext)
-
 
         val emailLayout = findViewById<TextInputLayout>(R.id.emailLoginLayout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.passwordLoginLayout)
@@ -123,22 +121,22 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    private fun makeRequest() {
-        val queue = SingletonManager.queue
-
-        val url = "http://192.168.0.45:8000/Users"
-
-        val django = JsonObjectRequest(
-            Request.Method.GET, url, null,
-            { response ->
-                Log.d("Response", response.toString())
-            },
-            { response ->
-                Log.d("Error", response.toString())
-            })
-
-        queue.add(django)
-    }
+//    private fun makeRequest() {
+//        val queue = SingletonManager.queue
+//
+//        val url = "http://192.168.0.45:8000/Users"
+//
+//        val django = JsonObjectRequest(
+//            Request.Method.GET, url, null,
+//            { response ->
+//                Log.d("Response", response.toString())
+//            },
+//            { response ->
+//                Log.d("Error", response.toString())
+//            })
+//
+//        queue.add(django)
+//    }
 
 //    override fun onCreate(
 //            inflater: LayoutInflater,
