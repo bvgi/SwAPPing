@@ -1,4 +1,4 @@
-package com.example.swapping
+package com.example.swapping.DataBase
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -18,7 +18,6 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         const val REVIEW_TABLE = "Review"
         const val FOLLOWEDUSERS_TABLE = "FollowedUsers"
 
-        // If you change the database schema, you must increment the database version.
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "swAPPing.db"
     }
@@ -38,64 +37,76 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
         val SQL_CREATE_REVIEW = "CREATE TABLE $REVIEW_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "User INTEGER FOREIGN KEY(user) REFERENCES USER(ID), NOT NULL, " +
-                "Reviewer INTEGER FOREIGN KEY(User, REFERENCES USER(ID), " +
+                "User INTEGER FOREIGN KEY(user) REFERENCES $USER_TABLE(ID), NOT NULL, " +
+                "Reviewer INTEGER FOREIGN KEY(User, REFERENCES $USER_TABLE(ID), " +
                 "Rate INTEGER, NOT NULL, " +
                 "Description VARCHAR(255))"
         db.execSQL(SQL_CREATE_REVIEW)
 
         val SQL_CREATE_FOLLOWEDUSERS = "CREATE TABLE $FOLLOWEDUSERS_TABLE (" +
-                "User INTEGER FOREIGN KEY(User) REFERENCES USER(ID) NOT NULL, " +
-                "Followed INTEGER FOREIGN KEY(User) REFERENCES USER(ID) NOT NULL"
+                "User INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID) NOT NULL, " +
+                "Followed INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID) NOT NULL"
         db.execSQL(SQL_CREATE_FOLLOWEDUSERS)
 
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS User")
-        db.execSQL("DROP TABLE IF EXISTS Review")
-        db.execSQL("DROP TABLE IF EXISTS FollowedUsers")
-        onCreate(db)
+        with(db) {
+            execSQL("DROP TABLE IF EXISTS User")
+            execSQL("DROP TABLE IF EXISTS Review")
+            execSQL("DROP TABLE IF EXISTS FollowedUsers")
+            onCreate(this)
+        }
     }
+
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         onUpgrade(db, oldVersion, newVersion)
     }
 
     // USER FUNCTIONS
 
-    fun addUser(user: User, password: String){
+    fun addUser(user: User, password: String) : Long {
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("Username", user.username)
-        values.put("Email", user.email)
-        values.put("Name", user.name)
-        values.put("City", user.city)
-        values.put("Phone_number", user.phone_number)
-        values.put("Password", password)
-        values.put("Logged_in", user.logged_in)
+        with(values) {
+            put("Username", user.username)
+            put("Email", user.email)
+            put("Name", user.name)
+            put("City", user.city)
+            put("Phone_number", user.phone_number)
+            put("Password", password)
+            put("Logged_in", user.logged_in)
+        }
 
         val result = db.insert(USER_TABLE, null, values)
         db.close()
+
+        return result
     }
 
-    fun setLoggedIn(userid: Int){
+    fun setLoggedIn(userid: Int): Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Logged_in", 1)
 
         val result = db.update(USER_TABLE, values, "ID = ?", arrayOf(userid.toString()))
+
         db.close()
+
+        return result
     }
 
-    fun setLoggedOut(userid: Int){
+    fun setLoggedOut(userid: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Logged_in", 0)
 
         val result = db.update(USER_TABLE, values, "ID = ?", arrayOf(userid.toString()))
         db.close()
+
+        return result
     }
 
-    fun updateUser(newUser: User, password: String){
+    fun updateUser(newUser: User, password: String) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Username", newUser.username)
@@ -105,26 +116,30 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         values.put("Phone_number", newUser.phone_number)
         values.put("Password", password)
 
-        val result = db.update(USER_TABLE, values, "Username = ?", arrayOf(newUser.username.toString()))
+        val result = db.update(Companion.USER_TABLE, values, "Username = ?", arrayOf(newUser.username.toString()))
         db.close()
+
+        return result
     }
 
-    fun getUser(username: String) : User{
+    fun getUser(username: String) : User {
         val db = this.readableDatabase
 
-        val getUserQuery = "SELECT Name, City, Phone_number, Mean_rate " +
+        val getUserQuery = "SELECT * " +
                 "FROM $USER_TABLE" +
                 "WHERE Username = $username"
 
         val cursor = db.rawQuery(getUserQuery, null)
 
-        var name: String = ""
-        var email: String = ""
-        var city: String = ""
-        var phone_number: Int = 0
-        var mean_rate: Double = 0.0
+        var id = 0
+        var name = ""
+        var email = ""
+        var city = ""
+        var phone_number = 0
+        var mean_rate = 0.0
 
         if(cursor.moveToFirst()){
+            id = cursor.getInt(cursor.getColumnIndex("ID"))
             name = cursor.getString(cursor.getColumnIndex("Name"))
             email = cursor.getString(cursor.getColumnIndex("Email"))
             city = cursor.getString(cursor.getColumnIndex("City"))
@@ -135,12 +150,19 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         cursor.close()
         db.close()
 
-        return User(username = username, email = email, name = name, city = city, phone_number = phone_number, mean_rate = mean_rate)
+        return User(
+            ID = id,
+            username = username,
+            email = email,
+            name = name,
+            city = city,
+            phone_number = phone_number,
+            mean_rate = mean_rate)
     }
 
     // REVIEW FUNCTIONS
 
-    fun addReview(review: Review){
+    fun addReview(review: Review) : Long {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("User", review.user)
@@ -149,20 +171,27 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         values.put("Description", review.description)
 
         val result = db.insert(REVIEW_TABLE, null, values)
+
         db.close()
+
+        return result
     }
 
-    fun deleteReview(userId: Int, reviewerId: Int){
+    fun deleteReview(userId: Int, reviewerId: Int) : Int {
         val db = this.writableDatabase
+
         val result = db.delete(REVIEW_TABLE, "user = ? and reviewer = ?", arrayOf(userId.toString(), reviewerId.toString()))
+
         db.close()
+
+        return result
     }
 
     @SuppressLint("Recycle")
     fun getUserReviews(userId: Int) : Array<Review> {
         val db = this.readableDatabase
-        var reviews = mutableListOf<Review>()
-        var cursor: Cursor? = null
+        val reviews = mutableListOf<Review>()
+        var cursor: Cursor?
 
         val getReviewsQuery = "SELECT User, Reviewer, Rate, Description " +
                 "FROM $REVIEW_TABLE" +
@@ -198,32 +227,38 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
     // FOLLOWERS FUNCTIONS
 
-    fun addFollower(userId: Int, followerId: Int){
+    fun addFollower(userId: Int, followerId: Int) : Long {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("User", userId)
         values.put("Reviewer", followerId)
 
         val result = db.insert(FOLLOWEDUSERS_TABLE, null, values)
+
         db.close()
+
+        return result
     }
 
-    fun deleteFollower(userId: Int, followerId: Int){
+    fun deleteFollower(userId: Int, followerId: Int) : Int {
         val db = this.writableDatabase
+
         val result = db.delete(FOLLOWEDUSERS_TABLE, "user = ? and followed = ?", arrayOf(userId.toString(), followerId.toString()))
+
         db.close()
+
+        return result
     }
 
-    fun getFollowers(username: String) : Array<String>{
+    fun getFollowers(userId: String) : Array<String>{
         val db = this.readableDatabase
         val followers = mutableListOf<String>()
         val cursor: Cursor?
 
         val getReviewsQuery = "SELECT F.Username AS Follower" +
                 "FROM $FOLLOWEDUSERS_TABLE" +
-                "JOIN $USER_TABLE U ON User = U.ID" +
                 "JOIN $USER_TABLE F ON Followed = F.ID" +
-                "WHERE U.Username = $username"
+                "WHERE User = $userId"
 
         try{
             cursor = db.rawQuery(getReviewsQuery, null)
@@ -248,7 +283,7 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return followers.toTypedArray()
     }
 
-    fun getFollowed(username: String) : Array<String>{
+    fun getFollowed(userId: String) : Array<String>{
         val db = this.readableDatabase
         val followed = mutableListOf<String>()
         val cursor: Cursor?
@@ -256,8 +291,7 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         val getReviewsQuery = "SELECT U.Username AS Followed" +
                 "FROM $FOLLOWEDUSERS_TABLE" +
                 "JOIN $USER_TABLE U ON User = U.ID" +
-                "JOIN $USER_TABLE F ON Followed = F.ID" +
-                "WHERE F.Username = $username"
+                "WHERE Followed = $userId"
 
         try{
             cursor = db.rawQuery(getReviewsQuery, null)

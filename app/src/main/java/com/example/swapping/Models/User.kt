@@ -1,6 +1,8 @@
 package com.example.swapping.Models
 
+
 class User(
+    var ID: Int = 0,
     var username: String,
     var email: String,
     var name: String,
