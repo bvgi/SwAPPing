@@ -26,14 +26,14 @@
             android:orientation="vertical">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/emailLoginLayout"
+                android:id="@+id/usernameLoginLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
                 app:boxBackgroundColor="#F3F3F3">
 
                 <EditText
-                    android:id="@+id/loginEmail"
+                    android:id="@+id/loginUsername"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -41,7 +41,7 @@
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:hint="@string/promptEmail"
+                    android:hint="@string/promptUsername"
                     app:hintEnabled = "true"
                     android:textColor="#616161" />
             </com.google.android.material.textfield.TextInputLayout>

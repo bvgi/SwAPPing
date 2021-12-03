@@ -131,7 +131,7 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
         val cursor = db.rawQuery(getUserQuery, null)
 
-        var id = 0
+        var id = -1
         var name = ""
         var email = ""
         var city = ""

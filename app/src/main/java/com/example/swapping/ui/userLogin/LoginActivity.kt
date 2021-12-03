@@ -3,64 +3,50 @@ package com.example.swapping.ui.userLogin
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
-import androidx.lifecycle.ViewModelProvider
-import com.example.swapping.databinding.ActivityLoginBinding
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.example.swapping.DataBase.UserDataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.R
-import com.example.swapping.ui.home.HomeFragment
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
-import kotlin.math.sign
 
 class LoginActivity : AppCompatActivity() {
 
-    private val emailLiveData = MutableLiveData<String>()
+    private lateinit var LoginViewModel: LoginViewModel
+    private var UserDBHelper = UserDataBaseHelper(applicationContext)
+    //    private var binding: ActivityLoginBinding? = null
+    private lateinit var makeAccount: TextView
+
+    private val usernameLiveData = MutableLiveData<String>()
     private val passwordLiveData = MutableLiveData<String>()
     private val isValidLiveData = MediatorLiveData<Int>().apply {
         this.value = 1
 
-        addSource(emailLiveData) { email ->
+        addSource(usernameLiveData) { username ->
             val password = passwordLiveData.value
-            this.value = validateForm(email, password)
+            this.value = validateForm(username, password)
         }
 
         addSource(passwordLiveData) { password ->
-            val email = emailLiveData.value
-            this.value = validateForm(email, password)
+            val username = usernameLiveData.value
+            this.value = validateForm(username, password)
         }
     }
 
-    private fun validateForm(email: String?, password: String?): Int {
-        val isValidEmail = email != null && email.isNotBlank() && email.contains("@") && email.matches(Regex(".+\\..+"))
+    fun validateForm(username: String?, password: String?): Int {
+        val isValidUsername = username != null && username.isNotBlank() && UserDBHelper.getUser(username).ID > -1
         val isValidPassword = password != null && password.isNotBlank() && password.length >= 6
-        Log.d("Validate", isValidEmail.toString() + isValidPassword.toString())
-        return if (isValidEmail && isValidPassword) 0
-        else if (!isValidPassword && !isValidEmail) 1
-        else if (!isValidEmail) 2
+        Log.d("Validate", isValidUsername.toString() + isValidPassword.toString())
+        return if (isValidUsername && isValidPassword) 0
+        else if (!isValidPassword && !isValidUsername) 1
+        else if (!isValidUsername) 2
         else 3
     }
 
-    private lateinit var LoginViewModel: UserProfileViewModel
-//    private var binding: ActivityLoginBinding? = null
-    private lateinit var makeAccount: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,13 +54,13 @@ class LoginActivity : AppCompatActivity() {
 //        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_login)
 
-        val emailLayout = findViewById<TextInputLayout>(R.id.emailLoginLayout)
+        val usernameLayout = findViewById<TextInputLayout>(R.id.usernameLoginLayout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.passwordLoginLayout)
         val signInButton = findViewById<Button>(R.id.buttonLogin)
-        val textView = findViewById<TextView>(R.id.TextView)
 
-        emailLayout.editText?.doOnTextChanged { text, _, _, _ ->
-            emailLiveData.value = text?.toString()
+
+        usernameLayout.editText?.doOnTextChanged { text, _, _, _ ->
+            usernameLiveData.value = text?.toString()
         }
 
         passwordLayout.editText?.doOnTextChanged {text, _, _, _ ->
@@ -83,29 +69,14 @@ class LoginActivity : AppCompatActivity() {
 
         signInButton.setOnClickListener {
                 isValidLiveData.observe(this) { isValid ->
-                    Log.d("Valid", isValid.toString())
-                    when (isValid) {
-                        2 -> {
-                            passwordLayout.error = null
-                            emailLayout.error = "Niepoprawny adres e-mail"
+                    LoginViewModel.loginErrors(isValid, usernameLayout, passwordLayout)
+                    if(isValid == 0)
+                        signInButton.setOnClickListener {
+                            val userID = UserDBHelper.getUser(usernameLiveData.value.toString()).ID
+                            UserDBHelper.setLoggedIn(userID)
+                            val homeIntent = Intent(this, MainActivity::class.java)
+                            startActivity(homeIntent)
                         }
-                        3 -> {
-                            emailLayout.error = null
-                            passwordLayout.error = "Niepoprawne hasło"
-                        }
-                        1 -> {
-                            emailLayout.error = "Niepoprawny adres e-mail"
-                            passwordLayout.error = "Niepoprawne hasło"
-                        }
-                        else -> {
-                            emailLayout.error = null
-                            passwordLayout.error = null
-                            signInButton.setOnClickListener {
-                                val homeIntent = Intent(this, MainActivity::class.java)
-                                startActivity(homeIntent)
-                            }
-                        }
-                    }
                 }
         }
 
@@ -115,28 +86,8 @@ class LoginActivity : AppCompatActivity() {
             val registerIntent = Intent(this, RegisterActivity::class.java)
             startActivity(registerIntent)
         }
-
-
-
-
     }
 
-//    private fun makeRequest() {
-//        val queue = SingletonManager.queue
-//
-//        val url = "http://192.168.0.45:8000/Users"
-//
-//        val django = JsonObjectRequest(
-//            Request.Method.GET, url, null,
-//            { response ->
-//                Log.d("Response", response.toString())
-//            },
-//            { response ->
-//                Log.d("Error", response.toString())
-//            })
-//
-//        queue.add(django)
-//    }
 
 //    override fun onCreate(
 //            inflater: LayoutInflater,
@@ -144,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
 //            savedInstanceState: Bundle?
 //    ): View? {
 //        userProfileViewModel =
-//                ViewModelProvider(this).get(UserProfileViewModel::class.java)
+//                ViewModelProvider(this).get(RegisterViewModel::class.java)
 //
 //        _binding = ActivityLoginBinding.inflate(inflater, container, false)
 //        val root: View = binding.root

@@ -1,26 +1,25 @@
 package com.example.swapping.ui.userLogin
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.swapping.DataBase.UserDataBaseHelper
+import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.google.android.material.textfield.TextInputLayout
 
 class RegisterActivity : AppCompatActivity() {
 
+    private val userDBHelper = UserDataBaseHelper(applicationContext)
     private val emailLiveData = MutableLiveData<String>()
     private val passwordLiveData = MutableLiveData<String>()
-    private val nicknameLiveData = MutableLiveData<String>()
+    private val usernameLiveData = MutableLiveData<String>()
     private val birthDateLiveData = MutableLiveData<Boolean>()
     private val nameLiveData = MutableLiveData<String>()
     private val phoneNumberLiveData = MutableLiveData<String>()
@@ -31,49 +30,49 @@ class RegisterActivity : AppCompatActivity() {
             hashMapOf(
             "Email" to false,
             "Password" to false,
-            "Nickname" to false,
+            "Username" to false,
             "BirthDate" to false,
             "Permission" to false
         )
 
         addSource(emailLiveData) { email ->
             val password = passwordLiveData.value
-            val nickname = nicknameLiveData.value
+            val username = usernameLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, nickname, birthDate, permission)
+            this.value = validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(passwordLiveData) { password ->
             val email = emailLiveData.value
-            val nickname = nicknameLiveData.value
+            val username = usernameLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, nickname, birthDate, permission)
+            this.value = validateForm(email, password, username, birthDate, permission)
         }
 
-        addSource(nicknameLiveData) { nickname ->
+        addSource(usernameLiveData) { username ->
             val email = emailLiveData.value
             val password = passwordLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, nickname, birthDate, permission)
+            this.value = validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(birthDateLiveData) { birthDate ->
             val email = emailLiveData.value
-            val nickname = nicknameLiveData.value
+            val username = usernameLiveData.value
             val password = passwordLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, nickname, birthDate, permission)
+            this.value = validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(permissionLiveData) { permission ->
             val email = emailLiveData.value
-            val nickname = nicknameLiveData.value
+            val username = usernameLiveData.value
             val password = passwordLiveData.value
             val birthDate = birthDateLiveData.value
-            this.value = validateForm(email, password, nickname, birthDate, permission)
+            this.value = validateForm(email, password, username, birthDate, permission)
         }
 
     }
@@ -96,11 +95,11 @@ class RegisterActivity : AppCompatActivity() {
             "Permission" to isCheckedPermission,
             "Email" to isValidEmail,
             "Password" to isValidPassword,
-            "Nickname" to isValidNickName
+            "Username" to isValidNickName
         )
     }
 
-    private lateinit var RegisterViewModel: UserProfileViewModel
+    private lateinit var registerViewModel: RegisterViewModel
     //    private var binding: ActivityLoginBinding? = null
     private lateinit var makeAccount: TextView
 
@@ -109,14 +108,14 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
 
         val emailLayout = findViewById<TextInputLayout>(R.id.emailRegisterLayout)
-        val nicknameLayout = findViewById<TextInputLayout>(R.id.nicknameRegisterLayout)
+        val usernameLayout = findViewById<TextInputLayout>(R.id.usernameRegisterLayout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.passwordRegisterLayout)
         val signUpButton = findViewById<Button>(R.id.registerButton)
         val permissionCheck = findViewById<CheckBox>(R.id.permissionCheckBox)
         val dateOfBirthCheckBox = findViewById<CheckBox>(R.id.dateOfBirthCheckBox)
+        val phoneNumberLayout = findViewById<TextInputLayout>(R.id.phoneRegisterLayout)
+        val cityLayout = findViewById<TextInputLayout>(R.id.cityRegisterLayout)
         var permissionValue = false
-
-
 
         emailLayout.editText?.doOnTextChanged { text, _, _, _ ->
             emailLiveData.value = text?.toString()
@@ -126,8 +125,8 @@ class RegisterActivity : AppCompatActivity() {
             passwordLiveData.value = text?.toString()
         }
 
-        nicknameLayout.editText?.doOnTextChanged {text, _, _, _ ->
-            nicknameLiveData.value = text?.toString()
+        usernameLayout.editText?.doOnTextChanged {text, _, _, _ ->
+            usernameLiveData.value = text?.toString()
         }
 
         permissionCheck.setOnClickListener {
@@ -135,42 +134,31 @@ class RegisterActivity : AppCompatActivity() {
             permissionLiveData.value = permissionValue
         }
 
-//        permissionCheck.setOnCheckedChangeListener { _, isChecked ->
-//            permissionLiveData.value = isChecked
-//        }
-
         dateOfBirthCheckBox.setOnCheckedChangeListener { _, isChecked ->
             birthDateLiveData.value = isChecked
         }
 
+        phoneNumberLayout.editText?.doOnTextChanged{text, _, _, _ ->
+            phoneNumberLiveData.value = text.toString()
+        }
+
+        cityLayout.editText?.doOnTextChanged{text, _, _, _ ->
+            cityLiveData.value = text.toString()
+        }
+
+        val user = User(username = usernameLiveData.value.toString(),
+                        email = emailLiveData.value.toString(),
+                        name = nameLiveData.value.toString(),
+                        phone_number = phoneNumberLiveData.value.toString().toInt(),
+                        city = cityLiveData.value.toString()
+        )
+
         signUpButton.setOnClickListener {
             isValidLiveData.observe(this) { isValid ->
-                for((key,value) in isValid.entries) {
-                    when (key) {
-                        "BirthDate" -> {
-                            if (!value) dateOfBirthCheckBox.error = "Obowiązkowe pole"
-                            else dateOfBirthCheckBox.error = null
-                        }
-                        "Permission" -> {
-                            if (!value) permissionCheck.error = "Obowiązkowe pole"
-                            else permissionCheck.error = null
-                        }
-                        "Email" -> {
-                            if (!value) emailLayout.error = "Adres e-mail już istnieje lub jest niepoprawny"
-                            else emailLayout.error = null
-                        }
-                        "Password" -> {
-                            if (!value) passwordLayout.error = "Niepoprawne hasło"
-                            else passwordLayout.error = null
-                        }
-                        "Nickname" -> {
-                            if (!value) nicknameLayout.error = "Nazwa użytkownika już istnieje lub jest niepoprawna"
-                            else nicknameLayout.error = null
-                        }
-                    }
-                }
+                registerViewModel.registerErrors(isValid, dateOfBirthCheckBox, permissionCheck, emailLayout, passwordLayout, usernameLayout)
                 if (!isValid.containsValue(false)){
                     signUpButton.setOnClickListener {
+//                        userDBHelper.addUser(user, passwordLiveData.value.toString())
                         val loginIntent = Intent(this, LoginActivity::class.java)
                         startActivity(loginIntent)
                     }

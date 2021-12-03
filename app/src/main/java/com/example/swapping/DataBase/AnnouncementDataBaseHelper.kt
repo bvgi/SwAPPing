@@ -88,6 +88,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
         const val LIKED_TABLE = "Liked"
     }
 
+
     // ADDS
 
     private fun addVoivodeships() : Long {

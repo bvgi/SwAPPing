@@ -6,18 +6,17 @@
     <string name="title_new_announcement">New Announcement</string>
     <string name="title_profile">Profile</string>
     <string name="makeAccount">Utwórz konto</string>
-    <string name="promptEmail">Adres e-mail <font color='#FF0000'>*</font></string>
+    <string name="promptUsername">Nazwa użytkownika <font color='#FF0000'>*</font></string>
     <string name="promptPassword">Hasło <font color='#FF0000'>*</font></string>
     <string name="ButtonLogin">Zaloguj</string>
     <string name="ButtonRegister">Utwórz konto</string>
     <string name="firstName">Imię</string>
     <string name="phoneNumber">Numer telefonu</string>
-    <string name="nickname">Nazwa <font color='#FF0000'>*</font></string>
+    <string name="username">Nazwa użytkownika <font color='#FF0000'>*</font></string>
     <string name="registerError">Spróbuj ponownie</string>
-    <string name="dateOfBirth"><font color='#FF0000'>*</font>Mam ukończone 18 lat.</string>
+    <string name="dateOfBirth"><font color='#FF0000'>*</font> Mam ukończone 18 lat.</string>
     <string name="city">Miejsce zamieszkania </string>
     <string name="permission"><font color='#FF0000'>*</font> Wyrażam zgodę na przetwarzanie moich danych w celu korzystania z aplikacji „swAPPing”.</string>
-    <string name="promptParentEmail">Adres e-mail rodzica/opiekuna<font color='#FF0000'>*</font></string>
-    <string name="info">infotext</string>
     <string name="RegisterActivity">Rejestracja</string>
+    <string name="promptEmail">Adres e-mail <font color='#FF0000'>*</font></string>
 </resources>
