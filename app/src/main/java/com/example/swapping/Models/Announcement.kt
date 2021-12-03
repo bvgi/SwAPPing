@@ -1,5 +1,7 @@
 package com.example.swapping.Models
 
+import com.example.swapping.DataBase.UserDataBaseHelper
+
 
 class Announcement(
     var ID: Int = 0,

@@ -13,10 +13,11 @@ import com.example.swapping.DataBase.UserDataBaseHelper
 import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.google.android.material.textfield.TextInputLayout
+import org.w3c.dom.Text
 
 class RegisterActivity : AppCompatActivity() {
 
-    private val userDBHelper = UserDataBaseHelper(applicationContext)
+    private lateinit var userDBHelper: UserDataBaseHelper
     private val emailLiveData = MutableLiveData<String>()
     private val passwordLiveData = MutableLiveData<String>()
     private val usernameLiveData = MutableLiveData<String>()
@@ -106,6 +107,8 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+        userDBHelper = UserDataBaseHelper(applicationContext)
+        registerViewModel = RegisterViewModel()
 
         val emailLayout = findViewById<TextInputLayout>(R.id.emailRegisterLayout)
         val usernameLayout = findViewById<TextInputLayout>(R.id.usernameRegisterLayout)
@@ -146,24 +149,32 @@ class RegisterActivity : AppCompatActivity() {
             cityLiveData.value = text.toString()
         }
 
-        val user = User(username = usernameLiveData.value.toString(),
-                        email = emailLiveData.value.toString(),
-                        name = nameLiveData.value.toString(),
-                        phone_number = phoneNumberLiveData.value.toString().toInt(),
-                        city = cityLiveData.value.toString()
-        )
+
+        var fine = false
 
         signUpButton.setOnClickListener {
-            isValidLiveData.observe(this) { isValid ->
-                registerViewModel.registerErrors(isValid, dateOfBirthCheckBox, permissionCheck, emailLayout, passwordLayout, usernameLayout)
-                if (!isValid.containsValue(false)){
-                    signUpButton.setOnClickListener {
-//                        userDBHelper.addUser(user, passwordLiveData.value.toString())
-                        val loginIntent = Intent(this, LoginActivity::class.java)
-                        startActivity(loginIntent)
-                    }
+            if (!fine){
+                isValidLiveData.observe(this) { isValid ->
+                    registerViewModel.registerErrors(isValid, dateOfBirthCheckBox, permissionCheck, emailLayout, passwordLayout, usernameLayout)
+                    fine = !isValid.containsValue(false)
                 }
+            } else {
+                val username = findViewById<TextView>(R.id.usernameRegister)
+                val email = findViewById<TextView>(R.id.emailRegister)
+                val name = findViewById<TextView>(R.id.nameRegister)
+                val phoneNumber = findViewById<TextView>(R.id.phoneRegister)
+                val city = findViewById<TextView>(R.id.cityRegister)
 
+                val user = User(username = username.text.toString(),
+                    email = email.text.toString(),
+                    name = name.text.toString(),
+                    phone_number = phoneNumber.text.toString(),
+                    city = city.text.toString()
+                )
+                println("USER: $user")
+                userDBHelper.addUser(user, passwordLiveData.value.toString())
+                val loginIntent = Intent(this, LoginActivity::class.java)
+                startActivity(loginIntent)
             }
         }
 

@@ -17,7 +17,7 @@ import com.google.android.material.textfield.TextInputLayout
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var LoginViewModel: LoginViewModel
-    private var UserDBHelper = UserDataBaseHelper(applicationContext)
+    private lateinit var UserDBHelper: UserDataBaseHelper
     //    private var binding: ActivityLoginBinding? = null
     private lateinit var makeAccount: TextView
 
@@ -38,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun validateForm(username: String?, password: String?): Int {
-        val isValidUsername = username != null && username.isNotBlank() && UserDBHelper.getUser(username).ID > -1
+        val isValidUsername = username != null && username.isNotBlank() && UserDBHelper.getUserByUsername(username).ID > -1
         val isValidPassword = password != null && password.isNotBlank() && password.length >= 6
         Log.d("Validate", isValidUsername.toString() + isValidPassword.toString())
         return if (isValidUsername && isValidPassword) 0
@@ -53,7 +53,8 @@ class LoginActivity : AppCompatActivity() {
 //        LoginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 //        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_login)
-
+        LoginViewModel = LoginViewModel()
+        UserDBHelper = UserDataBaseHelper(applicationContext)
         val usernameLayout = findViewById<TextInputLayout>(R.id.usernameLoginLayout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.passwordLoginLayout)
         val signInButton = findViewById<Button>(R.id.buttonLogin)
@@ -72,7 +73,7 @@ class LoginActivity : AppCompatActivity() {
                     LoginViewModel.loginErrors(isValid, usernameLayout, passwordLayout)
                     if(isValid == 0)
                         signInButton.setOnClickListener {
-                            val userID = UserDBHelper.getUser(usernameLiveData.value.toString()).ID
+                            val userID = UserDBHelper.getUserByUsername(usernameLiveData.value.toString()).ID
                             UserDBHelper.setLoggedIn(userID)
                             val homeIntent = Intent(this, MainActivity::class.java)
                             startActivity(homeIntent)

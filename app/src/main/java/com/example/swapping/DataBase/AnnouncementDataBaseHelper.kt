@@ -16,49 +16,57 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
 
         val SQL_CREATE_ANNOUCEMENT = "CREATE TABLE $ANNOUNCEMENT_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "User INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), NOT NULL, " +
-                "Title VARCHAR(100), NOT NULL, " +
-                "Description VARCHAR(255), NOT NULL, " +
-                "Voivodeship INTEGER FOREIGN KEY(Voivodeship) REFERENCES $VOIVODESHIPS_TABLE(ID), NOT NULL, " +
+                "User INTEGER NOT NULL, " +
+                "Title VARCHAR(100) NOT NULL, " +
+                "Description VARCHAR(255) NOT NULL, " +
+                "Voivodeship INTEGER NOT NULL, " +
                 "City VARCHAR(50), " +
-                "Category INTEGER FOREIGN KEY(Category) REFERENCES $CATEGORIES_TABLE(ID), NOT NULL, " +
-                "Status INTEGER FOREIGN KEY(Status) REFERENCES $STATUS_TABLE(ID), NOT NULL, " +
-                "Genre INTEGER FOREIGN KEY(Genre) REFERENCES $GENRE_TABLE(ID), NOT NULL, " +
+                "Category INTEGER NOT NULL, " +
+                "Status INTEGER NOT NULL, " +
+                "Genre INTEGER NOT NULL, " +
                 "Year INTEGER, " +
-                "Negotiation INTEGER, NOT NULL, " +
+                "Negotiation INTEGER NOT NULL, " +
                 "Archived INTEGER NOT NULL, " +
-                "Purchaser_id INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
+                "Purchaser_id INTEGER, " +
                 "Image BLOB, " +
-                "Published_date INTEGER, NOT NULL)"
+                "Published_date INTEGER NOT NULL, " +
+                "FOREIGN KEY(Voivodeship) REFERENCES $VOIVODESHIPS_TABLE(ID), " +
+                "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
+                "FOREIGN KEY(Category) REFERENCES $CATEGORIES_TABLE(ID), " +
+                "FOREIGN KEY(Status) REFERENCES $STATUS_TABLE(ID)," +
+                "FOREIGN KEY(Genre) REFERENCES $GENRE_TABLE(ID), " +
+                "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_ANNOUCEMENT)
 
         val SQL_CREATE_VOIVODESHIPS = "CREATE TABLE $VOIVODESHIPS_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "Name VARCHAR(30), NOT NULL)"
+                "Name VARCHAR(30) NOT NULL)"
         db.execSQL(SQL_CREATE_VOIVODESHIPS)
         addVoivodeships()
 
         val SQL_CREATE_CATEGORIES = "CREATE TABLE $CATEGORIES_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "Name VARCHAR(255), NOT NULL)"
+                "Name VARCHAR(255) NOT NULL)"
         db.execSQL(SQL_CREATE_CATEGORIES)
         addCategories()
 
         val SQL_CREATE_STATUS = "CREATE TABLE $STATUS_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "Name VARCHAR(255), NOT NULL)"
+                "Name VARCHAR(255) NOT NULL)"
         db.execSQL(SQL_CREATE_STATUS)
         addStatuses()
 
         val SQL_CREATE_GENRE = "CREATE TABLE $GENRE_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "Name VARCHAR(50), NOT NULL)"
+                "Name VARCHAR(50) NOT NULL)"
         db.execSQL(SQL_CREATE_GENRE)
 
         val SQL_CREATE_LIKED = "CREATE TABLE $LIKED_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "Announcement INTEGER FOREIGN KEY(Announcement) REFERENCES $ANNOUNCEMENT_TABLE(ID), " +
-                "User INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID)"
+                "Announcement INTEGER, " +
+                "User INTEGER, " +
+                "FOREIGN KEY(Announcement) REFERENCES $ANNOUNCEMENT_TABLE(ID), " +
+                "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_LIKED)
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {

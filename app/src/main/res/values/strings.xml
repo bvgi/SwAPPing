@@ -19,4 +19,7 @@
     <string name="permission"><font color='#FF0000'>*</font> Wyrażam zgodę na przetwarzanie moich danych w celu korzystania z aplikacji „swAPPing”.</string>
     <string name="RegisterActivity">Rejestracja</string>
     <string name="promptEmail">Adres e-mail <font color='#FF0000'>*</font></string>
+    <string name="homeTitle">title</string>
+    <string name="homeUsername">username</string>
+    <string name="announcement_image">Announcement image</string>
 </resources>

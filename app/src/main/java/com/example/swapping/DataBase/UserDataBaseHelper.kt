@@ -29,7 +29,7 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
                 "Email VARCHAR(255) NOT NULL, " +
                 "Name VARCHAR(100) NOT NULL, " +
                 "City VARCHAR(50), " +
-                "Phone_number INTEGER NOT NULL, " +
+                "Phone_number VARCHAR(15) NOT NULL, " +
                 "Password VARCHAR(50) NOT NULL, " +
                 "Logged_in BOOLEAN NOT NULL, " +
                 "Mean_rate INTEGER)"
@@ -37,15 +37,19 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
 
         val SQL_CREATE_REVIEW = "CREATE TABLE $REVIEW_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "User INTEGER FOREIGN KEY(user) REFERENCES $USER_TABLE(ID), NOT NULL, " +
-                "Reviewer INTEGER FOREIGN KEY(User, REFERENCES $USER_TABLE(ID), " +
-                "Rate INTEGER, NOT NULL, " +
-                "Description VARCHAR(255))"
+                "User INTEGER NOT NULL, " +
+                "Reviewer INTEGER, " +
+                "Rate INTEGER NOT NULL, " +
+                "Description VARCHAR(255), " +
+                "FOREIGN KEY (User) REFERENCES $USER_TABLE (ID)," +
+                "FOREIGN KEY (Reviewer) REFERENCES $USER_TABLE (ID))"
         db.execSQL(SQL_CREATE_REVIEW)
 
         val SQL_CREATE_FOLLOWEDUSERS = "CREATE TABLE $FOLLOWEDUSERS_TABLE (" +
-                "User INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID) NOT NULL, " +
-                "Followed INTEGER FOREIGN KEY(User) REFERENCES $USER_TABLE(ID) NOT NULL"
+                "User INTEGER NOT NULL, " +
+                "Followed INTEGER NOT NULL, " +
+                "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
+                "FOREIGN KEY(Followed) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_FOLLOWEDUSERS)
 
     }
@@ -122,12 +126,12 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         return result
     }
 
-    fun getUser(username: String) : User {
+    fun getUserByUsername(username: String) : User {
         val db = this.readableDatabase
 
         val getUserQuery = "SELECT * " +
-                "FROM $USER_TABLE" +
-                "WHERE Username = $username"
+                "FROM $USER_TABLE " +
+                "WHERE Username = \'" + username + "\'"
 
         val cursor = db.rawQuery(getUserQuery, null)
 
@@ -135,7 +139,7 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
         var name = ""
         var email = ""
         var city = ""
-        var phone_number = 0
+        var phone_number = ""
         var mean_rate = 0.0
 
         if(cursor.moveToFirst()){
@@ -143,7 +147,45 @@ class UserDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_
             name = cursor.getString(cursor.getColumnIndex("Name"))
             email = cursor.getString(cursor.getColumnIndex("Email"))
             city = cursor.getString(cursor.getColumnIndex("City"))
-            phone_number = cursor.getInt(cursor.getColumnIndex("Phone_number"))
+            phone_number = cursor.getString(cursor.getColumnIndex("Phone_number"))
+            mean_rate = cursor.getDouble(cursor.getColumnIndex("Mean_rate"))
+        }
+
+        cursor.close()
+        db.close()
+
+        return User(
+            ID = id,
+            username = username,
+            email = email,
+            name = name,
+            city = city,
+            phone_number = phone_number,
+            mean_rate = mean_rate)
+    }
+
+    fun getUserById(id: Int) : User {
+        val db = this.readableDatabase
+
+        val getUserQuery = "SELECT * " +
+                "FROM $USER_TABLE" +
+                "WHERE ID = $id"
+
+        val cursor = db.rawQuery(getUserQuery, null)
+
+        var username = ""
+        var name = ""
+        var email = ""
+        var city = ""
+        var phone_number = ""
+        var mean_rate = 0.0
+
+        if(cursor.moveToFirst()){
+            username = cursor.getString(cursor.getColumnIndex("Username"))
+            name = cursor.getString(cursor.getColumnIndex("Name"))
+            email = cursor.getString(cursor.getColumnIndex("Email"))
+            city = cursor.getString(cursor.getColumnIndex("City"))
+            phone_number = cursor.getString(cursor.getColumnIndex("Phone_number"))
             mean_rate = cursor.getDouble(cursor.getColumnIndex("Mean_rate"))
         }
 
