@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.swapping.DataBase.UserDataBaseHelper
+import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.R
 import com.google.android.material.textfield.TextInputLayout
@@ -17,7 +17,7 @@ import com.google.android.material.textfield.TextInputLayout
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var LoginViewModel: LoginViewModel
-    private lateinit var UserDBHelper: UserDataBaseHelper
+    private lateinit var DBHelper: DataBaseHelper
     //    private var binding: ActivityLoginBinding? = null
     private lateinit var makeAccount: TextView
 
@@ -38,8 +38,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun validateForm(username: String?, password: String?): Int {
-        val isValidUsername = username != null && username.isNotBlank() && UserDBHelper.getUserByUsername(username).ID > -1
-        val isValidPassword = password != null && password.isNotBlank() && password.length >= 6
+        val isValidUsername = username != null && username.isNotBlank() && DBHelper.getUserByUsername(username).ID > -1
+        val isValidPassword = password != null && password.isNotBlank() && password.length >= 6 && DBHelper.getUserByUsername(username!!).password == password
         Log.d("Validate", isValidUsername.toString() + isValidPassword.toString())
         return if (isValidUsername && isValidPassword) 0
         else if (!isValidPassword && !isValidUsername) 1
@@ -54,7 +54,10 @@ class LoginActivity : AppCompatActivity() {
 //        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_login)
         LoginViewModel = LoginViewModel()
-        UserDBHelper = UserDataBaseHelper(applicationContext)
+        DBHelper = DataBaseHelper(applicationContext)
+        DBHelper.addCategories()
+        DBHelper.addVoivodeships()
+        DBHelper.addStatuses()
         val usernameLayout = findViewById<TextInputLayout>(R.id.usernameLoginLayout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.passwordLoginLayout)
         val signInButton = findViewById<Button>(R.id.buttonLogin)
@@ -68,17 +71,25 @@ class LoginActivity : AppCompatActivity() {
             passwordLiveData.value = text?.toString()
         }
 
+
+
+        // TODO: Dlaczego trzeba naciskać dwa razy?
         signInButton.setOnClickListener {
-                isValidLiveData.observe(this) { isValid ->
-                    LoginViewModel.loginErrors(isValid, usernameLayout, passwordLayout)
-                    if(isValid == 0)
-                        signInButton.setOnClickListener {
-                            val userID = UserDBHelper.getUserByUsername(usernameLiveData.value.toString()).ID
-                            UserDBHelper.setLoggedIn(userID)
-                            val homeIntent = Intent(this, MainActivity::class.java)
-                            startActivity(homeIntent)
-                        }
-                }
+            var fine = false
+            isValidLiveData.observe(this) { isValid ->
+                LoginViewModel.loginErrors(isValid, usernameLayout, passwordLayout)
+                if (isValid == 0)
+                    fine = true
+            }
+            if(fine) {
+                val userID = DBHelper.getUserByUsername(usernameLiveData.value.toString()).ID
+                DBHelper.setLoggedIn(userID)
+
+                val homeIntent = Intent(this, MainActivity::class.java)
+                homeIntent.putExtra("userid", userID)
+                startActivity(homeIntent)
+            }
+
         }
 
 

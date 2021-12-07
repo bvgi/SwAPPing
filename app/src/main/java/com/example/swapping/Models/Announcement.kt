@@ -1,7 +1,5 @@
 package com.example.swapping.Models
 
-import com.example.swapping.DataBase.UserDataBaseHelper
-
 
 class Announcement(
     var ID: Int = 0,
@@ -12,12 +10,13 @@ class Announcement(
     var city: String,
     var category: String,
     var status: String,
-    var genre: String,
-    var year: String,
     var negotiation: Int = 0,
     var archived: Int = 0,
-    var purchaser_id: Int,
+    var purchaser_id: Int = 0,
     var image: ByteArray,
     val published_date: Int
 ) {
+    override fun toString(): String {
+        return "ID: $ID, user: $user, title: $title, description: $description, voivode: $voivodeship, city: $city, category: $category, status: $status, negotiation: $negotiation, archived: $archived, purchaser: $purchaser_id, date: $published_date"
+    }
 }

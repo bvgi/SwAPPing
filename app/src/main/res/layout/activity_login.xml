@@ -37,13 +37,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:hint="@string/promptUsername"
                     android:importantForAutofill="no"
                     android:inputType="textEmailAddress"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:hint="@string/promptUsername"
-                    app:hintEnabled = "true"
-                    android:textColor="#616161" />
+                    android:textColor="#616161"
+                    app:hintEnabled="true"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout

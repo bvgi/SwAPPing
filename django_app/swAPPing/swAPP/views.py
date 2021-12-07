@@ -1,15 +1,29 @@
-from django.http import HttpResponse, JsonResponse
-from rest_framework.generics import ListAPIView
-from rest_framework.parsers import JSONParser
 from rest_framework import viewsets, generics, permissions
-from rest_framework.renderers import JSONRenderer
-from rest_framework.views import APIView
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 
+from .permissions import IsOwnerOrReadOnly
 from .serializer import *
+
 
 class AnnouncementViewSet(viewsets.ModelViewSet):
     queryset = Announcement.objects.all()
     serializer_class = AnnouncementSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class UserAnnouncements(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication, SessionAuthentication)
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return Announcement.objects.all().filter(user=self.request.user.id)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -33,4 +47,9 @@ class LikedViewSet(viewsets.ModelViewSet):
     queryset = Liked.objects.all()
     serializer_class = LikedSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 

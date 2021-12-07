@@ -87,8 +87,8 @@ class Announcement(models.Model):
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, null=False)
     year = models.IntegerField(null=True)
     negotiation = models.IntegerField(null=False)
-    archived = models.IntegerField(null=False)
-    purchaser_id = models.IntegerField(null=False)
+    archived = models.BooleanField(null=False, default=False)
+    purchaser_id = models.OneToOneField(User, on_delete=models.CASCADE, related_name='purchaser_id', null=True)
     image = models.ImageField(null=True)
     published_date = models.IntegerField(default=20210101, null=False)
 

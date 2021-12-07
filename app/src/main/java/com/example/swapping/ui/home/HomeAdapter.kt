@@ -1,6 +1,5 @@
 package com.example.swapping.ui.home
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.view.LayoutInflater
@@ -9,12 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.UserDataBaseHelper
+import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.Models.Announcement
 import com.example.swapping.R
-import com.example.swapping.ui.userLogin.LoginActivity
 
-class HomeAdapter (val dataset: Array<Announcement>, val context: Context) :
+class HomeAdapter (val dataset: Array<Announcement>) :
     RecyclerView.Adapter<HomeAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -35,7 +33,7 @@ class HomeAdapter (val dataset: Array<Announcement>, val context: Context) :
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
         // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
-            .inflate(R.layout.row_item, viewGroup, false)
+            .inflate(R.layout.announcement_item, viewGroup, false)
 
         return ViewHolder(view)
     }
@@ -45,7 +43,7 @@ class HomeAdapter (val dataset: Array<Announcement>, val context: Context) :
 
         // Get element from your dataset at this position and replace the
         // contents of the view with that element
-        val userDB = UserDataBaseHelper(context)
+        val userDB = DataBaseHelper(holder.itemView.context)
         val row = dataset[position]
         val bmp = BitmapFactory.decodeByteArray(row.image, 0, row.image.size)
         holder.image.setImageBitmap(Bitmap.createScaledBitmap(bmp, holder.image.width, holder.image.height, false))

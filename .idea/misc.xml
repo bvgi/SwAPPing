@@ -4,20 +4,29 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.2515625" />
+        <entry key="../../Android/Sdk/platforms/android-30/data/res/layout/simple_spinner_dropdown_item.xml" value="0.4125" />
         <entry key="app/src/main/res/drawable/ic_baseline_repeat_24.xml" value="0.15885416666666666" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.2526041666666667" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.42205128205128206" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.23645833333333333" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.29483695652173914" />
-        <entry key="app/src/main/res/layout/activity_register.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/activity_new_announcement.xml" value="0.26614583333333336" />
+        <entry key="app/src/main/res/layout/activity_register.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/announcement_item.xml" value="0.2006079027355623" />
+        <entry key="app/src/main/res/layout/bottom_nav_selection.xml" value="0.2776268115942029" />
         <entry key="app/src/main/res/layout/fragment_adding.xml" value="0.40942028985507245" />
         <entry key="app/src/main/res/layout/fragment_dashboard.xml" value="0.40942028985507245" />
-        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.23645833333333333" />
-        <entry key="app/src/main/res/layout/fragment_new_announcement.xml" value="0.23645833333333333" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/fragment_new_announcement.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_notifications.xml" value="0.40942028985507245" />
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.23645833333333333" />
         <entry key="app/src/main/res/layout/fragment_searching.xml" value="0.40942028985507245" />
+        <entry key="app/src/main/res/layout/list_item.xml" value="0.27355072463768115" />
+        <entry key="app/src/main/res/layout/row_item.xml" value="0.3052536231884058" />
+        <entry key="app/src/main/res/layout/styles.xml" value="0.3894927536231884" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.23645833333333333" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.4296875" />
+        <entry key="app/src/main/res/mipmap-anydpi-v26/no_photo.xml" value="0.22" />
       </map>
     </option>
   </component>

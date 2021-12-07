@@ -1,10 +1,10 @@
 <resources>
-    <string name="app_name">SwAPPing</string>
-    <string name="title_home">Home</string>
-    <string name="title_notifications">Notifications</string>
-    <string name="title_searching">Searching</string>
-    <string name="title_new_announcement">New Announcement</string>
-    <string name="title_profile">Profile</string>
+    <string name="app_name">swAPPing</string>
+    <string name="title_home">Ogłoszenia</string>
+    <string name="title_notifications">Powiadomienia</string>
+    <string name="title_searching">Przeglądaj</string>
+    <string name="title_new_announcement">Dodaj</string>
+    <string name="title_profile">Profil</string>
     <string name="makeAccount">Utwórz konto</string>
     <string name="promptUsername">Nazwa użytkownika <font color='#FF0000'>*</font></string>
     <string name="promptPassword">Hasło <font color='#FF0000'>*</font></string>
@@ -22,4 +22,13 @@
     <string name="homeTitle">title</string>
     <string name="homeUsername">username</string>
     <string name="announcement_image">Announcement image</string>
+    <string name="addTitle">Tytuł <font color='#FF0000'>*</font></string>
+    <string name="addPhoto">Dodaj zdjęcie</string>
+    <string name="addDescription">Opis <font color='#FF0000'>*</font></string>
+    <string name="addLocationCity">Miasto</string>
+    <string name="addLocationVoivodeship">Województwo <font color='#FF0000'>*</font></string>
+    <string name="addCategory">Kategoria</string>
+    <string name="radio_button">Radio Button</string>
+    <string name="addState">Stan zużycia</string>
+    <string name="addAnnouncementButton">Dodaj ogłoszenie</string>
 </resources>

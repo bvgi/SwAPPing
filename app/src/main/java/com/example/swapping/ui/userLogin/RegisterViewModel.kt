@@ -10,7 +10,7 @@ import com.example.swapping.MainActivity
 import com.google.android.material.textfield.TextInputLayout
 
 class RegisterViewModel : ViewModel() {
-    fun registerErrors(isValid: HashMap<String, Boolean>, birthCheckBox: CheckBox, permissionCheck: CheckBox, emailLayout: TextInputLayout, passwordLayout: TextInputLayout, usernameLayout: TextInputLayout) {
+    fun registerErrors(isValid: HashMap<String, Boolean>, birthCheckBox: CheckBox, permissionCheck: CheckBox, emailLayout: TextInputLayout, passwordLayout: TextInputLayout, usernameLayout: TextInputLayout) : Boolean {
         for((key,value) in isValid.entries) {
             when (key) {
                 "BirthDate" -> {
@@ -35,6 +35,7 @@ class RegisterViewModel : ViewModel() {
                 }
             }
         }
+        return !isValid.containsValue(false)
     }
 
     private val _text = MutableLiveData<String>().apply {
