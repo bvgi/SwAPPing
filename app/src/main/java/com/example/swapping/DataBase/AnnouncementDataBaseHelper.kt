@@ -367,7 +367,6 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
 
     fun getAnnouncement(id: Int) : Announcement{
         val db = this.readableDatabase
-        val announcement: Announcement
 
         val getAnnouncementQuery = "SELECT * " +
                 "FROM $ANNOUNCEMENT_TABLE" +
