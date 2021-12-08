@@ -17,6 +17,7 @@ import com.google.android.material.textfield.TextInputLayout
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var DBHelper: DataBaseHelper
+    private lateinit var registerViewModel: RegisterViewModel
 
     private lateinit var emailLayout: TextInputLayout
     private lateinit var usernameLayout: TextInputLayout
@@ -50,7 +51,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(passwordLiveData) { password ->
@@ -58,7 +59,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(usernameLiveData) { username ->
@@ -66,7 +67,7 @@ class RegisterActivity : AppCompatActivity() {
             val password = passwordLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(birthDateLiveData) { birthDate ->
@@ -74,7 +75,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val password = passwordLiveData.value
             val permission = permissionLiveData.value
-            this.value = validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
         }
 
         addSource(permissionLiveData) { permission ->
@@ -82,34 +83,11 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val password = passwordLiveData.value
             val birthDate = birthDateLiveData.value
-            this.value = validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
         }
 
     }
 
-    private fun validateForm(
-        email: String?,
-        password: String?,
-        name: String?,
-        birthDate: Boolean?,
-        permission: Boolean?
-    ): HashMap<String, Boolean>  {
-        val isValidEmail =
-            email != null && email.isNotBlank() && email.contains("@") && email.contains(".")
-        val isValidPassword = password != null && password.isNotBlank() && password.length >= 6
-        val isValidNickName = name != null && name.isNotBlank() && DBHelper.getUserByUsername(name).ID == -1
-        val isValidBirthDate = birthDate == true
-        val isCheckedPermission = permission == true
-        return hashMapOf(
-            "BirthDate" to isValidBirthDate,
-            "Permission" to isCheckedPermission,
-            "Email" to isValidEmail,
-            "Password" to isValidPassword,
-            "Username" to isValidNickName
-        )
-    }
-
-    private lateinit var registerViewModel: RegisterViewModel
     //    private var binding: ActivityLoginBinding? = null
     private lateinit var makeAccount: TextView
 
@@ -117,7 +95,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
         DBHelper = DataBaseHelper(applicationContext)
-        registerViewModel = RegisterViewModel()
+        registerViewModel = RegisterViewModel(DBHelper)
 
         emailLayout = findViewById(R.id.emailRegisterLayout)
         usernameLayout = findViewById(R.id.usernameRegisterLayout)

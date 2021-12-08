@@ -6,10 +6,11 @@ import android.widget.CheckBox
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.google.android.material.textfield.TextInputLayout
 
-class RegisterViewModel : ViewModel() {
+class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {
     fun registerErrors(isValid: HashMap<String, Boolean>, birthCheckBox: CheckBox, permissionCheck: CheckBox, emailLayout: TextInputLayout, passwordLayout: TextInputLayout, usernameLayout: TextInputLayout) : Boolean {
         for((key,value) in isValid.entries) {
             when (key) {
@@ -37,6 +38,50 @@ class RegisterViewModel : ViewModel() {
         }
         return !isValid.containsValue(false)
     }
+
+    fun validateForm(
+        email: String?,
+        password: String?,
+        username: String?,
+        birthDate: Boolean?,
+        permission: Boolean?
+    ): HashMap<String, Boolean>  {
+
+        val isValidEmail =
+            email != null && email.isNotBlank() && email.contains("@") && email.contains(".") && isEmailAvailable(email)
+        val isValidPassword = password != null && password.isNotBlank() && password.length >= 6
+        val isValidNickName = username != null && username.isNotBlank() && isUsernameAvailable(username)
+        val isValidBirthDate = birthDate == true
+        val isCheckedPermission = permission == true
+        return hashMapOf(
+            "BirthDate" to isValidBirthDate,
+            "Permission" to isCheckedPermission,
+            "Email" to isValidEmail,
+            "Password" to isValidPassword,
+            "Username" to isValidNickName
+        )
+    }
+
+    private fun isUsernameAvailable(username: String) : Boolean {
+        val usersList = DBHelper.getAllUsers()
+        var contains = false
+        for(data in usersList){
+            if (data.first == username)
+                contains = true
+        }
+        return !contains
+    }
+
+    private fun isEmailAvailable(email: String) : Boolean {
+        val usersList = DBHelper.getAllUsers()
+        var contains = false
+        for(data in usersList){
+            if (data.second == email)
+                contains = true
+        }
+        return !contains
+    }
+
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is home Fragment"

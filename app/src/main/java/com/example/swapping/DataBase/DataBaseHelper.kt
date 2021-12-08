@@ -171,7 +171,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun updateUser(newUser: User, password: String) : Int {
+    fun updateUser(newUser: User) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Username", newUser.username)
@@ -232,7 +232,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.readableDatabase
 
         val getUserQuery = "SELECT * " +
-                "FROM $USER_TABLE" +
+                "FROM $USER_TABLE " +
                 "WHERE ID = $id"
 
         val cursor = db.rawQuery(getUserQuery, null)
@@ -267,6 +267,31 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             phone_number = phone_number,
             mean_rate = mean_rate,
             password = password)
+    }
+
+    fun getAllUsers() : Array<Pair<String, String>>{
+        val db = this.readableDatabase
+        val users: MutableList<Pair<String, String>> = mutableListOf()
+
+        val getUserQuery = "SELECT * " +
+                "FROM $USER_TABLE"
+
+        val cursor = db.rawQuery(getUserQuery, null)
+
+        var username = ""
+        var email = ""
+
+        if(cursor.moveToFirst()){
+            username = cursor.getString(cursor.getColumnIndex("Username"))
+            email = cursor.getString(cursor.getColumnIndex("Email"))
+
+            users.add(Pair(username, email))
+        }
+
+        cursor.close()
+        db.close()
+
+        return users.toTypedArray()
     }
 
     // REVIEW FUNCTIONS
@@ -617,7 +642,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun updateAnnouncement(announcement: Announcement){
+    fun updateAnnouncement(announcement: Announcement) : Int{
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Title", announcement.title)
@@ -628,6 +653,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val result = db.update(USER_TABLE, values, "ID = ?", arrayOf(announcement.ID.toString()))
         db.close()
+
+        return result
     }
 
     fun getUserAnnouncements(userId: Int) : Array<Announcement> {
@@ -702,7 +729,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     fun getAnnouncement(id: Int) : Announcement {
         val db = this.readableDatabase
-        val announcement: Announcement
 
         val getAnnouncementQuery = "SELECT * " +
                 "FROM ${DataBaseHelper.ANNOUNCEMENT_TABLE}" +
@@ -784,7 +810,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getLiked(userId: Int) : Array<Announcement> {
         val db = this.readableDatabase
         val announcements = mutableListOf<Announcement>()
-        var cursor: Cursor? = null
+        var cursor: Cursor?
 
         val geLikedQuery = "SELECT * " +
                 "FROM ${DataBaseHelper.LIKED_TABLE}" +
