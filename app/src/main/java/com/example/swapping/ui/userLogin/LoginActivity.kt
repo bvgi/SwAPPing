@@ -71,9 +71,6 @@ class LoginActivity : AppCompatActivity() {
             passwordLiveData.value = text?.toString()
         }
 
-
-
-        // TODO: Dlaczego trzeba naciskać dwa razy?
         signInButton.setOnClickListener {
             var fine = false
             isValidLiveData.observe(this) { isValid ->

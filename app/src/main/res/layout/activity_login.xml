@@ -39,7 +39,7 @@
                     android:layout_marginTop="10dp"
                     android:hint="@string/promptUsername"
                     android:importantForAutofill="no"
-                    android:inputType="textEmailAddress"
+                    android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true"
                     android:textColor="#616161"

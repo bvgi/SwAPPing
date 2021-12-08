@@ -30,9 +30,13 @@ class NewAnnouncementFragment : Fragment() {
     ): View? {
         val arg = this.arguments
         val intent = Intent(activity, NewAnnouncementActivity::class.java)
-        intent.putExtra("userid", arg)
+        if (arg != null) {
+            intent.putExtra("userid", arg["userid"] as Int)
+        }
         startActivity(intent)
+
         val view: View = inflater.inflate(R.layout.fragment_new_announcement, container, false)
+
         return view
     }
 

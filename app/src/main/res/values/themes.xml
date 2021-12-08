@@ -6,11 +6,11 @@
         <item name="colorPrimaryVariant">@color/yellow_700</item>
         <item name="colorOnPrimary">@color/gray</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondary">@color/yellow_600</item>
         <item name="colorSecondaryVariant">@color/teal_700</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">@color/design_default_color_background</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/yellow_700</item>
 
         <!-- Customize your theme here. -->
     </style>
@@ -19,17 +19,17 @@
 
     </style>
 
-    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/white</item>
-        <item name="actionBarStyle">@style/MyActionBar</item>
-    </style>
+<!--    <style name="AppBaseTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">-->
+<!--        <item name="colorPrimary">@color/white</item>-->
+<!--        <item name="actionBarStyle">@style/MyActionBar</item>-->
+<!--    </style>-->
 
-    <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
-        <item name="titleTextStyle">@style/MyTitleTextStyle</item>
-    </style>
+<!--    <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">-->
+<!--        <item name="titleTextStyle">@style/MyTitleTextStyle</item>-->
+<!--    </style>-->
 
-    <style name="MyTitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/yellow_700</item>
-        <item name="fontFamily">@font/alegreya_sans_sc_extrabold</item>
-    </style>
+<!--    <style name="MyTitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">-->
+<!--        <item name="android:textColor">@color/yellow_700</item>-->
+<!--        <item name="fontFamily">@font/alegreya_sans_sc_bold.ttf</item>-->
+<!--    </style>-->
 </resources>

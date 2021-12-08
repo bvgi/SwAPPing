@@ -31,4 +31,6 @@
     <string name="radio_button">Radio Button</string>
     <string name="addState">Stan zużycia</string>
     <string name="addAnnouncementButton">Dodaj ogłoszenie</string>
+    <string name="saveData">zapisz</string>
+    <string name="currentEmail">email</string>
 </resources>
