@@ -366,7 +366,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("User", userId)
-        values.put("Reviewer", followerId)
+        values.put("Followed", followerId)
 
         val result = db.insert(FOLLOWEDUSERS_TABLE, null, values)
 
@@ -378,20 +378,20 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun deleteFollower(userId: Int, followerId: Int) : Int {
         val db = this.writableDatabase
 
-        val result = db.delete(FOLLOWEDUSERS_TABLE, "user = ? and followed = ?", arrayOf(userId.toString(), followerId.toString()))
+        val result = db.delete(FOLLOWEDUSERS_TABLE, "User = ? and Followed = ?", arrayOf(userId.toString(), followerId.toString()))
 
         db.close()
 
         return result
     }
 
-    fun getFollowers(userId: String) : Array<String>{
+    fun getFollowers(userId: Int) : Array<String>{
         val db = this.readableDatabase
         val followers = mutableListOf<String>()
         val cursor: Cursor?
 
-        val getReviewsQuery = "SELECT F.Username AS Follower" +
-                "FROM $FOLLOWEDUSERS_TABLE" +
+        val getReviewsQuery = "SELECT F.Username AS Follower " +
+                "FROM $FOLLOWEDUSERS_TABLE " +
                 "JOIN $USER_TABLE F ON Followed = F.ID " +
                 "WHERE User = $userId"
 
@@ -418,13 +418,13 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return followers.toTypedArray()
     }
 
-    fun getFollowed(userId: String) : Array<String>{
+    fun getFollowed(userId: Int) : Array<String>{
         val db = this.readableDatabase
         val followed = mutableListOf<String>()
         val cursor: Cursor?
 
-        val getReviewsQuery = "SELECT U.Username AS Followed" +
-                "FROM $FOLLOWEDUSERS_TABLE" +
+        val getReviewsQuery = "SELECT U.Username AS Followed " +
+                "FROM $FOLLOWEDUSERS_TABLE " +
                 "JOIN $USER_TABLE U ON User = U.ID " +
                 "WHERE Followed = $userId"
 

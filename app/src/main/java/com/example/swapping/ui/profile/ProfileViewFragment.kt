@@ -29,7 +29,7 @@ import com.google.android.material.snackbar.Snackbar
 import org.w3c.dom.Text
 import kotlin.math.round
 
-// TODO: Dodawanie i usuwanie ocen
+// TODO: Dodawanie i usuwanie ocen, przegląd followersów, napis na action bar
 
 class ProfileViewFragment : Fragment() {
 
@@ -50,6 +50,8 @@ class ProfileViewFragment : Fragment() {
     private lateinit var meanRate: TextView
     private lateinit var alert: TextView
     private lateinit var reviewsContent: LinearLayout
+    private lateinit var followers: TextView
+    private lateinit var following: TextView
 
     private lateinit var reviews: Array<Review>
     private lateinit var reviewsRecycler: RecyclerView
@@ -137,6 +139,15 @@ class ProfileViewFragment : Fragment() {
             profileAds.visibility = View.GONE
         }
 
+        if(profileViewViewModel.isFollower(userID, profileID, root.context)){
+            observeButton.text = "Przestań obserwować"
+//                observeButton.setBackgroundColor(Color.GRAY)
+        }
+        else{
+            observeButton.text = resources.getString(R.string.follow)
+//                observeButton.setBackgroundColor(ContextCompat.getColor(view.context, R.color.light_green))
+        }
+
 
         if(profileViewViewModel.isReviewer(userID, profileID, root.context))
             addOpinionLayout.visibility = View.GONE
@@ -158,8 +169,6 @@ class ProfileViewFragment : Fragment() {
 
         val userData = dbHelper.getUserById(profileID)
 
-        println("PF: ${userData.toString()}")
-
         username = view.findViewById(R.id.profileUsername)
         username.text = userData.username
 
@@ -169,16 +178,31 @@ class ProfileViewFragment : Fragment() {
         phoneNumber = view.findViewById(R.id.profilePhoneNumber)
         phoneNumber.text = phoneNumber.text.toString() + userData.phone_number
 
+        followers = view.findViewById(R.id.followersNumber)
+        following = view.findViewById(R.id.followingNumber)
+
+        followers.text = dbHelper.getFollowers(profileID).size.toString()
+        followers.setOnClickListener {  }
+        following.text = dbHelper.getFollowed(profileID).size.toString()
+
         observeButton.setOnClickListener {
-            if(observeButton.text == resources.getString(R.string.follow)){
+            if(!profileViewViewModel.isFollower(userID, profileID, view.context)){
+                dbHelper.addFollower(profileID, userID)
                 observeButton.text = "Przestań obserwować"
+                followers.text = dbHelper.getFollowers(profileID).size.toString()
+
 //                observeButton.setBackgroundColor(Color.GRAY)
             }
             else{
+                dbHelper.deleteFollower(profileID, userID)
                 observeButton.text = resources.getString(R.string.follow)
+                followers.text = dbHelper.getFollowers(profileID).size.toString()
 //                observeButton.setBackgroundColor(ContextCompat.getColor(view.context, R.color.light_green))
             }
         }
+
+
+
 
 
         val star1 = view.findViewById<ImageView>(R.id.star1)

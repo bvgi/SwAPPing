@@ -1,6 +1,7 @@
 package com.example.swapping.ui.profile
 
 import android.content.Context
+import android.provider.ContactsContract
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -52,5 +53,12 @@ class ProfileViewViewModel : ViewModel() {
         val dbHelper = DataBaseHelper(context)
 
         return dbHelper.getUserReviews(userID)
+    }
+
+    fun isFollower(userID: Int, profileID: Int, context: Context) : Boolean {
+        val dbHelper = DataBaseHelper(context)
+        val followers = dbHelper.getFollowers(profileID)
+        val username = dbHelper.getUserById(userID).username
+        return followers.contains(username)
     }
 }
