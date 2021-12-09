@@ -33,4 +33,23 @@
     <string name="addAnnouncementButton">Dodaj ogłoszenie</string>
     <string name="saveData">zapisz</string>
     <string name="currentEmail">email</string>
+    <string name="follow">Zaobserwuj</string>
+    <string name="followersNumber">0</string>
+    <string name="followers">Obserwujący</string>
+    <string name="followingNumber">0</string>
+    <string name="following">Obserwowani</string>
+    <string name="contactTitle">Kontakt:</string>
+    <string name="emailTitle">Adres e-mail: \t</string>
+    <string name="phoneNumberTitle">Tel.: \t</string>
+    <string name="reviewsTitle">Oceny: \t</string>
+    <string name="meanRateTitle">Średnia ocena: </string>
+    <string name="adsTitle">Ogłoszenia</string>
+    <string name="reviewerName">Username</string>
+    <string name="rate">0/5</string>
+    <string name="addReview">Dodaj opinię: \t</string>
+    <string name="swapping">SWAPPING</string>
+    <string name="addReviewDescription">Dodaj opis...</string>
+    <string name="add">Dodaj</string>
+    <string name="chooseRateAlert">Wybierz ocenę!</string>
+    <string name="opinion">Opinia...</string>
 </resources>

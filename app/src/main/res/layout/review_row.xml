@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/reviewerName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/reviewerName"
+            android:gravity="center_vertical"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingStart="15dp"
+            android:textColor="@color/black"
+            android:layout_gravity="center"
+            tools:ignore="RtlSymmetry" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="end|center_horizontal"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/black"
+            android:gravity="end"
+            tools:ignore="RtlSymmetry" >
+
+            <ImageView
+                android:id="@+id/reviewStar1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_round_star_outline_24" />
+            <ImageView
+                android:id="@+id/reviewStar2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_round_star_outline_24"/>
+            <ImageView
+                android:id="@+id/reviewStar3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_round_star_outline_24"/>
+            <ImageView
+                android:id="@+id/reviewStar4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_round_star_outline_24"/>
+            <ImageView
+                android:id="@+id/reviewStar5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleX="0.8"
+                android:scaleY="0.8"
+                android:src="@drawable/ic_round_star_outline_24"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_margin="10dp"
+        android:id="@+id/rateDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="10dp"
+        android:text="@string/opinion"
+        android:background="@color/gray"/>
+
+    <ImageButton
+        android:id="@+id/deleteReview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@android:color/transparent"
+        android:padding="10dp"
+        android:scaleX="0.8"
+        android:scaleY="0.8"
+        android:src="@drawable/ic_baseline_delete_24" />
+</LinearLayout>

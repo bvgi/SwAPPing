@@ -329,7 +329,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val getReviewsQuery = "SELECT User, Reviewer, Rate, Description " +
                 "FROM $REVIEW_TABLE " +
-                "WHERE User = $userId"
+                "WHERE User = $userId " +
+                "ORDER BY ID DESC "
 
         try{
             cursor = db.rawQuery(getReviewsQuery, null)
