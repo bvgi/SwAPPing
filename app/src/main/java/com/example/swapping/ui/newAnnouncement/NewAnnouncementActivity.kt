@@ -20,11 +20,16 @@ import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Announcement
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentNewAnnouncementBinding
+import com.example.swapping.ui.profile.ProfileFragmentDirections
+import com.example.swapping.ui.profile.ProfileViewFragmentArgs
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import java.io.ByteArrayOutputStream
@@ -37,6 +42,8 @@ class NewAnnouncementActivity : AppCompatActivity() {
     val REQUEST_CAMERA = 1
     private lateinit var imageView: ImageView
     private var userID: Int = 0
+
+    val arg: NewAnnouncementActivityArgs by navArgs()
 
     private val titleLiveData = MutableLiveData<String>()
     private val descriptionLiveData = MutableLiveData<String>()
@@ -58,7 +65,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val voivodeship = voivodeshipLiveData.value
             val category = categoryLiveData.value
             val status = statusLiveData.value
-            this.value = validateForm(title, description, voivodeship, category, status)
+            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(descriptionLiveData) { description ->
@@ -66,7 +73,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val voivodeship = voivodeshipLiveData.value
             val category = categoryLiveData.value
             val status = statusLiveData.value
-            this.value = validateForm(title, description, voivodeship, category, status)
+            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(voivodeshipLiveData) { voivodeship ->
@@ -74,7 +81,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val description = descriptionLiveData.value
             val category = categoryLiveData.value
             val status = statusLiveData.value
-            this.value = validateForm(title, description, voivodeship, category, status)
+            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(categoryLiveData) { category ->
@@ -82,7 +89,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val description = descriptionLiveData.value
             val voivodeship = voivodeshipLiveData.value
             val status = statusLiveData.value
-            this.value = validateForm(title, description, voivodeship, category, status)
+            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(statusLiveData) { status ->
@@ -90,30 +97,9 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val description = descriptionLiveData.value
             val voivodeship = voivodeshipLiveData.value
             val category = categoryLiveData.value
-            this.value = validateForm(title, description, voivodeship, category, status)
+            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
-    }
-
-    private fun validateForm(
-        title: String?,
-        description: String?,
-        voivodeship: String?,
-        category: String?,
-        status: String?
-    ): HashMap<String, Boolean>  {
-        val isValidTitle = title != null && title.isNotBlank()
-        val isValidDescription = description != null && description.isNotBlank() && description.length <= 255
-        val isValidVoivodeship = voivodeship != null && voivodeship.isNotBlank()
-        val isValidCategory = category != null && category.isNotBlank()
-        val isValidStatus = status != null && status.isNotBlank()
-        return hashMapOf(
-            "Title" to isValidTitle,
-            "Description" to isValidDescription,
-            "Voivodeship" to isValidVoivodeship,
-            "Category" to isValidCategory,
-            "Status" to isValidStatus
-        )
     }
 
     private val binding get() = _binding!!
@@ -122,6 +108,9 @@ class NewAnnouncementActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_announcement)
+
+        newAnnouncementViewModel =
+            ViewModelProvider(this).get(NewAnnouncementViewModel::class.java)
 
         val DBHelper = DataBaseHelper(applicationContext)
 
@@ -150,15 +139,14 @@ class NewAnnouncementActivity : AppCompatActivity() {
         val addAnnouncement = findViewById<Button>(R.id.addAnnouncementButton)
 
         imageView = findViewById(R.id.addedPhoto)
-        val extras: Bundle = intent.extras!!
-        userID = extras.getInt("userid")
+        userID = arg.userID
         println("AGRS $userID")
 
         var image = byteArrayOf()
 
         addImage.setOnClickListener {
             cameraRequest()
-            startCamera()
+
             image = getByteArray(imageView)
         }
 
@@ -193,58 +181,56 @@ class NewAnnouncementActivity : AppCompatActivity() {
             statusLiveData.value = radioStatusGroup.findViewById<RadioButton>(checkedId).text.toString()
         }
 
-            addAnnouncement.setOnClickListener {
-                var fine = false
-                voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
-                isValidLiveData.observe(this) { isValid ->
-                    fine = newAnnouncementViewModel.registerErrors(
-                        isValid,
-                        titleLayout,
-                        descriptionLayout,
-                        voivodeshipLayout,
-                        categoryLayout,
-                        statusLayout
-                    )
-                    println(" ${titleLiveData.value},  ${descriptionLiveData.value}, ${voivodeshipLiveData.value}, ${categoryLiveData.value}, ${statusLiveData.value}")
-                }
-                if (fine) {
-                    val ann = Announcement(
-                        user = userID,
-                        title = title.text.toString(),
-                        description = description.text.toString(),
-                        voivodeship = dropdownVoivodeship.selectedItem.toString(),
-                        category = radioCategoryGroup.findViewById<RadioButton>(
-                            radioCategoryGroup.checkedRadioButtonId
-                        ).text.toString(),
-                        city = city.text.toString(),
-                        status = radioStatusGroup.findViewById<RadioButton>(radioStatusGroup.checkedRadioButtonId).text.toString(),
-                        image = image,
-                        published_date = LocalDate.now().year * 10000 + LocalDate.now().monthValue * 100 + LocalDate.now().dayOfMonth,
-                        negotiation = 0,
-                        archived = 0
-                    )
-                    DBHelper.addAnnouncement(ann)
-
-                    println(ann)
-
-                    Snackbar.make(
-                        findViewById(R.id.myCoordinatorLayout),
-                        "Ogłoszenie zostało dodane",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-
-                    val homeIntent = Intent(this, MainActivity::class.java)
-                    homeIntent.putExtra("userid", userID)
-                    startActivity(homeIntent)
-
-                }
+        addAnnouncement.setOnClickListener {
+            var fine = false
+            voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
+            isValidLiveData.observe(this) { isValid ->
+                fine = newAnnouncementViewModel.registerErrors(
+                    isValid,
+                    titleLayout,
+                    descriptionLayout,
+                    voivodeshipLayout,
+                    categoryLayout,
+                    statusLayout
+                )
+                println(" ${titleLiveData.value},  ${descriptionLiveData.value}, ${voivodeshipLiveData.value}, ${categoryLiveData.value}, ${statusLiveData.value}")
             }
+            if (fine) {
+                val ann = Announcement(
+                    user = userID,
+                    title = title.text.toString(),
+                    description = description.text.toString(),
+                    voivodeship = dropdownVoivodeship.selectedItem.toString(),
+                    category = radioCategoryGroup.findViewById<RadioButton>(
+                        radioCategoryGroup.checkedRadioButtonId
+                    ).text.toString(),
+                    city = city.text.toString(),
+                    status = radioStatusGroup.findViewById<RadioButton>(radioStatusGroup.checkedRadioButtonId).text.toString(),
+                    image = image,
+                    published_date = LocalDate.now().year * 10000 + LocalDate.now().monthValue * 100 + LocalDate.now().dayOfMonth,
+                    negotiation = 0,
+                    archived = 0
+                )
+                DBHelper.addAnnouncement(ann)
+
+                println(ann)
+
+                Snackbar.make(
+                    findViewById(R.id.myCoordinatorLayout),
+                    "Ogłoszenie zostało dodane",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+
+
+                val homeIntent = Intent(this, MainActivity::class.java)
+                homeIntent.putExtra("userid", userID)
+                startActivity(homeIntent)
+
+            }
+        }
 
 
 
-
-        newAnnouncementViewModel =
-            ViewModelProvider(this).get(NewAnnouncementViewModel::class.java)
 
 //        _binding = FragmentNewAnnouncementBinding.inflate(inflater, container, false)
 //        binding.root.context
@@ -278,17 +264,12 @@ class NewAnnouncementActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA
             )
         }
+        else
+            startCamera()
+
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE && data != null){
-            imageView.setImageBitmap(data.extras?.get("data") as Bitmap)
-            imageView.visibility = View.VISIBLE
-        }
-    }
-
-    private fun getByteArray(imageView: ImageView): ByteArray {
+    fun getByteArray(imageView: ImageView): ByteArray {
         return try {
             val bitmap = (imageView.drawable as BitmapDrawable).bitmap
             val stream = ByteArrayOutputStream()
@@ -301,6 +282,33 @@ class NewAnnouncementActivity : AppCompatActivity() {
             byteArrayOf(1)
         }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE && data != null){
+            imageView.setImageBitmap(data.extras?.get("data") as Bitmap)
+            imageView.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if(requestCode == REQUEST_CAMERA){
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                startCamera()
+            }
+            else
+            {
+                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
 
     override fun getParentActivityIntent(): Intent? {
         return super.getParentActivityIntent()?.putExtra("userid", userID)

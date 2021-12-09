@@ -6,11 +6,17 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.User
@@ -19,10 +25,13 @@ import com.example.swapping.databinding.FragmentProfileBinding
 import com.google.android.material.textfield.TextInputLayout
 
 class EditProfileActivity : AppCompatActivity() {
+
     private lateinit var editProfileViewModel: EditProfileViewModel
     private var _binding: FragmentProfileBinding? = null
+
     private var userID: Int = 0
     private lateinit var userData: User
+    private lateinit var DBHelper: DataBaseHelper
 
     private lateinit var emailLayout: TextInputLayout
     private lateinit var usernameLayout: TextInputLayout
@@ -37,16 +46,20 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var phoneNumber: EditText
     private lateinit var city: EditText
 
-    lateinit var saveDataItem: MenuItem
+    private val args: EditProfileActivityArgs by navArgs()
+
+    private lateinit var saveDataItem: MenuItem
 
     private val binding get() = _binding!!
+
+    private lateinit var navCon: NavController
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
 
-        val DBHelper = DataBaseHelper(applicationContext)
+        DBHelper = DataBaseHelper(applicationContext)
 
         emailLayout = findViewById(R.id.emailEditLayout)
         usernameLayout = findViewById(R.id.usernameEditLayout)
@@ -54,9 +67,7 @@ class EditProfileActivity : AppCompatActivity() {
         phoneNumberLayout = findViewById(R.id.phoneEditLayout)
         cityLayout = findViewById(R.id.cityEditLayout)
 
-        val extras: Bundle = intent.extras!!
-        userID = extras.getInt("userid")
-        println("AGRS $userID")
+        userID = args.userID
 
         userData = getUserData()
 
@@ -79,14 +90,7 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun getUserData() : User {
-        val dbHelper = DataBaseHelper(applicationContext)
-        return dbHelper.getUserById(userID)
-    }
-
-    private fun updateDataBase(user: User){
-        val dbHelper = DataBaseHelper(applicationContext)
-        dbHelper.updateUser(user)
-        println(getUserData())
+        return DBHelper.getUserById(userID)
     }
 
     override fun getParentActivityIntent(): Intent? {
@@ -95,9 +99,8 @@ class EditProfileActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_save, menu)
-        if (menu != null) {
+        if (menu != null)
             saveDataItem = menu.findItem(R.id.menu_saveData)
-        }
         return true
     }
 
@@ -107,7 +110,7 @@ class EditProfileActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.menu_saveData -> {
-                var user: User
+                val user: User
                 if(password.text.isNullOrBlank())
                     user = User(
                         ID = userID,
@@ -128,10 +131,13 @@ class EditProfileActivity : AppCompatActivity() {
                         city = city.text.toString(),
                         phone_number = phoneNumber.text.toString()
                     )
-                updateDataBase(user)
+                DBHelper.updateUser(user)
+
+//                val index = bundleOf("userID" to userID)
+//                navCon.navigate(R.id.navigation_profile, index)
                 val intent = Intent(this, MainActivity::class.java)
                 intent.putExtra("userid", userID)
-                setResult(2, intent) // TODO: powrót do fragmentu z profilem
+//                setResult(2, intent) // TODO: powrót do fragmentu z profilem
                 startActivity(intent)
                 return true
             }

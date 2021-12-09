@@ -1,7 +1,6 @@
 
 package com.example.swapping
 
-import android.R.attr
 import android.content.Intent
 import android.os.Bundle
 import android.widget.TextView
@@ -14,9 +13,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.databinding.ActivityMainBinding
-import android.R.attr.data
-
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -36,19 +32,29 @@ class MainActivity : AppCompatActivity() {
             userID = extras.getInt("userid")
 
         navView = binding.navView
+
         if(savedInstanceState == null)
             navView.selectedItemId = R.id.navigation_home
+
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
 
         val appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.navigation_home, R.id.navigation_search, R.id.navigation_new_announcement, R.id.navigation_notifications, R.id.navigation_profile))
+                R.id.navigation_home, R.id.navigation_search, R.id.navigation_new_announcement, R.id.navigation_notifications, R.id.navigation_profile, R.id.navigation_profile_view))
+
 
         navController.graph.findNode(R.id.navigation_new_announcement)
-            ?.addArgument("userid", NavArgument.Builder().setDefaultValue(userID).build())
+            ?.addArgument("userID", NavArgument.Builder().setDefaultValue(userID).build())
         navController.graph.findNode(R.id.navigation_profile)
-            ?.addArgument("userid", NavArgument.Builder().setDefaultValue(userID).build())
+            ?.addArgument("userID", NavArgument.Builder().setDefaultValue(userID).build())
+        navController.graph.findNode(R.id.navigation_home)
+            ?.addArgument("userID", NavArgument.Builder().setDefaultValue(userID).build())
+        navController.graph.findNode(R.id.navigation_search)
+            ?.addArgument("userID", NavArgument.Builder().setDefaultValue(userID).build())
+        navController.graph.findNode(R.id.navigation_notifications)
+            ?.addArgument("userID", NavArgument.Builder().setDefaultValue(userID).build())
 
         setupActionBarWithNavController(navController, appBarConfiguration)
+
         navView.setupWithNavController(navController)
 
     }

@@ -11,12 +11,13 @@ import androidx.fragment.app.Fragment
 import com.example.swapping.R
 
 import android.content.Intent
+import androidx.navigation.fragment.navArgs
+import com.example.swapping.ui.profile.ProfileViewFragmentArgs
 
 
 class NewAnnouncementFragment : Fragment() {
 
-
-
+    val arg: NewAnnouncementFragmentArgs by navArgs()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -28,11 +29,8 @@ class NewAnnouncementFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val arg = this.arguments
         val intent = Intent(activity, NewAnnouncementActivity::class.java)
-        if (arg != null) {
-            intent.putExtra("userid", arg["userid"] as Int)
-        }
+        intent.putExtra("userid", arg.userID)
         startActivity(intent)
 
         val view: View = inflater.inflate(R.layout.fragment_new_announcement, container, false)

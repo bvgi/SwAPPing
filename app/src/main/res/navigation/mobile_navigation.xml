@@ -9,30 +9,174 @@
         android:id="@+id/navigation_profile"
         android:name="com.example.swapping.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_profile_to_profileViewFragment"
+            app:destination="@id/navigation_profile_view" >
+            <argument
+                android:name="userID"
+                app:argType="integer"
+                android:defaultValue="0" />
+        </action>
+        <action
+            android:id="@+id/action_navigation_profile_to_navigation_new_announcement"
+            app:destination="@id/navigation_new_announcement" />
+        <action
+            android:id="@+id/action_navigation_profile_to_navigation_notifications"
+            app:destination="@id/navigation_notifications" />
+        <action
+            android:id="@+id/action_navigation_profile_to_navigation_search"
+            app:destination="@id/navigation_search" />
+        <action
+            android:id="@+id/action_navigation_profile_to_navigation_home"
+            app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_profile_to_editProfileActivity"
+            app:destination="@id/navigation_edit_profile_activity" />
+        <action
+            android:id="@+id/action_navigation_profile_to_loginActivity"
+            app:destination="@id/navigation_login_activity" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.swapping.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_new_announcement"
+            app:destination="@id/navigation_new_announcement" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_search"
+            app:destination="@id/navigation_search" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_notifications"
+            app:destination="@id/navigation_notifications" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_new_announcement"
         android:name="com.example.swapping.ui.newAnnouncement.NewAnnouncementFragment"
         android:label="@string/title_new_announcement"
-        tools:layout="@layout/fragment_new_announcement" />
+        tools:layout="@layout/fragment_new_announcement" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_new_announcement_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_navigation_new_announcement_to_navigation_notifications2"
+            app:destination="@id/navigation_notifications" />
+        <action
+            android:id="@+id/action_navigation_new_announcement_to_navigation_search2"
+            app:destination="@id/navigation_search" />
+        <action
+            android:id="@+id/action_navigation_new_announcement_to_navigation_home2"
+            app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_new_announcement_to_newAnnouncementActivity"
+            app:destination="@id/new_announcement_activity" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.swapping.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        tools:layout="@layout/fragment_notifications" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_new_announcement"
+            app:destination="@id/navigation_new_announcement" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_search"
+            app:destination="@id/navigation_search" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_navigation_home"
+            app:destination="@id/navigation_home" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_search"
         android:name="com.example.swapping.ui.searching.SearchingFragment"
         android:label="@string/title_searching"
-        tools:layout="@layout/fragment_searching" />
+        tools:layout="@layout/fragment_searching" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_new_announcement"
+            app:destination="@id/navigation_new_announcement" />
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_notifications"
+            app:destination="@id/navigation_notifications" />
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_home"
+            app:destination="@id/navigation_home" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_profile_view"
+        android:name="com.example.swapping.ui.profile.ProfileViewFragment"
+        android:label="fragment_profile_view"
+        tools:layout="@layout/fragment_profile_view" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+    <activity
+        android:id="@+id/navigation_edit_profile_activity"
+        android:name="com.example.swapping.ui.profile.EditProfileActivity"
+        android:label="EditProfileActivity" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
+    <activity
+        android:id="@+id/new_announcement_activity"
+        android:name="com.example.swapping.ui.newAnnouncement.NewAnnouncementActivity"
+        android:label="NewAnnouncementActivity" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
+    <activity
+        android:id="@+id/navigation_login_activity"
+        android:name="com.example.swapping.ui.userLogin.LoginActivity"
+        android:label="LoginActivity" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
 
 </navigation>

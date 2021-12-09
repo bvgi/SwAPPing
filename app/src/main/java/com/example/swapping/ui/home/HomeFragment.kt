@@ -39,7 +39,7 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val homeRecycler = view.findViewById<RecyclerView>(R.id.RecyclerViewHome)
         if (homeRecycler != null) {
-            homeRecycler.layoutManager = GridLayoutManager(view?.context!!, 3)
+            homeRecycler.layoutManager = GridLayoutManager(view.context!!, 3)
             homeRecycler.adapter = adapter
         }
 
@@ -52,8 +52,9 @@ class HomeFragment : Fragment() {
         return root
     }
 
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

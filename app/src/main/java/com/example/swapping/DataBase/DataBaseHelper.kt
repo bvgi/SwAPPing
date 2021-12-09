@@ -278,8 +278,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val cursor = db.rawQuery(getUserQuery, null)
 
-        var username = ""
-        var email = ""
+        var username: String
+        var email: String
 
         if(cursor.moveToFirst()){
             username = cursor.getString(cursor.getColumnIndex("Username"))
@@ -328,7 +328,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var cursor: Cursor?
 
         val getReviewsQuery = "SELECT User, Reviewer, Rate, Description " +
-                "FROM $REVIEW_TABLE" +
+                "FROM $REVIEW_TABLE " +
                 "WHERE User = $userId"
 
         try{
@@ -391,7 +391,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val getReviewsQuery = "SELECT F.Username AS Follower" +
                 "FROM $FOLLOWEDUSERS_TABLE" +
-                "JOIN $USER_TABLE F ON Followed = F.ID" +
+                "JOIN $USER_TABLE F ON Followed = F.ID " +
                 "WHERE User = $userId"
 
         try{
@@ -424,7 +424,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val getReviewsQuery = "SELECT U.Username AS Followed" +
                 "FROM $FOLLOWEDUSERS_TABLE" +
-                "JOIN $USER_TABLE U ON User = U.ID" +
+                "JOIN $USER_TABLE U ON User = U.ID " +
                 "WHERE Followed = $userId"
 
         try{
@@ -663,7 +663,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val cursor: Cursor?
 
         val getAnnouncementsQuery = "SELECT * " +
-                "FROM ${DataBaseHelper.ANNOUNCEMENT_TABLE}" +
+                "FROM $ANNOUNCEMENT_TABLE " +
                 "WHERE User = $userId"
 
         try{
@@ -731,7 +731,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.readableDatabase
 
         val getAnnouncementQuery = "SELECT * " +
-                "FROM ${DataBaseHelper.ANNOUNCEMENT_TABLE}" +
+                "FROM $ANNOUNCEMENT_TABLE " +
                 "WHERE ID = $id"
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
@@ -813,7 +813,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var cursor: Cursor?
 
         val geLikedQuery = "SELECT * " +
-                "FROM ${DataBaseHelper.LIKED_TABLE}" +
+                "FROM $LIKED_TABLE " +
                 "WHERE User = $userId"
 
         try{
