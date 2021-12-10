@@ -1,11 +1,15 @@
-package com.example.swapping.ui.newAnnouncement
+package com.example.swapping.ui.newAd
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Bitmap.CompressFormat
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,35 +19,35 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.navigation.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
-import com.example.swapping.Models.Announcement
+import com.example.swapping.Models.Ad
 import com.example.swapping.R
-import com.example.swapping.databinding.FragmentNewAnnouncementBinding
-import com.example.swapping.ui.profile.ProfileFragmentDirections
-import com.example.swapping.ui.profile.ProfileViewFragmentArgs
+import com.example.swapping.databinding.FragmentNewAdBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 
-class NewAnnouncementActivity : AppCompatActivity() {
-    private lateinit var newAnnouncementViewModel: NewAnnouncementViewModel
-    private var _binding: FragmentNewAnnouncementBinding? = null
+
+class NewAdActivity : AppCompatActivity() {
+    private lateinit var newAdViewModel: NewAdViewModel
+    private var _binding: FragmentNewAdBinding? = null
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_CAMERA = 1
     private lateinit var imageView: ImageView
     private var userID: Int = 0
+    private lateinit var image: ByteArray
 
-    val arg: NewAnnouncementActivityArgs by navArgs()
+    val arg: NewAdActivityArgs by navArgs()
 
     private val titleLiveData = MutableLiveData<String>()
     private val descriptionLiveData = MutableLiveData<String>()
@@ -65,7 +69,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val voivodeship = voivodeshipLiveData.value
             val category = categoryLiveData.value
             val status = statusLiveData.value
-            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
+            this.value = newAdViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(descriptionLiveData) { description ->
@@ -73,7 +77,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val voivodeship = voivodeshipLiveData.value
             val category = categoryLiveData.value
             val status = statusLiveData.value
-            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
+            this.value = newAdViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(voivodeshipLiveData) { voivodeship ->
@@ -81,7 +85,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val description = descriptionLiveData.value
             val category = categoryLiveData.value
             val status = statusLiveData.value
-            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
+            this.value = newAdViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(categoryLiveData) { category ->
@@ -89,7 +93,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val description = descriptionLiveData.value
             val voivodeship = voivodeshipLiveData.value
             val status = statusLiveData.value
-            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
+            this.value = newAdViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
         addSource(statusLiveData) { status ->
@@ -97,20 +101,21 @@ class NewAnnouncementActivity : AppCompatActivity() {
             val description = descriptionLiveData.value
             val voivodeship = voivodeshipLiveData.value
             val category = categoryLiveData.value
-            this.value = newAnnouncementViewModel.validateForm(title, description, voivodeship, category, status)
+            this.value = newAdViewModel.validateForm(title, description, voivodeship, category, status)
         }
 
     }
 
     private val binding get() = _binding!!
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_new_announcement)
+        setContentView(R.layout.activity_new_ad)
 
-        newAnnouncementViewModel =
-            ViewModelProvider(this).get(NewAnnouncementViewModel::class.java)
+        newAdViewModel =
+            ViewModelProvider(this).get(NewAdViewModel::class.java)
 
         val DBHelper = DataBaseHelper(applicationContext)
 
@@ -142,12 +147,10 @@ class NewAnnouncementActivity : AppCompatActivity() {
         userID = arg.userID
         println("AGRS $userID")
 
-        var image = byteArrayOf()
+        image = byteArrayOf()
 
         addImage.setOnClickListener {
             cameraRequest()
-
-            image = getByteArray(imageView)
         }
 
         val dropdownVoivodeship: Spinner = findViewById(R.id.spinnerVoivodeship)
@@ -185,7 +188,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
             var fine = false
             voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
             isValidLiveData.observe(this) { isValid ->
-                fine = newAnnouncementViewModel.registerErrors(
+                fine = newAdViewModel.registerErrors(
                     isValid,
                     titleLayout,
                     descriptionLayout,
@@ -196,7 +199,26 @@ class NewAnnouncementActivity : AppCompatActivity() {
                 println(" ${titleLiveData.value},  ${descriptionLiveData.value}, ${voivodeshipLiveData.value}, ${categoryLiveData.value}, ${statusLiveData.value}")
             }
             if (fine) {
-                val ann = Announcement(
+                var cityName = "-"
+                if (!city.text.isNullOrBlank())
+                    cityName = city.text.toString()
+
+                if(image.isEmpty()){
+                    val nophoto = resources.getDrawable(R.drawable.ic_baseline_no_photography_24, null)
+                    imageView.setImageResource(R.drawable.ic_baseline_no_photography_24)
+                    val bitmap =  imageView.drawable.toBitmap(nophoto.intrinsicWidth, nophoto.intrinsicHeight)
+                    val stream = ByteArrayOutputStream()
+                    bitmap.compress(CompressFormat.PNG, 0, stream)
+                    val bitmapdata = stream.toByteArray()
+                    image = bitmapdata
+
+                }
+
+                println(userID)
+
+
+//                image = getByteArray(imageView)
+                val ann = Ad(
                     user = userID,
                     title = title.text.toString(),
                     description = description.text.toString(),
@@ -204,7 +226,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
                     category = radioCategoryGroup.findViewById<RadioButton>(
                         radioCategoryGroup.checkedRadioButtonId
                     ).text.toString(),
-                    city = city.text.toString(),
+                    city = cityName,
                     status = radioStatusGroup.findViewById<RadioButton>(radioStatusGroup.checkedRadioButtonId).text.toString(),
                     image = image,
                     published_date = LocalDate.now().year * 10000 + LocalDate.now().monthValue * 100 + LocalDate.now().dayOfMonth,
@@ -221,9 +243,8 @@ class NewAnnouncementActivity : AppCompatActivity() {
                     Snackbar.LENGTH_SHORT
                 ).show()
 
-
                 val homeIntent = Intent(this, MainActivity::class.java)
-                homeIntent.putExtra("userid", userID)
+                homeIntent.putExtra("userID", userID)
                 startActivity(homeIntent)
 
             }
@@ -238,7 +259,7 @@ class NewAnnouncementActivity : AppCompatActivity() {
 
 //        val title: TextView = binding.addTitle
 //
-//        newAnnouncementViewModel.text.observe(viewLifecycleOwner, Observer {
+//        newAdViewModel.text.observe(viewLifecycleOwner, Observer {
 //            title.text = it
 //        })
 //        if ()
@@ -269,11 +290,11 @@ class NewAnnouncementActivity : AppCompatActivity() {
 
     }
 
-    fun getByteArray(imageView: ImageView): ByteArray {
+        fun getByteArray(imageView: Bitmap): ByteArray {
         return try {
-            val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+//            val bitmap = (imageView.drawable).toBitmap()
             val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+            imageView.compress(Bitmap.CompressFormat.JPEG, 100, stream)
             val imageByteArray = stream.toByteArray()
             stream.close()
             imageByteArray
@@ -286,9 +307,22 @@ class NewAnnouncementActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE && data != null){
-            imageView.setImageBitmap(data.extras?.get("data") as Bitmap)
+            val imageBitmap = data.extras?.get("data") as Bitmap
+            imageView.setImageBitmap(imageBitmap)
+            image = getBytes(imageBitmap)
+//            val compressed = imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, ByteArrayOutputStream)
             imageView.visibility = View.VISIBLE
         }
+    }
+
+    fun getBytes(bitmap: Bitmap): ByteArray {
+//        val stream = ByteArrayOutputStream()
+//        bitmap.compress(CompressFormat.PNG, 0, stream)
+//        return stream.toByteArray()
+        val bitmap =  imageView.drawable.toBitmap(imageView.drawable.intrinsicWidth, imageView.drawable.intrinsicHeight)
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(CompressFormat.PNG, 0, stream)
+        return stream.toByteArray()
     }
 
     override fun onRequestPermissionsResult(
@@ -311,6 +345,6 @@ class NewAnnouncementActivity : AppCompatActivity() {
 
 
     override fun getParentActivityIntent(): Intent? {
-        return super.getParentActivityIntent()?.putExtra("userid", userID)
+        return super.getParentActivityIntent()?.putExtra("userID", userID)
     }
 }

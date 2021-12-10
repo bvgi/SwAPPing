@@ -8,6 +8,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavArgument
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -29,7 +30,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val extras: Bundle? = intent.extras
         if(extras != null)
-            userID = extras.getInt("userid")
+            userID = extras.getInt("userID")
+
+        println("MAIN::$userID")
+
+
 
         navView = binding.navView
 
@@ -40,6 +45,9 @@ class MainActivity : AppCompatActivity() {
 
         val appBarConfiguration = AppBarConfiguration(setOf(
                 R.id.navigation_home, R.id.navigation_search, R.id.navigation_new_announcement, R.id.navigation_notifications, R.id.navigation_profile, R.id.navigation_profile_view))
+
+        navController.setGraph(R.navigation.mobile_navigation, extras)
+
 
 
         navController.graph.findNode(R.id.navigation_new_announcement)

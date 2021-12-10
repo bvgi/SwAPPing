@@ -16,6 +16,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,8 @@ import com.example.swapping.Models.Review
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
 import com.example.swapping.databinding.FragmentProfileViewBinding
+import com.example.swapping.ui.home.HomeAdapter
+import com.example.swapping.ui.home.HomeFragmentDirections
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import org.w3c.dom.Text
@@ -71,8 +74,8 @@ class ProfileViewFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         userID = arg.userID
-//        profileID = arg.profileID
-        profileID = 1
+        profileID = arg.profileID
+
         profileViewViewModel =
             ViewModelProvider(this).get(ProfileViewViewModel::class.java)
 
@@ -166,6 +169,16 @@ class ProfileViewFragment : Fragment() {
         reviewsAdapter = ReviewsAdapter(Pair(userID, reviews), view.context)
         reviewsRecycler.isNestedScrollingEnabled = false
         reviewsRecycler.adapter = reviewsAdapter
+
+        reviewsAdapter.setOnClickListener(object : ReviewsAdapter.ReviewsClickListener{
+            override fun onClick(pos: Int, aView: View) {
+                dbHelper.deleteReview(profileID, userID)
+                reviews = profileViewViewModel.getReviews(profileID, root.context)
+                dbHelper.updateMeanRate(profileID, round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0))
+                reviewsAdapter.notifyItemRemoved(pos)
+                reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
+            }
+        })
 
         val userData = dbHelper.getUserById(profileID)
 
@@ -264,7 +277,9 @@ class ProfileViewFragment : Fragment() {
                 reviewsAdapter.notifyItemInserted(0)
                 reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
                 reviewsRecycler.adapter = reviewsAdapter
-                meanRate.text = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0).toString()
+                val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                dbHelper.updateMeanRate(profileID, mean_rate)
+                meanRate.text = mean_rate.toString()
                 Snackbar.make(
                     view.findViewById(R.id.reviewInformation),
                     "Ocena została dodana",
@@ -274,6 +289,8 @@ class ProfileViewFragment : Fragment() {
                 alert.visibility = View.VISIBLE
             }
         }
+
+
 
 
     }

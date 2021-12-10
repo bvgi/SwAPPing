@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.swapping.DataBase.DataBaseHelper.Companion.USER_TABLE
-import com.example.swapping.Models.Announcement
+import com.example.swapping.Models.Ad
 
 
 class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -16,7 +16,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
         const val DATABASE_VERSION = 1
         const val DATABASE_NAME = "swAPPing.db"
 
-        const val ANNOUNCEMENT_TABLE = "Announcement"
+        const val ANNOUNCEMENT_TABLE = "Ad"
         const val VOIVODESHIPS_TABLE = "Voivodeships"
         const val CATEGORIES_TABLE = "Categories"
         const val STATUS_TABLE = "Status"
@@ -72,16 +72,16 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
 
         val SQL_CREATE_LIKED = "CREATE TABLE $LIKED_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "Announcement INTEGER, " +
+                "Ad INTEGER, " +
                 "User INTEGER, " +
-                "FOREIGN KEY(Announcement) REFERENCES $ANNOUNCEMENT_TABLE(ID), " +
+                "FOREIGN KEY(Ad) REFERENCES $ANNOUNCEMENT_TABLE(ID), " +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_LIKED)
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-        db.execSQL("DROP TABLE IF EXISTS Announcement")
+        db.execSQL("DROP TABLE IF EXISTS Ad")
         db.execSQL("DROP TABLE IF EXISTS Voivodeships")
         db.execSQL("DROP TABLE IF EXISTS Categories")
         db.execSQL("DROP TABLE IF EXISTS Status")
@@ -261,20 +261,20 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
 
     // ANNOUNCEMENTS
 
-    fun addAnnouncement(announcement: Announcement) : Long{
+    fun addAnnouncement(ad: Ad) : Long{
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("User", announcement.user)
-        values.put("Title", announcement.title)
-        values.put("Description", announcement.description)
-        values.put("Voivodeship", announcement.voivodeship)
-        if(announcement.city.isNotBlank())
-            values.put("City", announcement.city)
-        values.put("Category", announcement.category)
-        values.put("Status", announcement.status)
-        if (announcement.image.isNotEmpty())
-            values.put("Image", announcement.image)
-        values.put("Published_date", announcement.published_date)
+        values.put("User", ad.user)
+        values.put("Title", ad.title)
+        values.put("Description", ad.description)
+        values.put("Voivodeship", ad.voivodeship)
+        if(ad.city.isNotBlank())
+            values.put("City", ad.city)
+        values.put("Category", ad.category)
+        values.put("Status", ad.status)
+        if (ad.image.isNotEmpty())
+            values.put("Image", ad.image)
+        values.put("Published_date", ad.published_date)
 
         val result = db.insert(ANNOUNCEMENT_TABLE, null, values)
         db.close()
@@ -282,24 +282,24 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
         return result
     }
 
-    fun updateAnnouncement(announcement: Announcement) : Int{
+    fun updateAnnouncement(ad: Ad) : Int{
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("Title", announcement.title)
-        values.put("Description", announcement.description)
-        values.put("Status", announcement.status)
-        if (announcement.image.isNotEmpty())
-            values.put("Image", announcement.image)
+        values.put("Title", ad.title)
+        values.put("Description", ad.description)
+        values.put("Status", ad.status)
+        if (ad.image.isNotEmpty())
+            values.put("Image", ad.image)
 
-        val result = db.update(USER_TABLE, values, "ID = ?", arrayOf(announcement.ID.toString()))
+        val result = db.update(USER_TABLE, values, "ID = ?", arrayOf(ad.ID.toString()))
         db.close()
 
         return result
     }
 
-    fun getUserAnnouncements(userId: Int) : Array<Announcement> {
+    fun getUserAnnouncements(userId: Int) : Array<Ad> {
         val db = this.readableDatabase
-        val announcements = mutableListOf<Announcement>()
+        val announcements = mutableListOf<Ad>()
         val cursor: Cursor?
 
         val getAnnouncementsQuery = "SELECT * " +
@@ -341,7 +341,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
                 published_date = cursor.getInt(cursor.getColumnIndex("Published_date"))
 
-                announcements.add(Announcement(
+                announcements.add(Ad(
                     ID = id,
                     user = user,
                     title = title,
@@ -365,7 +365,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
         return announcements.toTypedArray()
     }
 
-    fun getAnnouncement(id: Int) : Announcement{
+    fun getAnnouncement(id: Int) : Ad{
         val db = this.readableDatabase
 
         val getAnnouncementQuery = "SELECT * " +
@@ -403,7 +403,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
         cursor.close()
         db.close()
 
-        return Announcement(
+        return Ad(
             ID = id,
             user = user,
             title = title,
@@ -425,7 +425,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
         val db = this.writableDatabase
 
         val values = ContentValues()
-        values.put("Announcement", announcementId)
+        values.put("Ad", announcementId)
         values.put("User", userId)
 
         val result = db.insert(LIKED_TABLE, null, values)
@@ -438,16 +438,16 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
     fun deleteLiked(userId: Int, announcementId: Int) : Int {
         val db = this.writableDatabase
 
-        val result = db.delete(LIKED_TABLE, "User = ? and Announcement = ?", arrayOf(userId.toString(), announcementId.toString()))
+        val result = db.delete(LIKED_TABLE, "User = ? and Ad = ?", arrayOf(userId.toString(), announcementId.toString()))
 
         db.close()
 
         return result
     }
 
-    fun getLiked(userId: Int) : Array<Announcement> {
+    fun getLiked(userId: Int) : Array<Ad> {
         val db = this.readableDatabase
-        val announcements = mutableListOf<Announcement>()
+        val announcements = mutableListOf<Ad>()
         var cursor: Cursor?
 
         val geLikedQuery = "SELECT * " +
@@ -463,7 +463,7 @@ class AnnouncementDataBaseHelper(context: Context) : SQLiteOpenHelper(context, D
 
         if(cursor.moveToFirst()){
             do{
-                val announcementId = cursor.getInt(cursor.getColumnIndex("Announcement"))
+                val announcementId = cursor.getInt(cursor.getColumnIndex("Ad"))
                 announcements.add(getAnnouncement(announcementId))
             } while (cursor.moveToNext())
         }

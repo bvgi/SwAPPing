@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ad_user_navigation"
+    app:startDestination="@id/navigation_ad_details">
+
+    <fragment
+        android:id="@+id/navigation_ad_details"
+        android:name="com.example.swapping.ui.AdDetails.AdDetailsFragment"
+        android:label="AdDetailsFragment"
+        tools:layout="@layout/fragment_ad_details">
+        <action
+            android:id="@+id/action_adDetailsFragment_to_profileViewFragment"
+            app:destination="@id/navigation_ad_profile" />
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_ad_profile"
+        android:name="com.example.swapping.ui.profile.ProfileViewFragment"
+        android:label="fragment_profile_view"
+        tools:layout="@layout/fragment_profile_view" >
+        <action
+            android:id="@+id/action_profileViewFragment_to_adDetailsFragment"
+            app:destination="@id/navigation_ad_details" />
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </fragment>
+</navigation>

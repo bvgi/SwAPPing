@@ -83,7 +83,7 @@ class LoginActivity : AppCompatActivity() {
                 DBHelper.setLoggedIn(userID)
 
                 val homeIntent = Intent(this, MainActivity::class.java)
-                homeIntent.putExtra("userid", userID)
+                homeIntent.putExtra("userID", userID)
                 startActivity(homeIntent)
             }
 

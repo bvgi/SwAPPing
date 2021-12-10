@@ -1,7 +1,7 @@
 package com.example.swapping.Models
 
 
-class Announcement(
+class Ad(
     var ID: Int = 0,
     val user: Int,
     var title: String,

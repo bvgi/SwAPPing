@@ -12,24 +12,23 @@
     <string name="ButtonRegister">Utwórz konto</string>
     <string name="firstName">Imię</string>
     <string name="phoneNumber">Numer telefonu</string>
-    <string name="username">Nazwa użytkownika <font color='#FF0000'>*</font></string>
     <string name="registerError">Spróbuj ponownie</string>
     <string name="dateOfBirth"><font color='#FF0000'>*</font> Mam ukończone 18 lat.</string>
     <string name="city">Miejsce zamieszkania </string>
     <string name="permission"><font color='#FF0000'>*</font> Wyrażam zgodę na przetwarzanie moich danych w celu korzystania z aplikacji „swAPPing”.</string>
     <string name="RegisterActivity">Rejestracja</string>
     <string name="promptEmail">Adres e-mail <font color='#FF0000'>*</font></string>
-    <string name="homeTitle">title</string>
-    <string name="homeUsername">username</string>
+    <string name="title">Tytuł</string>
+    <string name="username">Username</string>
     <string name="announcement_image">Announcement image</string>
     <string name="addTitle">Tytuł <font color='#FF0000'>*</font></string>
     <string name="addPhoto">Dodaj zdjęcie</string>
     <string name="addDescription">Opis <font color='#FF0000'>*</font></string>
     <string name="addLocationCity">Miasto</string>
     <string name="addLocationVoivodeship">Województwo <font color='#FF0000'>*</font></string>
-    <string name="addCategory">Kategoria</string>
+    <string name="addCategory">Kategoria:\t</string>
     <string name="radio_button">Radio Button</string>
-    <string name="addState">Stan zużycia</string>
+    <string name="addState">Stan zużycia:\t</string>
     <string name="addAnnouncementButton">Dodaj ogłoszenie</string>
     <string name="saveData">zapisz</string>
     <string name="currentEmail">email</string>
@@ -52,4 +51,11 @@
     <string name="add">Dodaj</string>
     <string name="chooseRateAlert">Wybierz ocenę!</string>
     <string name="opinion">Opinia...</string>
+    <string name="title_activity_ad_details">AdDetailsActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="description">Opis przedmiotu</string>
+    <string name="voivodeship">Województwo</string>
+    <string name="location">Lokalizacja:\t</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

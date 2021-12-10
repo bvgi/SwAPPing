@@ -63,13 +63,37 @@
         <action
             android:id="@+id/action_navigation_home_to_navigation_profile"
             app:destination="@id/navigation_profile" />
+        <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_navigation_home_to_adDetailsActivity"
+            app:destination="@id/adDetailsActivity" />
+        <action
+            android:id="@+id/action_navigation_home_to_ad_user_navigation"
+            app:destination="@id/ad_user_navigation">
+            <argument
+                android:name="userID"
+                app:argType="integer"
+                android:defaultValue="0" />
+            <argument
+                android:name="adID"
+                app:argType="integer"
+                android:defaultValue="0" />
+            <argument
+                android:name="profileID"
+                app:argType="integer"
+                android:defaultValue="0" />
+        </action>
+
     </fragment>
 
     <fragment
         android:id="@+id/navigation_new_announcement"
-        android:name="com.example.swapping.ui.newAnnouncement.NewAnnouncementFragment"
+        android:name="com.example.swapping.ui.newAd.NewAdFragment"
         android:label="@string/title_new_announcement"
-        tools:layout="@layout/fragment_new_announcement" >
+        tools:layout="@layout/fragment_new_ad" >
         <argument
             android:name="userID"
             app:argType="integer"
@@ -162,7 +186,7 @@
     </activity>
     <activity
         android:id="@+id/new_announcement_activity"
-        android:name="com.example.swapping.ui.newAnnouncement.NewAnnouncementActivity"
+        android:name="com.example.swapping.ui.newAd.NewAdActivity"
         android:label="NewAnnouncementActivity" >
         <argument
             android:name="userID"
@@ -178,5 +202,24 @@
             app:argType="integer"
             android:defaultValue="0" />
     </activity>
+    <activity
+        android:id="@+id/adDetailsActivity"
+        android:name="com.example.swapping.ui.AdDetails.AdDetailsActivity"
+        android:label="activity_ad_details"
+        tools:layout="@layout/activity_ad_details" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
+    <include app:graph="@navigation/ad_user_navigation" />
 
 </navigation>

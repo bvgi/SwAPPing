@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.Models.Review
 import com.example.swapping.R
+import com.example.swapping.ui.home.HomeAdapter
 
 class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context) : RecyclerView.Adapter<ReviewsAdapter.ViewHolder>(){
     /**
@@ -19,7 +20,18 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
      * (custom ViewHolder).
      */
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    lateinit var mClickListener: ReviewsClickListener
+    lateinit var deleteButton: Button
+
+    interface ReviewsClickListener {
+        fun onClick(pos: Int, aView: View)
+    }
+
+    fun setOnClickListener(aClickListener: ReviewsClickListener){
+        mClickListener = aClickListener
+    }
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
         val username: TextView
         val deleteReview: ImageView
         val description: TextView
@@ -30,6 +42,7 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
         val star5: ImageView
 
         init {
+            view.setOnClickListener(this)
             username = view.findViewById(R.id.reviewerName)
             deleteReview = view.findViewById(R.id.deleteReview)
             description = view.findViewById(R.id.rateDescription)
@@ -38,6 +51,10 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
             star3 = view.findViewById(R.id.reviewStar3)
             star4 = view.findViewById(R.id.reviewStar4)
             star5 = view.findViewById(R.id.reviewStar5)
+        }
+
+        override fun onClick(p0: View?) {
+            mClickListener.onClick(adapterPosition, itemView)
         }
     }
 

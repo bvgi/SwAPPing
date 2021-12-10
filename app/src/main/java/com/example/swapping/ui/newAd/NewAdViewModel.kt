@@ -1,29 +1,21 @@
-package com.example.swapping.ui.newAnnouncement
+package com.example.swapping.ui.newAd
 
 import android.Manifest
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
-import android.provider.MediaStore
-import android.widget.ImageView
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.android.material.textfield.TextInputLayout
-import java.io.ByteArrayOutputStream
 
-class NewAnnouncementViewModel : ViewModel() {
+class NewAdViewModel : ViewModel() {
 
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is new Announcement Fragment"
+        value = "This is new Ad Fragment"
     }
     val text: LiveData<String> = _text
 
