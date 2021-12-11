@@ -115,6 +115,16 @@
                         </LinearLayout>
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/profileName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="@string/firstName"
+                    android:textColor="@color/black" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
@@ -327,14 +337,14 @@
 
                     </LinearLayout>
 
-
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/reviews"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"/>
 
                 </LinearLayout>
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/reviews"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"/>
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

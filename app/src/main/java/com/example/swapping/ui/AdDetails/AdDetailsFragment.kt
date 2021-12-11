@@ -1,16 +1,17 @@
 package com.example.swapping.ui.AdDetails
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.media.Image
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.example.swapping.MainActivity
+import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentAdDetailsBinding
 

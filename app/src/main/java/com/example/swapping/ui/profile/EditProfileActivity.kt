@@ -16,6 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
@@ -94,7 +96,7 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     override fun getParentActivityIntent(): Intent? {
-        return super.getParentActivityIntent()?.putExtra("userid", userID)
+        return super.getParentActivityIntent()?.putExtra("userID", userID)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -135,8 +137,9 @@ class EditProfileActivity : AppCompatActivity() {
 
 //                val index = bundleOf("userID" to userID)
 //                navCon.navigate(R.id.navigation_profile, index)
+
                 val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("userid", userID)
+                intent.putExtra("userID", userID)
 //                setResult(2, intent) // TODO: powrót do fragmentu z profilem
                 startActivity(intent)
                 return true

@@ -55,6 +55,8 @@ class ProfileViewFragment : Fragment() {
     private lateinit var reviewsContent: LinearLayout
     private lateinit var followers: TextView
     private lateinit var following: TextView
+    private lateinit var reviewTitle: TextView
+    private lateinit var profileName: TextView
 
     private lateinit var reviews: Array<Review>
     private lateinit var reviewsRecycler: RecyclerView
@@ -87,9 +89,10 @@ class ProfileViewFragment : Fragment() {
         reviewsContent = root.findViewById(R.id.reviewsContents)
         reviews = profileViewViewModel.getReviews(profileID, root.context)
         println(reviews)
+        reviewTitle = root.findViewById(R.id.reviewTitle)
 
         if(reviews.size == 0)
-            reviewsContent.visibility = View.GONE
+            reviewTitle.visibility = View.GONE
 
 
 
@@ -182,8 +185,11 @@ class ProfileViewFragment : Fragment() {
 
         val userData = dbHelper.getUserById(profileID)
 
+        profileName = view.findViewById(R.id.profileName)
+        profileName.text = userData.name
+
         username = view.findViewById(R.id.profileUsername)
-        username.text = userData.username
+        username.text = "@" + userData.username
 
         email = view.findViewById(R.id.profileEmail)
         email.text = email.text.toString() + userData.email

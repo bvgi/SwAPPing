@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -13,16 +14,23 @@ import androidx.navigation.fragment.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
+import com.example.swapping.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import android.content.Intent
+
+
+
 
 class ProfileFragment : Fragment() {
     var index = 0
+    var previousFragment = " "
     private lateinit var profileViewModel: ProfileViewModel
     private var _binding: FragmentProfileBinding? = null
     lateinit var logOutButton: FloatingActionButton
     private lateinit var dbHelper: DataBaseHelper
     private lateinit var editTextView: TextView
     private lateinit var profileViewLayout: LinearLayout
+    private lateinit var userAds: LinearLayout
 
     private val args: ProfileFragmentArgs by navArgs()
 
@@ -35,6 +43,8 @@ class ProfileFragment : Fragment() {
     ): View {
 
         index = args.userID
+        previousFragment = args.previousFragment
+
 
         profileViewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 
@@ -44,13 +54,26 @@ class ProfileFragment : Fragment() {
 
         dbHelper = DataBaseHelper(root.context)
 
+        if(previousFragment == "AdDetails"){
+            val homeFragment = HomeFragment()
+            homeFragment.setArguments(bundleOf("userID" to index, "previousFragment" to "Profile"))
+            fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
+        }
+
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        println(index)
+        println("PROFILE:::" + index)
+
+        userAds = view.findViewById(R.id.userAds)
+        userAds.setOnClickListener {
+            val homeFragment = HomeFragment()
+            homeFragment.setArguments(bundleOf("userID" to index, "previousFragment" to "Profile"))
+            fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
+        }
 
         logOutButton = view.findViewById(R.id.logoutButton)
         logOutButton.setOnClickListener {

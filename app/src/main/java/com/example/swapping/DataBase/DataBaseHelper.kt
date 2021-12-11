@@ -491,12 +491,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val db = this.writableDatabase
         db.execSQL("DELETE FROM $VOIVODESHIPS_TABLE")
         for(name in voivodeships) {
-
             val values = ContentValues()
-
             values.put("Name", name)
-
-            result = db.insert(DataBaseHelper.VOIVODESHIPS_TABLE, null, values)
+            result = db.insert(VOIVODESHIPS_TABLE, null, values)
 
         }
             db.close()
@@ -524,8 +521,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             result = db.insert(DataBaseHelper.CATEGORIES_TABLE, null, values)
         }
         db.close()
-
-        println("CATEGORIES ADDED")
         return result
     }
 
@@ -545,7 +540,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             result = db.insert(DataBaseHelper.STATUS_TABLE, null, values)
         }
         db.close()
-        println("STATUSES ADDED")
         return result
     }
 
@@ -663,11 +657,13 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val values = ContentValues()
         values.put("Title", ad.title)
         values.put("Description", ad.description)
+        values.put("City", ad.city)
+        values.put("Voivodeship", ad.voivodeship)
+        values.put("Category", ad.category)
         values.put("Status", ad.status)
-        if (ad.image.isNotEmpty())
-            values.put("Image", ad.image)
+        values.put("Image", ad.image)
 
-        val result = db.update(USER_TABLE, values, "ID = ?", arrayOf(ad.ID.toString()))
+        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(ad.ID.toString()))
         db.close()
 
         return result
@@ -855,6 +851,16 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             image = image,
             published_date = published_date
         )
+    }
+
+    fun deleteAnnouncement(id: Int) : Int {
+        val db = this.writableDatabase
+
+        val result = db.delete(ADVERTISEMENT_TABLE, "ID = ?", arrayOf(id.toString()))
+
+        db.close()
+
+        return result
     }
 
     // LIKED ANNOUNCEMENTS

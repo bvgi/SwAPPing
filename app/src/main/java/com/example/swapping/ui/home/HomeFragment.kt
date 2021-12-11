@@ -1,9 +1,11 @@
 package com.example.swapping.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MediatorLiveData
@@ -11,12 +13,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentHomeBinding
+import com.example.swapping.ui.AdDetails.AdDetailsActivity
+import com.example.swapping.ui.AdDetails.AdDetailsFragment
 import com.example.swapping.ui.profile.ProfileFragmentDirections
 
 class HomeFragment : Fragment() {
@@ -44,10 +50,13 @@ class HomeFragment : Fragment() {
         val root: View = binding.root
         homeViewModel =
                 ViewModelProvider(this).get(HomeViewModel()::class.java)
-
-
         userID = arguments.userID
-        ads = homeViewModel.getAnnouncements(userID, root.context)
+        if(arguments.previousFragment == "Profile"){
+            ads = homeViewModel.getUserAnnouncements(userID, root.context)
+        }else{
+            ads = homeViewModel.getAnnouncements(userID, root.context)
+        }
+
         adapter = HomeAdapter(arrayOf(), root.context)
         println("HOME:::${ads.size}, $userID")
         homeRecycler = root.findViewById(R.id.RecyclerViewHome)
@@ -69,12 +78,19 @@ class HomeFragment : Fragment() {
 
         adapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val action = HomeFragmentDirections.actionNavigationHomeToAdUserNavigation()
-                action.userID = arguments.userID
-                action.profileID = ads[pos].user
-                println(ads[pos].user)
-                action.adID = ads[pos].ID
-                root.findNavController().navigate(action)
+                if(arguments.previousFragment == "Profile"){
+                    val intent = Intent(root.context, AdDetailsActivity::class.java)
+                    intent.putExtras( bundleOf("userID" to userID, "profileID" to userID, "adID" to ads[pos].ID))
+                    startActivity(intent)
+                    // TODO: Nachodzą na siebie fragmenty
+                } else {
+                    val action = HomeFragmentDirections.actionNavigationHomeToAdUserNavigation()
+                    action.userID = arguments.userID
+                    action.profileID = ads[pos].user
+                    println(ads[pos].user)
+                    action.adID = ads[pos].ID
+                    root.findNavController().navigate(action)
+                }
             }
         })
     }

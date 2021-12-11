@@ -139,7 +139,6 @@ class NewAdActivity : AppCompatActivity() {
         val title = findViewById<TextView>(R.id.addTitle)
         val description = findViewById<TextView>(R.id.addDescription)
         val city = findViewById<TextView>(R.id.addLocationCity)
-        val voivodeship = findViewById<TextView>(R.id.addLocationVoivodeship)
         val addImage = findViewById<Button>(R.id.addPhoto)
         val addAnnouncement = findViewById<Button>(R.id.addAnnouncementButton)
 
@@ -161,19 +160,19 @@ class NewAdActivity : AppCompatActivity() {
         voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
 
         val categories = DBHelper.getCategories()
-        var index = 0
+        var catIndex = 0
 
         for(button in radioCategoryGroup.children){
-            radioCategoryGroup.findViewById<RadioButton>(button.id).text = categories[index]
-            index++
+            radioCategoryGroup.findViewById<RadioButton>(button.id).text = categories[catIndex]
+            catIndex++
         }
 
         val statuses = DBHelper.getStatuses()
-        index = 0
+        var statIndex = 0
 
         for(button in radioStatusGroup.children){
-            radioStatusGroup.findViewById<RadioButton>(button.id).text = statuses[index]
-            index++
+            radioStatusGroup.findViewById<RadioButton>(button.id).text = statuses[statIndex]
+            statIndex++
         }
 
         radioCategoryGroup.setOnCheckedChangeListener { _, checkedId ->

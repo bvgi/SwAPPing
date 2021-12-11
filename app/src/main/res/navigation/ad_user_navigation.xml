@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/navigation_ad_details"
         android:name="com.example.swapping.ui.AdDetails.AdDetailsFragment"
-        android:label="AdDetailsFragment"
+        android:label=""
         tools:layout="@layout/fragment_ad_details">
         <action
             android:id="@+id/action_adDetailsFragment_to_profileViewFragment"
@@ -29,11 +29,13 @@
     <fragment
         android:id="@+id/navigation_ad_profile"
         android:name="com.example.swapping.ui.profile.ProfileViewFragment"
-        android:label="fragment_profile_view"
+        android:label="Informacje o użytkowniku"
         tools:layout="@layout/fragment_profile_view" >
         <action
             android:id="@+id/action_profileViewFragment_to_adDetailsFragment"
-            app:destination="@id/navigation_ad_details" />
+            app:destination="@id/navigation_ad_details"
+            app:popUpTo="@id/navigation_ad_details"
+            app:popUpToInclusive="true" />
         <argument
             android:name="userID"
             app:argType="integer"

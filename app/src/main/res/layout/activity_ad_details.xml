@@ -1,18 +1,199 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/adDetails"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".ui.AdDetails.AdDetailsActivity">
 
-    <fragment
-        android:id="@+id/nav_host_fragment_activity_ad_details"
-        android:name="androidx.navigation.fragment.NavHostFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:defaultNavHost="true"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintBottom_toTopOf="parent"
-        app:navGraph="@navigation/ad_user_navigation">
-    </fragment>
+    <ScrollView
+        android:layout_width="409dp"
+        android:layout_height="657dp"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/Title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title"
+                android:padding="10dp"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textColor="@color/black"/>
+
+            <ImageView
+                android:id="@+id/AdImage"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:srcCompat="@drawable/ic_baseline_no_photography_24"
+                android:padding="10dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/adOwnerName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:layout_gravity="center"
+                    android:text="@string/firstName"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/ownerUsername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="@string/username" />
+                <LinearLayout
+                    android:layout_width="100dp"
+                    android:layout_height="30dp"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginLeft="7dp"
+                    android:textColor="@color/black"
+                    android:gravity="center"
+                    tools:ignore="RtlSymmetry" >
+
+                    <ImageView
+                        android:id="@+id/adStar1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_round_star_outline_24"
+                        android:adjustViewBounds="true"/>
+                    <ImageView
+                        android:id="@+id/adStar2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_round_star_outline_24"
+                        android:adjustViewBounds="true"/>
+                    <ImageView
+                        android:id="@+id/adStar3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_round_star_outline_24"
+                        android:adjustViewBounds="true"/>
+                    <ImageView
+                        android:id="@+id/adStar4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_round_star_outline_24"
+                        android:adjustViewBounds="true"/>
+                    <ImageView
+                        android:id="@+id/adStar5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_round_star_outline_24"
+                        android:adjustViewBounds="true"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp">
+
+                <TextView
+                    android:id="@+id/adTitleDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/description"
+                    android:textAllCaps="true"/>
+                <TextView
+                    android:id="@+id/adDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:paddingStart="5dp"
+                    android:text="@string/description" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_margin="10dp">
+                <TextView
+                    android:id="@+id/locationTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/locationName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="start"
+                    android:text="@string/location"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_margin="10dp">
+
+                <TextView
+                    android:id="@+id/adCategoryTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/addCategory"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/adCategory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="start"
+                    android:text="@string/addCategory"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_margin="10dp">
+                <TextView
+                    android:id="@+id/adStatusTitle"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/addState"
+                    android:textColor="@color/black"/>
+                <TextView
+                    android:id="@+id/adStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="start"
+                    android:text="@string/addState"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

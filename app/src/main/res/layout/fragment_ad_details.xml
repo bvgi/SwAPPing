@@ -5,7 +5,7 @@
     android:id="@+id/adDetails"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.AdDetails.AdDetailsActivity">
+    tools:context=".ui.AdDetails.AdDetailsFragment">
 
         <ScrollView
             android:layout_width="409dp"

@@ -40,17 +40,21 @@
         <action
             android:id="@+id/action_navigation_profile_to_loginActivity"
             app:destination="@id/navigation_login_activity" />
+        <argument
+            android:name="previousFragment"
+            app:argType="string"
+            android:defaultValue=" " />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.example.swapping.ui.home.HomeFragment"
         android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_home">
         <argument
             android:name="userID"
-            app:argType="integer"
-            android:defaultValue="0" />
+            android:defaultValue="0"
+            app:argType="integer" />
         <action
             android:id="@+id/action_navigation_home_to_navigation_new_announcement"
             app:destination="@id/navigation_new_announcement" />
@@ -65,8 +69,8 @@
             app:destination="@id/navigation_profile" />
         <argument
             android:name="adID"
-            app:argType="integer"
-            android:defaultValue="0" />
+            android:defaultValue="0"
+            app:argType="integer" />
         <action
             android:id="@+id/action_navigation_home_to_adDetailsActivity"
             app:destination="@id/adDetailsActivity" />
@@ -75,17 +79,21 @@
             app:destination="@id/ad_user_navigation">
             <argument
                 android:name="userID"
-                app:argType="integer"
-                android:defaultValue="0" />
+                android:defaultValue="0"
+                app:argType="integer" />
             <argument
                 android:name="adID"
-                app:argType="integer"
-                android:defaultValue="0" />
+                android:defaultValue="0"
+                app:argType="integer" />
             <argument
                 android:name="profileID"
-                app:argType="integer"
-                android:defaultValue="0" />
+                android:defaultValue="0"
+                app:argType="integer" />
         </action>
+        <argument
+            android:name="previousFragment"
+            app:argType="string"
+            android:defaultValue="MainActivity" />
 
     </fragment>
 

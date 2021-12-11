@@ -24,10 +24,10 @@
             <ImageView
                 android:id="@+id/profileImage"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
                 android:layout_gravity="center|center_horizontal|center_vertical"
                 android:src="@drawable/ic_baseline_person_24"
-                android:layout_margin="20dp"
                 android:contentDescription="Profile picture" />
 
             <TextView
@@ -35,7 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
+                android:padding="15dp"
+                android:layout_weight="1"
                 android:text="Profil"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
@@ -48,6 +49,7 @@
             android:background="@color/gray" />
 
         <LinearLayout
+            android:id="@+id/userAds"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -55,18 +57,18 @@
             <ImageView
                 android:id="@+id/adsImage"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
                 android:layout_gravity="center|center_horizontal|center_vertical"
-                android:src="@drawable/ic_baseline_assignment_24"
-                android:layout_margin="20dp"/>
+                android:src="@drawable/ic_baseline_assignment_24"/>
 
             <TextView
                 android:id="@+id/adsProfile"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:layout_marginTop="2dp"
+                android:layout_weight="1"
+                android:padding="15dp"
                 android:text="Moje ogłoszenia"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
@@ -78,6 +80,7 @@
         android:background="@color/gray" />
 
         <LinearLayout
+            android:id="@+id/userFavs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -85,17 +88,17 @@
             <ImageView
                 android:id="@+id/likedImage"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
                 android:layout_gravity="center|center_horizontal|center_vertical"
-                android:src="@drawable/ic_baseline_favorite_24"
-                android:layout_margin="20dp"/>
+                android:src="@drawable/ic_baseline_favorite_24"/>
 
             <TextView
                 android:id="@+id/likedProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
+                android:padding="15dp"
                 android:text="Polubione"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
@@ -115,17 +118,17 @@
             <ImageView
                 android:id="@+id/editImage"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="20dp"
                 android:layout_gravity="center|center_horizontal|center_vertical"
-                android:src="@drawable/ic_baseline_edit_24"
-                android:layout_margin="20dp"/>
+                android:src="@drawable/ic_baseline_edit_24"/>
 
             <TextView
                 android:id="@+id/editProfile"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
+                android:padding="15dp"
                 android:text="Edytuj"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
