@@ -145,10 +145,12 @@ class AdDetailsFragment : Fragment() {
 
         startNegotiation = view.findViewById(R.id.startNegotiationButton)
         startNegotiation.setOnClickListener {
-            val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsActivity()
-            action.userID = userID
-            action.adID = adID
-            view.findNavController().navigate(action)
+            if(ad.purchaser_id != userID){
+                val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsActivity()
+                action.userID = userID
+                action.adID = adID
+                view.findNavController().navigate(action)
+            }
         }
     }
 
@@ -187,7 +189,6 @@ class AdDetailsFragment : Fragment() {
             dbHelper.addLiked(userID, adID)
             likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
         }
-
     }
 
     private fun isLiked() : Boolean {

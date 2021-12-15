@@ -18,6 +18,8 @@ class AdDetailsActivity : AppCompatActivity() {
 
     private lateinit var adDetailsViewModel: AdDetailsViewModel
     private lateinit var editAd: MenuItem
+    private lateinit var deleteAd: MenuItem
+    private lateinit var purchased: MenuItem
     private lateinit var title: TextView
     private lateinit var adPhoto: ImageView
     private lateinit var name: TextView
@@ -29,6 +31,8 @@ class AdDetailsActivity : AppCompatActivity() {
     private lateinit var rateStars: Array<ImageView>
     private lateinit var goToProfile: ImageView
     private lateinit var dbHelper: DataBaseHelper
+    private var purchaser = 0
+    private var archived = 0
 
     var userID = 0
     var adID = 0
@@ -54,6 +58,9 @@ class AdDetailsActivity : AppCompatActivity() {
         val user = adDetailsViewModel.getUserInfo(profileID, this)
         val ad = adDetailsViewModel.getAd(adID, this)
         val photo = adDetailsViewModel.getImage(ad.image)
+
+        archived = ad.archived
+        purchaser = ad.purchaser_id
 
         title = findViewById(R.id.Title)
         title.text = ad.title
@@ -94,14 +101,25 @@ class AdDetailsActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_ad_details, menu)
-        if (menu != null)
+        if (menu != null) {
             editAd = menu.findItem(R.id.menu_editAd)
+            deleteAd = menu.findItem(R.id.menu_deleteAd)
+            purchased = menu.findItem(R.id.menu_purchased)
+        }
+        if(archived == 1){
+            editAd.isVisible = false
+            deleteAd.isVisible = false
+            if(purchaser == userID)
+                purchased.isVisible = true
+        }
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.menu_editAd)
-            editAd = item
+        when(item.itemId){
+            R.id.menu_editAd -> editAd = item
+            R.id.menu_deleteAd -> deleteAd = item
+        }
 
         when (item.itemId) {
             R.id.menu_editAd -> {

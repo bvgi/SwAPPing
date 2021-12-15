@@ -60,4 +60,8 @@
     <string name="changePhoto">Zmień zdjęcie</string>
     <string name="deleteAd">Usuń</string>
     <string name="name">Nazwa</string>
+    <string name="state">Stan ogłoszenia</string>
+    <string name="usersTitle">Użytkownicy</string>
+    <string name="categoryTitle">Kategoria</string>
+    <string name="localizationTitle">Lokalizacja</string>
 </resources>

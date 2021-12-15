@@ -305,6 +305,32 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return users.toTypedArray()
     }
 
+    fun findUsers(string: String) : Array<Pair<Int, String>> {
+        val db = this.readableDatabase
+        val users: MutableList<Pair<Int, String>> = mutableListOf()
+
+        val getUserQuery = "SELECT * " +
+                "FROM $USER_TABLE " +
+                "WHERE Username LIKE $string OR Name LIKE $string"
+
+        val cursor = db.rawQuery(getUserQuery, null)
+
+        val username: String
+        val ID: Int
+
+        if(cursor.moveToFirst()){
+            username = cursor.getString(cursor.getColumnIndex("Username"))
+            ID = cursor.getInt(cursor.getColumnIndex("ID"))
+
+            users.add(Pair(ID, username))
+        }
+
+        cursor.close()
+        db.close()
+
+        return users.toTypedArray()
+    }
+
     // REVIEW FUNCTIONS
 
     fun addReview(review: Review) : Long {
@@ -680,6 +706,78 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val getAnnouncementsQuery = "SELECT * " +
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE User = $userId"
+
+        try{
+            cursor = db.rawQuery(getAnnouncementsQuery, null)
+        } catch (e: SQLiteException){
+            db.execSQL(getAnnouncementsQuery)
+            return emptyArray()
+        }
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var negotiation: Int
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = cursor.getString(cursor.getColumnIndex("Voivodeship"))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = cursor.getString(cursor.getColumnIndex("Category"))
+                status = cursor.getString(cursor.getColumnIndex("Status"))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                negotiation = cursor.getInt(cursor.getColumnIndex("Negotiation"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+
+                announcements.add(
+                    Ad(
+                        ID = id,
+                        user = user,
+                        title = title,
+                        description = description,
+                        voivodeship = voivodeship,
+                        city = city,
+                        category = category,
+                        status = status,
+                        archived = archived,
+                        purchaser_id = purchaserId,
+                        image = image,
+                        negotiation = negotiation,
+                        published_date = publishedDate
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return announcements.toTypedArray()
+    }
+
+    fun getPurchasedAnnouncements(userId: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val announcements = mutableListOf<Ad>()
+        val cursor: Cursor?
+
+        val getAnnouncementsQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE Purchaser_id = $userId AND Archived = 1"
 
         try{
             cursor = db.rawQuery(getAnnouncementsQuery, null)

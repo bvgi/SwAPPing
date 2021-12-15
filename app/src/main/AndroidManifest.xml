@@ -27,12 +27,21 @@
         android:theme="@style/Theme.SwAPPing"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".ui.searching.LocalizationSearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.searching.CategorySearchActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.searching.ClueWordSearchActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.userAds.UserAdsActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".ui.AdDetails.EditAdActivity"

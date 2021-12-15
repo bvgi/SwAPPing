@@ -19,6 +19,8 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
+    // TODO: sprawdzanie internetu
+
     private lateinit var binding: ActivityMainBinding
     lateinit var DBHelper: DataBaseHelper
     lateinit var registerLink: TextView

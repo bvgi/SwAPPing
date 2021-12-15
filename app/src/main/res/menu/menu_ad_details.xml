@@ -14,4 +14,11 @@
         android:title="@string/deleteAd"
         android:visible="true"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_purchased"
+        android:checkable="false"
+        android:enabled="false"
+        android:icon="@drawable/bought_icon"
+        android:title="@string/state"
+        android:visible="false" />
 </menu>

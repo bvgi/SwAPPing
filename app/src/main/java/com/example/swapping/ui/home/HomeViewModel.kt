@@ -33,4 +33,12 @@ class HomeViewModel : ViewModel() {
 
         return ads
     }
+
+    fun getPurchasedAnnouncements(userID: Int, context: Context): Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getPurchasedAnnouncements(userID)
+
+
+        return ads
+    }
 }

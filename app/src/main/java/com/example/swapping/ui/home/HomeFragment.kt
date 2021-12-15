@@ -52,9 +52,17 @@ class HomeFragment : Fragment() {
                 ViewModelProvider(this).get(HomeViewModel()::class.java)
         userID = arguments.userID
         when(arguments.previousFragment){
-            "Profile" -> ads = homeViewModel.getUserAnnouncements(userID, root.context)
+            "Profile" -> ads = homeViewModel.getUserAnnouncements(userID, root.context) + homeViewModel.getPurchasedAnnouncements(userID, root.context)
             "Liked" -> ads = homeViewModel.getUserLiked(userID, root.context)
             else -> ads = homeViewModel.getAnnouncements(userID, root.context)
+        }
+
+        if(arguments.previousFragment != "Profile"){
+            for(ad in ads){
+                if (ad.archived == 1){
+                    ads.drop(ads.indexOf(ad))
+                }
+            }
         }
 
         adapter = HomeAdapter(arrayOf(), root.context)
@@ -65,11 +73,6 @@ class HomeFragment : Fragment() {
         adapter.dataset = ads
         adapter.notifyDataSetChanged()
 
-//
-//        val title: TextView = homeRecycler.
-//        homeViewModel.text.observe(viewLifecycleOwner, Observer {
-//            textView.text = it
-//        })
         return root
     }
 
