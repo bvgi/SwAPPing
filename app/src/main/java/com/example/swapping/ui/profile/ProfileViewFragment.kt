@@ -6,17 +6,19 @@ import android.media.Image
 import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.os.bundleOf
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,6 +27,7 @@ import com.example.swapping.Models.Review
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
 import com.example.swapping.databinding.FragmentProfileViewBinding
+import com.example.swapping.ui.AdDetails.AdDetailsFragment
 import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.home.HomeFragmentDirections
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -38,6 +41,7 @@ class ProfileViewFragment : Fragment() {
 
     var userID = 0
     var profileID = 0
+    var prev = ""
     private lateinit var profileViewViewModel: ProfileViewViewModel
     private var _binding: FragmentProfileViewBinding? = null
     private lateinit var dbHelper: DataBaseHelper
@@ -62,6 +66,8 @@ class ProfileViewFragment : Fragment() {
     private lateinit var reviewsRecycler: RecyclerView
     private lateinit var reviewsAdapter: ReviewsAdapter
 
+    private lateinit var reportUser: MenuItem
+
     var finalrate = 0
 
     private lateinit var root: View
@@ -70,21 +76,27 @@ class ProfileViewFragment : Fragment() {
 
     private val binding get() = _binding!!
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        arg.let {
+            profileID = it.profileID // ID profilu na który wchodzimy
+            userID = it.userID // ID użytkownika korzystającego z aplikacji
+            prev = it.previous // poprzedni fragment
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        userID = arg.userID
-        profileID = arg.profileID
+        super.onCreate(savedInstanceState)
 
         profileViewViewModel =
             ViewModelProvider(this).get(ProfileViewViewModel::class.java)
-
         _binding = FragmentProfileViewBinding.inflate(inflater, container, false)
-
         root = binding.root
-
 
         reviewsContent = root.findViewById(R.id.reviewsContents)
         reviews = profileViewViewModel.getReviews(profileID, root.context)
@@ -93,8 +105,6 @@ class ProfileViewFragment : Fragment() {
 
         if(reviews.size == 0)
             reviewTitle.visibility = View.GONE
-
-
 
 //        reviewsAdapter.button?.setOnClickListener {
 //            dbHelper.deleteReview(userID, profileID)
@@ -165,6 +175,7 @@ class ProfileViewFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         dbHelper = DataBaseHelper(view.context)
 
         reviewsRecycler = view.findViewById(R.id.reviews)
@@ -195,18 +206,51 @@ class ProfileViewFragment : Fragment() {
         email.text = email.text.toString() + userData.email
 
         phoneNumber = view.findViewById(R.id.profilePhoneNumber)
-        phoneNumber.text = phoneNumber.text.toString() + userData.phone_number
+        if(phoneNumber.text != "") {
+            phoneNumber.visibility = View.VISIBLE
+            phoneNumber.text = phoneNumber.text.toString() + userData.phone_number
+        }
 
         followers = view.findViewById(R.id.followersNumber)
         following = view.findViewById(R.id.followingNumber)
 
         followers.text = dbHelper.getFollowers(profileID).size.toString()
-        followers.setOnClickListener {  }
-        following.text = dbHelper.getFollowed(profileID).size.toString()
+        followers.setOnClickListener {
+            if(prev == "Liked"){
+                val usersList = UsersListFragment()
+                usersList.arguments =
+                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 0, "previousFragment" to "Liked")
+                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
+            } else {
+                val action =
+                    ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
+                action.followersOrFollowing = 0
+                action.profileID = profileID
+                action.userID = userID
+                findNavController().navigate(action)
+            }
+        }
+        following.text = dbHelper.getFollowing(profileID).size.toString()
+        following.setOnClickListener {
+            if(prev == "Liked"){
+                val usersList = UsersListFragment()
+                usersList.arguments =
+                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 1, "previous" to "Liked")
+                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
+            } else {
+                val action =
+                    ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
+                action.followersOrFollowing = 1
+                action.profileID = profileID
+                action.userID = userID
+                findNavController().navigate(action)
+            }
+        }
 
         observeButton.setOnClickListener {
             if(!profileViewViewModel.isFollower(userID, profileID, view.context)){
                 dbHelper.addFollower(profileID, userID)
+                println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
                 observeButton.text = "Przestań obserwować"
                 followers.text = dbHelper.getFollowers(profileID).size.toString()
 
@@ -220,9 +264,7 @@ class ProfileViewFragment : Fragment() {
             }
         }
 
-
-
-
+        println("PHONE_NUMBER: ${userData.phone_number}")
 
         val star1 = view.findViewById<ImageView>(R.id.star1)
         val star2 = view.findViewById<ImageView>(R.id.star2)
@@ -295,12 +337,44 @@ class ProfileViewFragment : Fragment() {
                 alert.visibility = View.VISIBLE
             }
         }
+    }
 
-
-
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.profile_menu, menu)
+        reportUser = menu.findItem(R.id.menu_reportUser)
+        if(profileID == userID)
+            reportUser.isVisible = false
 
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            android.R.id.home -> {
+                return true
+            }
+            R.id.menu_reportUser -> {
+                Snackbar.make(
+                    root.findViewById(R.id.reviewInformation),
+                    "Zgłoszono użytkownika",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
+
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        if(item.itemId == R.id.menu_likeAd)
+//            likeAd = item
+//
+//        when (item.itemId) {
+//            R.id.menu_likeAd -> {
+//                addToLiked()
+//                return true
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
 }

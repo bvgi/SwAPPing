@@ -1,23 +1,20 @@
 
 package com.example.swapping
 
-import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.widget.TextView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.NavArgument
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.databinding.ActivityMainBinding
-import com.example.swapping.ui.home.HomeFragment
-import com.example.swapping.ui.home.HomeFragmentDirections
-import com.example.swapping.ui.profile.ProfileFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var navView: BottomNavigationView
     var userID = 0
     var adID = 0
+    var exitCounter = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DBHelper = DataBaseHelper(applicationContext)
@@ -80,17 +78,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 2) {
-            navView.selectedItemId = R.id.navigation_profile
+    override fun onBackPressed() {
+        if(exitCounter == 0){
+            Snackbar.make(
+                findViewById(R.id.exitInformation),
+                "Naciśnij ponownie, aby wyjść z aplikacji",
+                Snackbar.LENGTH_SHORT
+            ).show()
+            exitCounter += 1
+            val handler = Handler()
+            handler.postDelayed({
+                                exitCounter = 0
+            }, 5000)
+        } else {
+            finishAffinity()
+            exitCounter = 0
+//
+////            super.onBackPressed()
+////            val intent = Intent(Intent.ACTION_MAIN)
+////            intent.addCategory(Intent.CATEGORY_HOME)
+////            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+////            startActivity(intent)
         }
     }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        val intent = Intent(Intent.ACTION_MAIN)
-//        intent.addCategory(Intent.CATEGORY_HOME)
-//        startActivity(intent)
-//    }
 }

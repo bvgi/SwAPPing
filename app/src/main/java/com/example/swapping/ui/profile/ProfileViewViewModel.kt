@@ -58,7 +58,10 @@ class ProfileViewViewModel : ViewModel() {
     fun isFollower(userID: Int, profileID: Int, context: Context) : Boolean {
         val dbHelper = DataBaseHelper(context)
         val followers = dbHelper.getFollowers(profileID)
-        val username = dbHelper.getUserById(userID).username
-        return followers.contains(username)
+        var contains = false
+        for(user in followers){
+            contains = user.first == userID
+        }
+        return contains
     }
 }

@@ -400,12 +400,12 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun getFollowers(userId: Int) : Array<String>{
+    fun getFollowers(userId: Int) : Array<Triple<Int, String, String>>{
         val db = this.readableDatabase
-        val followers = mutableListOf<String>()
+        val followers = mutableListOf<Triple<Int, String, String>>()
         val cursor: Cursor?
 
-        val getReviewsQuery = "SELECT F.Username AS Follower " +
+        val getReviewsQuery = "SELECT F.Username AS Username, F.Name AS Name, F.ID AS ID " +
                 "FROM $FOLLOWEDUSERS_TABLE " +
                 "JOIN $USER_TABLE F ON Followed = F.ID " +
                 "WHERE User = $userId"
@@ -417,12 +417,16 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             return emptyArray()
         }
 
-        var follower: String
+        var followerUsername: String
+        var followerName: String
+        var followerID: Int
 
         if(cursor.moveToFirst()){
             do{
-                follower = cursor.getString(cursor.getColumnIndex("Follower"))
-                followers.add(follower)
+                followerUsername = cursor.getString(cursor.getColumnIndex("Username"))
+                followerName = cursor.getString(cursor.getColumnIndex("Name"))
+                followerID = cursor.getInt(cursor.getColumnIndex("ID"))
+                followers.add(Triple(followerID, followerName, followerUsername))
 
             } while (cursor.moveToNext())
         }
@@ -433,12 +437,12 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return followers.toTypedArray()
     }
 
-    fun getFollowed(userId: Int) : Array<String>{
+    fun getFollowing(userId: Int) : Array<Triple<Int, String, String>>{
         val db = this.readableDatabase
-        val followed = mutableListOf<String>()
+        val following = mutableListOf<Triple<Int, String, String>>()
         val cursor: Cursor?
 
-        val getReviewsQuery = "SELECT U.Username AS Followed " +
+        val getReviewsQuery = "SELECT U.Username AS Username, U.Name AS Name, U.ID AS ID " +
                 "FROM $FOLLOWEDUSERS_TABLE " +
                 "JOIN $USER_TABLE U ON User = U.ID " +
                 "WHERE Followed = $userId"
@@ -450,12 +454,16 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             return emptyArray()
         }
 
-        var user: String
+        var followerUsername: String
+        var followerName: String
+        var followerID: Int
 
         if(cursor.moveToFirst()){
             do{
-                user = cursor.getString(cursor.getColumnIndex("Followed"))
-                followed.add(user)
+                followerUsername = cursor.getString(cursor.getColumnIndex("Username"))
+                followerName = cursor.getString(cursor.getColumnIndex("Name"))
+                followerID = cursor.getInt(cursor.getColumnIndex("ID"))
+                following.add(Triple(followerID, followerName, followerUsername))
 
             } while (cursor.moveToNext())
         }
@@ -463,7 +471,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         cursor.close()
         db.close()
 
-        return followed.toTypedArray()
+        return following.toTypedArray()
     }
 
     // ADDS
@@ -876,6 +884,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         db.close()
 
+        println("LIKED $announcementId, $result")
+
         return result
     }
 
@@ -885,6 +895,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val result = db.delete(DataBaseHelper.LIKED_TABLE, "User = ? and Ad = ?", arrayOf(userId.toString(), announcementId.toString()))
 
         db.close()
+
+        println("DISLIKED $announcementId, $result")
 
         return result
     }

@@ -75,8 +75,8 @@
             android:id="@+id/action_navigation_home_to_adDetailsActivity"
             app:destination="@id/adDetailsActivity" />
         <action
-            android:id="@+id/action_navigation_home_to_ad_user_navigation"
-            app:destination="@id/ad_user_navigation">
+            android:id="@+id/action_navigation_home_to_ad_details"
+            app:destination="@id/adDetailsFragment">
             <argument
                 android:name="userID"
                 android:defaultValue="0"
@@ -172,7 +172,7 @@
     <fragment
         android:id="@+id/navigation_profile_view"
         android:name="com.example.swapping.ui.profile.ProfileViewFragment"
-        android:label="fragment_profile_view"
+        android:label="Profil użytkownika"
         tools:layout="@layout/fragment_profile_view" >
         <argument
             android:name="userID"
@@ -182,6 +182,16 @@
             android:name="profileID"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="previous"
+            app:argType="string"
+            android:defaultValue=" " />
+        <action
+            android:id="@+id/action_navigation_profile_view_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_navigation_profile_view_to_usersListFragment"
+            app:destination="@id/usersListFragment" />
     </fragment>
     <activity
         android:id="@+id/navigation_edit_profile_activity"
@@ -228,6 +238,69 @@
             app:argType="integer"
             android:defaultValue="0" />
     </activity>
-    <include app:graph="@navigation/ad_user_navigation" />
+<!--    <include app:graph="@navigation/ad_user_navigation" />-->
+    <fragment
+        android:id="@+id/usersListFragment"
+        android:name="com.example.swapping.ui.profile.UsersListFragment"
+        android:label="fragment_users_list"
+        tools:layout="@layout/fragment_users_list" >
+        <action
+            android:id="@+id/action_usersListFragment_to_navigation_profile_view"
+            app:destination="@id/navigation_profile_view" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="followersOrFollowing"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="previous"
+            app:argType="string"
+            android:defaultValue=" " />
+    </fragment>
+    <fragment
+        android:id="@+id/adDetailsFragment"
+        android:name="com.example.swapping.ui.AdDetails.AdDetailsFragment"
+        android:label="fragment_ad_details"
+        tools:layout="Szczegóły ogłoszenia" >
+        <action
+            android:id="@+id/action_adDetailsFragment_to_navigation_profile_view"
+            app:destination="@id/navigation_profile_view" />
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="previousFragment"
+            app:argType="string"
+            android:defaultValue=" " />
+        <action
+            android:id="@+id/action_adDetailsFragment_to_userAdsActivity"
+            app:destination="@id/userAdsActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/userAdsActivity"
+        android:name="com.example.swapping.ui.userAds.UserAdsActivity"
+        android:label="activity_user_ads"
+        tools:layout="@layout/activity_user_ads">
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
 
 </navigation>

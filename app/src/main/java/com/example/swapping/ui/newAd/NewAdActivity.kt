@@ -18,6 +18,7 @@ import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NavUtils
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
@@ -346,4 +347,9 @@ class NewAdActivity : AppCompatActivity() {
     override fun getParentActivityIntent(): Intent? {
         return super.getParentActivityIntent()?.putExtra("userID", userID)
     }
+
+//    override fun onBackPressed() {
+////        super.onBackPressed()
+//        NavUtils.navigateUpFromSameTask(this);
+//    }
 }

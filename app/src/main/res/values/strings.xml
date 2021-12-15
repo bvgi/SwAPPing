@@ -56,9 +56,10 @@
     <string name="description">Opis przedmiotu</string>
     <string name="voivodeship">Województwo</string>
     <string name="location">Lokalizacja:\t</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="editAd">Edytuj</string>
     <string name="changePhoto">Zmień zdjęcie</string>
     <string name="deleteAd">Usuń</string>
+    <string name="name">Nazwa</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

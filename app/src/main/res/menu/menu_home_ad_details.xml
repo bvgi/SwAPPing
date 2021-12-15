@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.swapping.ui.AdDetails.AdDetailsFragment">
+    <item
+        android:id="@+id/menu_likeAd"
+        android:icon="@drawable/ic_twotone_favorite_border_24"
+        android:title="@string/editAd"
+        android:visible="true"
+        app:showAsAction="always" />
+</menu>

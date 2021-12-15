@@ -51,14 +51,14 @@ class HomeFragment : Fragment() {
         homeViewModel =
                 ViewModelProvider(this).get(HomeViewModel()::class.java)
         userID = arguments.userID
-        if(arguments.previousFragment == "Profile"){
-            ads = homeViewModel.getUserAnnouncements(userID, root.context)
-        }else{
-            ads = homeViewModel.getAnnouncements(userID, root.context)
+        when(arguments.previousFragment){
+            "Profile" -> ads = homeViewModel.getUserAnnouncements(userID, root.context)
+            "Liked" -> ads = homeViewModel.getUserLiked(userID, root.context)
+            else -> ads = homeViewModel.getAnnouncements(userID, root.context)
         }
 
         adapter = HomeAdapter(arrayOf(), root.context)
-        println("HOME:::${ads.size}, $userID")
+        println("HOME::: Num of ads: ${ads.size}, userID: $userID")
         homeRecycler = root.findViewById(R.id.RecyclerViewHome)
         homeRecycler.layoutManager = GridLayoutManager(root.context, 3)
         homeRecycler.adapter = adapter
@@ -78,20 +78,28 @@ class HomeFragment : Fragment() {
 
         adapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                if(arguments.previousFragment == "Profile"){
-                    val intent = Intent(root.context, AdDetailsActivity::class.java)
-                    intent.putExtras( bundleOf("userID" to userID, "profileID" to userID, "adID" to ads[pos].ID))
-                    startActivity(intent)
-                    // TODO: Nachodzą na siebie fragmenty
-                } else {
-                    val action = HomeFragmentDirections.actionNavigationHomeToAdUserNavigation()
-                    action.userID = arguments.userID
-                    action.profileID = ads[pos].user
-                    println(ads[pos].user)
-                    action.adID = ads[pos].ID
-                    root.findNavController().navigate(action)
+                when(arguments.previousFragment){
+                    "Profile" -> {
+                        val intent = Intent(root.context, AdDetailsActivity::class.java)
+                        intent.putExtras( bundleOf("userID" to arguments.userID, "profileID" to arguments.userID, "adID" to ads[pos].ID))
+                        startActivity(intent)
+                    }
+                    "Liked" -> {
+                        val adDetailsFragment = AdDetailsFragment()
+                        adDetailsFragment.arguments =
+                            bundleOf("userID" to arguments.userID, "profileID" to ads[pos].user, "adID" to ads[pos].ID, "previousFragment" to "Liked")
+                        fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, adDetailsFragment)?.commit()
+                    }
+                    else -> {
+                            val action = HomeFragmentDirections.actionNavigationHomeToAdDetails()
+                            action.userID = arguments.userID
+                            action.profileID = ads[pos].user
+                            println(ads[pos].user)
+                            action.adID = ads[pos].ID
+                            root.findNavController().navigate(action)
+                        }
+                    }
                 }
-            }
         })
     }
 

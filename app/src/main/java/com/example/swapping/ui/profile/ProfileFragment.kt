@@ -31,6 +31,7 @@ class ProfileFragment : Fragment() {
     private lateinit var editTextView: TextView
     private lateinit var profileViewLayout: LinearLayout
     private lateinit var userAds: LinearLayout
+    private lateinit var userFavs: LinearLayout
 
     private val args: ProfileFragmentArgs by navArgs()
 
@@ -50,7 +51,6 @@ class ProfileFragment : Fragment() {
 
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
-//        val root: View = inflater.inflate(R.layout.fragment_profile, container, false)
 
         dbHelper = DataBaseHelper(root.context)
 
@@ -75,6 +75,7 @@ class ProfileFragment : Fragment() {
             fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
         }
 
+
         logOutButton = view.findViewById(R.id.logoutButton)
         logOutButton.setOnClickListener {
             dbHelper.setLoggedOut(index)
@@ -85,11 +86,15 @@ class ProfileFragment : Fragment() {
 //            startActivityForResult(loginIntent, 2)
         }
 
+        userFavs = view.findViewById(R.id.userFavs)
+        userFavs.setOnClickListener {
+            val homeFragment = HomeFragment()
+            homeFragment.setArguments(bundleOf("userID" to index, "previousFragment" to "Liked"))
+            fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
+        }
+
         editTextView = view.findViewById(R.id.editProfile)
         editTextView.setOnClickListener {
-//            val editIntent = Intent(activity, EditProfileActivity::class.java)
-//            editIntent.putExtra("userid", index)
-//            startActivity(editIntent)
             val action = ProfileFragmentDirections.actionNavigationProfileToEditProfileActivity().setUserID(index)
             view.findNavController().navigate(action)
         }
