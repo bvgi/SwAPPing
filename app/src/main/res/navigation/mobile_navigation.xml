@@ -127,7 +127,7 @@
         android:id="@+id/navigation_notifications"
         android:name="com.example.swapping.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" >
+        tools:layout="@layout/fragment_notifications">
         <argument
             android:name="userID"
             app:argType="integer"
@@ -196,7 +196,8 @@
     <activity
         android:id="@+id/navigation_edit_profile_activity"
         android:name="com.example.swapping.ui.profile.EditProfileActivity"
-        android:label="EditProfileActivity" >
+        android:label="EditProfileActivity"
+        tools:layout="@layout/activity_edit_profile">
         <argument
             android:name="userID"
             app:argType="integer"
@@ -205,7 +206,8 @@
     <activity
         android:id="@+id/new_announcement_activity"
         android:name="com.example.swapping.ui.newAd.NewAdActivity"
-        android:label="NewAnnouncementActivity" >
+        android:label="NewAnnouncementActivity"
+        tools:layout="@layout/activity_new_ad">
         <argument
             android:name="userID"
             app:argType="integer"
@@ -214,7 +216,8 @@
     <activity
         android:id="@+id/navigation_login_activity"
         android:name="com.example.swapping.ui.userLogin.LoginActivity"
-        android:label="LoginActivity" >
+        android:label="LoginActivity"
+        tools:layout="@layout/activity_login">
         <argument
             android:name="userID"
             app:argType="integer"
@@ -267,8 +270,8 @@
     <fragment
         android:id="@+id/adDetailsFragment"
         android:name="com.example.swapping.ui.AdDetails.AdDetailsFragment"
-        android:label="fragment_ad_details"
-        tools:layout="Szczegóły ogłoszenia" >
+        android:label="Szczegóły ogłoszenia"
+        tools:layout="@layout/fragment_ad_details" >
         <action
             android:id="@+id/action_adDetailsFragment_to_navigation_profile_view"
             app:destination="@id/navigation_profile_view" />

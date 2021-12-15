@@ -699,6 +699,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var archived: Int
         var purchaserId: Int
         var image: ByteArray
+        var negotiation: Int
         var publishedDate: Int
 
         if(cursor.moveToFirst()){
@@ -714,25 +715,26 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
                 purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                negotiation = cursor.getInt(cursor.getColumnIndex("Negotiation"))
                 publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
 
                 announcements.add(
                     Ad(
-                    ID = id,
-                    user = user,
-                    title = title,
-                    description = description,
-                    voivodeship = voivodeship,
-                    city = city,
-                    category = category,
-                    status = status,
-                    archived = archived,
-                    purchaser_id = purchaserId,
-                    image = image,
-                    published_date = publishedDate
+                        ID = id,
+                        user = user,
+                        title = title,
+                        description = description,
+                        voivodeship = voivodeship,
+                        city = city,
+                        category = category,
+                        status = status,
+                        archived = archived,
+                        purchaser_id = purchaserId,
+                        image = image,
+                        negotiation = negotiation,
+                        published_date = publishedDate
+                    )
                 )
-                )
-
             } while (cursor.moveToNext())
         }
 
@@ -927,21 +929,26 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     // NEGOTIATIONS
 
-    fun startNegotiation(adID: Int) : Int {
+    fun startNegotiation(adID: Int, purchaserID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Negotiation", 1)
+        values.put("Purchaser_id", purchaserID)
 
         val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
         db.close()
 
+        println("DB::: RESULT: $result")
+
         return result
     }
 
-    fun acceptedNegotiation(adID: Int) : Int {
+    fun acceptedNegotiation(adID: Int, purchaserID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Negotiation", 2)
+        values.put("Purchaser_id", purchaserID)
+        values.put("Archived", 1)
 
         val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
         db.close()
@@ -949,10 +956,11 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun rejectedNegotiation(adID: Int) : Int {
+    fun rejectedNegotiation(adID: Int, purchaserID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Negotiation", -1)
+        values.put("Purchaser_id", purchaserID)
 
         val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
         db.close()
@@ -960,10 +968,11 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun restartNegotiation(adID: Int) : Int {
+    fun restartNegotiation(adID: Int, purchaserID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Negotiation", 0)
+        values.put("Purchaser_id", 0)
 
         val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
         db.close()

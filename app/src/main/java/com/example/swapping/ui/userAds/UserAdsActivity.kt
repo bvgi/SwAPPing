@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -54,6 +55,12 @@ class UserAdsActivity : AppCompatActivity() {
 
         ads = homeViewModel.getUserAnnouncements(userID, this)
 
+        for(ad in ads){
+            if(ad.archived == 1){
+                ads.drop(ads.indexOf(ad))
+            }
+        }
+
         adapter = UserAdsAdapter(arrayOf(), this)
         println("USERADS::: Num of ads: ${ads.size}, userID: $userID")
         adsRecycler = findViewById(R.id.usersAds)
@@ -83,17 +90,17 @@ class UserAdsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_saveData -> {
-                Snackbar.make(
-                    findViewById(R.id.startOfNegotiation),
-                    "Negocjacja rozpoczęta",
-                    Snackbar.LENGTH_SHORT
-                ).show()
-                dbHelper.startNegotiation(adID)
 
-//                val handler = Handler()
-//                handler.postDelayed({
-//                    onBackPressed()
-//                }, 5000)
+                dbHelper.startNegotiation(adID, userID) // TODO: zapisywanie, co zostało zaoferowane
+                onBackPressed()
+
+                Handler(Looper.getMainLooper()).postDelayed({
+                    Snackbar.make(
+                        findViewById(android.R.id.content),
+                        "Negocjacja rozpoczęta",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }, 5000)
                 return true
             }
         }

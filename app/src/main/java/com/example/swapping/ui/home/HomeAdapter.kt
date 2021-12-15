@@ -3,6 +3,7 @@ package com.example.swapping.ui.home
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,22 +33,17 @@ class HomeAdapter (var dataset: Array<Ad>, val context: Context) : RecyclerView.
         val row = dataset[position]
         println(row.image)
         if(row.image.isNotEmpty()) {
-//            val bmp = BitmapFactory.decodeByteArray(row.image, 0, row.image.size)
-//            println(bmp)
-
-            holder.image.setImageBitmap(getImage(row.image)
-//                Bitmap.createScaledBitmap(
-//                    bmp,
-//                    holder.image.width,
-//                    holder.image.height,
-//                    false
-//                )
-            )
+            holder.image.setImageBitmap(getImage(row.image))
         } else {
             holder.image.setImageResource(R.drawable.no_photo_foreground)
         }
         holder.title.text = row.title
         holder.username.text = userDB.getUserById(row.user).username
+        if(row.archived == 1){
+            holder.title.text = holder.title.text.toString() + " [ZAKOŃCZONO]"
+            holder.title.setTextColor(Color.GRAY)
+            holder.username.setTextColor(Color.GRAY)
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)
