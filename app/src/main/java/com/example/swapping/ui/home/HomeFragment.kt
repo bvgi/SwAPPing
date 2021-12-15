@@ -91,7 +91,7 @@ class HomeFragment : Fragment() {
                         fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, adDetailsFragment)?.commit()
                     }
                     else -> {
-                            val action = HomeFragmentDirections.actionNavigationHomeToAdDetails()
+                            val action = HomeFragmentDirections.actionNavigationHomeToAdDetails() // TODO: czy to nie powinno być activity
                             action.userID = arguments.userID
                             action.profileID = ads[pos].user
                             println(ads[pos].user)

@@ -301,6 +301,10 @@
             android:name="userID"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
     </activity>
 
 </navigation>

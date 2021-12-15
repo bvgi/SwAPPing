@@ -23,7 +23,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val VOIVODESHIPS_TABLE = "Voivodeships"
         const val CATEGORIES_TABLE = "Categories"
         const val STATUS_TABLE = "Status"
-        const val GENRE_TABLE = "Genre"
         const val LIKED_TABLE = "Liked"
 
         const val DATABASE_VERSION = 3
@@ -60,7 +59,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FOREIGN KEY(Followed) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_FOLLOWEDUSERS)
 
-        val SQL_CREATE_ANNOUCEMENT = "CREATE TABLE ${DataBaseHelper.ADVERTISEMENT_TABLE} (" +
+        val SQL_CREATE_AD = "CREATE TABLE $ADVERTISEMENT_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "User INTEGER NOT NULL, " +
                 "Title VARCHAR(100) NOT NULL, " +
@@ -74,36 +73,33 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "Purchaser_id INTEGER, " +
                 "Image BLOB, " +
                 "Published_date INTEGER NOT NULL, " +
-                "FOREIGN KEY(Voivodeship) REFERENCES ${DataBaseHelper.VOIVODESHIPS_TABLE}(ID), " +
+                "FOREIGN KEY(Voivodeship) REFERENCES $VOIVODESHIPS_TABLE(ID), " +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
-                "FOREIGN KEY(Category) REFERENCES ${DataBaseHelper.CATEGORIES_TABLE}(ID), " +
-                "FOREIGN KEY(Status) REFERENCES ${DataBaseHelper.STATUS_TABLE}(ID)," +
+                "FOREIGN KEY(Category) REFERENCES $CATEGORIES_TABLE(ID), " +
+                "FOREIGN KEY(Status) REFERENCES $STATUS_TABLE(ID)," +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID))"
-        db.execSQL(SQL_CREATE_ANNOUCEMENT)
-        println("ANNOUNCEMENT")
+        db.execSQL(SQL_CREATE_AD)
 
-        val SQL_CREATE_VOIVODESHIPS = "CREATE TABLE ${DataBaseHelper.VOIVODESHIPS_TABLE} (" +
+        val SQL_CREATE_VOIVODESHIPS = "CREATE TABLE $VOIVODESHIPS_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "Name VARCHAR(30) NOT NULL)"
         db.execSQL(SQL_CREATE_VOIVODESHIPS)
-        println("VOIVODESHIP")
 
-        val SQL_CREATE_CATEGORIES = "CREATE TABLE ${DataBaseHelper.CATEGORIES_TABLE} (" +
+        val SQL_CREATE_CATEGORIES = "CREATE TABLE $CATEGORIES_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "Name VARCHAR(255) NOT NULL)"
         db.execSQL(SQL_CREATE_CATEGORIES)
-        println("CATEGORIES")
 
-        val SQL_CREATE_STATUS = "CREATE TABLE ${DataBaseHelper.STATUS_TABLE} (" +
+        val SQL_CREATE_STATUS = "CREATE TABLE $STATUS_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "Name VARCHAR(255) NOT NULL)"
         db.execSQL(SQL_CREATE_STATUS)
 
-        val SQL_CREATE_LIKED = "CREATE TABLE ${DataBaseHelper.LIKED_TABLE} (" +
+        val SQL_CREATE_LIKED = "CREATE TABLE $LIKED_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "Ad INTEGER, " +
                 "User INTEGER, " +
-                "FOREIGN KEY(Ad) REFERENCES ${DataBaseHelper.ADVERTISEMENT_TABLE}(ID), " +
+                "FOREIGN KEY(Ad) REFERENCES $ADVERTISEMENT_TABLE(ID), " +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_LIKED)
 
@@ -215,8 +211,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var name = ""
         var email = ""
         var city = ""
-        var phone_number = ""
-        var mean_rate = 0.0
+        var phoneNumber = ""
+        var meanRate = 0.0
         var password = ""
 
         if(cursor.moveToFirst()){
@@ -224,8 +220,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             name = cursor.getString(cursor.getColumnIndex("Name"))
             email = cursor.getString(cursor.getColumnIndex("Email"))
             city = cursor.getString(cursor.getColumnIndex("City"))
-            phone_number = cursor.getString(cursor.getColumnIndex("Phone_number"))
-            mean_rate = cursor.getDouble(cursor.getColumnIndex("Mean_rate"))
+            phoneNumber = cursor.getString(cursor.getColumnIndex("Phone_number"))
+            meanRate = cursor.getDouble(cursor.getColumnIndex("Mean_rate"))
             password = cursor.getString(cursor.getColumnIndex("Password"))
         }
 
@@ -238,8 +234,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             email = email,
             name = name,
             city = city,
-            phone_number = phone_number,
-            mean_rate = mean_rate,
+            phone_number = phoneNumber,
+            mean_rate = meanRate,
             password = password)
     }
 
@@ -256,8 +252,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var name = ""
         var email = ""
         var city = ""
-        var phone_number = ""
-        var mean_rate = 0.0
+        var phoneNumber = ""
+        var meanRate = 0.0
         var password = ""
 
         if(cursor.moveToFirst()){
@@ -265,8 +261,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             name = cursor.getString(cursor.getColumnIndex("Name"))
             email = cursor.getString(cursor.getColumnIndex("Email"))
             city = cursor.getString(cursor.getColumnIndex("City"))
-            phone_number = cursor.getString(cursor.getColumnIndex("Phone_number"))
-            mean_rate = cursor.getDouble(cursor.getColumnIndex("Mean_rate"))
+            phoneNumber = cursor.getString(cursor.getColumnIndex("Phone_number"))
+            meanRate = cursor.getDouble(cursor.getColumnIndex("Mean_rate"))
             password = cursor.getString(cursor.getColumnIndex("Password"))
         }
 
@@ -279,8 +275,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             email = email,
             name = name,
             city = city,
-            phone_number = phone_number,
-            mean_rate = mean_rate,
+            phone_number = phoneNumber,
+            mean_rate = meanRate,
             password = password)
     }
 
@@ -293,8 +289,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val cursor = db.rawQuery(getUserQuery, null)
 
-        var username: String
-        var email: String
+        val username: String
+        val email: String
 
         if(cursor.moveToFirst()){
             username = cursor.getString(cursor.getColumnIndex("Username"))
@@ -340,7 +336,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getUserReviews(userId: Int) : Array<Review> {
         val db = this.readableDatabase
         val reviews = mutableListOf<Review>()
-        var cursor: Cursor?
+        val cursor: Cursor?
 
         val getReviewsQuery = "SELECT User, Reviewer, Rate, Description " +
                 "FROM $REVIEW_TABLE " +
@@ -525,8 +521,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         for (name in categories) {
             val values = ContentValues()
             values.put("Name", name)
-            println(values)
-            result = db.insert(DataBaseHelper.CATEGORIES_TABLE, null, values)
+            result = db.insert(CATEGORIES_TABLE, null, values)
         }
         db.close()
         return result
@@ -545,7 +540,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         for (name in statuses) {
             val values = ContentValues()
             values.put("Name", name)
-            result = db.insert(DataBaseHelper.STATUS_TABLE, null, values)
+            result = db.insert(STATUS_TABLE, null, values)
         }
         db.close()
         return result
@@ -559,7 +554,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val cursor: Cursor?
 
         val getCategoriesQuery = "SELECT * " +
-                "FROM ${DataBaseHelper.CATEGORIES_TABLE}"
+                "FROM $CATEGORIES_TABLE"
 
         try{
             cursor = db.rawQuery(getCategoriesQuery, null)
@@ -587,7 +582,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val cursor: Cursor?
 
         val getVoivodeshipsQuery = "SELECT * " +
-                "FROM ${DataBaseHelper.VOIVODESHIPS_TABLE}"
+                "FROM $VOIVODESHIPS_TABLE"
 
         try{
             cursor = db.rawQuery(getVoivodeshipsQuery, null)
@@ -614,7 +609,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val cursor: Cursor?
 
         val getStatusQuery = "SELECT * " +
-                "FROM ${DataBaseHelper.STATUS_TABLE}"
+                "FROM $STATUS_TABLE"
 
         try{
             cursor = db.rawQuery(getStatusQuery, null)
@@ -702,9 +697,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var category: String
         var status: String
         var archived: Int
-        var purchaser_id: Int
+        var purchaserId: Int
         var image: ByteArray
-        var published_date: Int
+        var publishedDate: Int
 
         if(cursor.moveToFirst()){
             do{
@@ -717,9 +712,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 category = cursor.getString(cursor.getColumnIndex("Category"))
                 status = cursor.getString(cursor.getColumnIndex("Status"))
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
-                purchaser_id = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
-                published_date = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
 
                 announcements.add(
                     Ad(
@@ -732,9 +727,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     category = category,
                     status = status,
                     archived = archived,
-                    purchaser_id = purchaser_id,
+                    purchaser_id = purchaserId,
                     image = image,
-                    published_date = published_date
+                    published_date = publishedDate
                 )
                 )
 
@@ -757,18 +752,18 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
-        var id = 0
-        var user = 0
-        var title = ""
-        var description = ""
-        var voivodeship = ""
-        var city = ""
-        var category = ""
-        var status = ""
-        var archived = 0
-        var purchaser_id = 0
-        var image = byteArrayOf()
-        var published_date = 0
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
 
         if(cursor.moveToFirst()){
             do{
@@ -781,9 +776,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 category = cursor.getString(cursor.getColumnIndex("Category"))
                 status = cursor.getString(cursor.getColumnIndex("Status"))
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
-                purchaser_id = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
-                published_date = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
                 ads.add(Ad(
                     ID = id,
                     user = user,
@@ -794,9 +789,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     category = category,
                     status = status,
                     archived = archived,
-                    purchaser_id = purchaser_id,
+                    purchaser_id = purchaserId,
                     image = image,
-                    published_date = published_date
+                    published_date = publishedDate
                 ))
             } while (cursor.moveToNext())
         }
@@ -824,9 +819,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var category = ""
         var status = ""
         var archived = 0
-        var purchaser_id = 0
+        var purchaserId = 0
         var image = byteArrayOf()
-        var published_date = 0
+        var publishedDate = 0
 
         if(cursor.moveToFirst()){
             user = cursor.getInt(cursor.getColumnIndex("User"))
@@ -837,9 +832,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             category = cursor.getString(cursor.getColumnIndex("Category"))
             status = cursor.getString(cursor.getColumnIndex("Status"))
             archived = cursor.getInt(cursor.getColumnIndex("Archived"))
-            purchaser_id = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+            purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
             image = cursor.getBlob(cursor.getColumnIndex("Image"))
-            published_date = cursor.getInt(cursor.getColumnIndex("Published_date"))
+            publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
         }
 
         cursor.close()
@@ -855,9 +850,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             category = category,
             status = status,
             archived = archived,
-            purchaser_id = purchaser_id,
+            purchaser_id = purchaserId,
             image = image,
-            published_date = published_date
+            published_date = publishedDate
         )
     }
 
@@ -880,7 +875,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         values.put("Ad", announcementId)
         values.put("User", userId)
 
-        val result = db.insert(DataBaseHelper.LIKED_TABLE, null, values)
+        val result = db.insert(LIKED_TABLE, null, values)
 
         db.close()
 
@@ -892,7 +887,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun deleteLiked(userId: Int, announcementId: Int) : Int {
         val db = this.writableDatabase
 
-        val result = db.delete(DataBaseHelper.LIKED_TABLE, "User = ? and Ad = ?", arrayOf(userId.toString(), announcementId.toString()))
+        val result = db.delete(LIKED_TABLE, "User = ? and Ad = ?", arrayOf(userId.toString(), announcementId.toString()))
 
         db.close()
 
@@ -904,7 +899,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun getLiked(userId: Int) : Array<Ad> {
         val db = this.readableDatabase
         val announcements = mutableListOf<Ad>()
-        var cursor: Cursor?
+        val cursor: Cursor?
 
         val geLikedQuery = "SELECT * " +
                 "FROM $LIKED_TABLE " +
@@ -930,5 +925,50 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return announcements.toTypedArray()
     }
 
+    // NEGOTIATIONS
+
+    fun startNegotiation(adID: Int) : Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put("Negotiation", 1)
+
+        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        db.close()
+
+        return result
+    }
+
+    fun acceptedNegotiation(adID: Int) : Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put("Negotiation", 2)
+
+        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        db.close()
+
+        return result
+    }
+
+    fun rejectedNegotiation(adID: Int) : Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put("Negotiation", -1)
+
+        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        db.close()
+
+        return result
+    }
+
+    fun restartNegotiation(adID: Int) : Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put("Negotiation", 0)
+
+        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        db.close()
+
+        return result
+    }
 
 }
