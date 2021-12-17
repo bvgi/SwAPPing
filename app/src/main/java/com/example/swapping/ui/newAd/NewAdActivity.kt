@@ -342,8 +342,6 @@ class NewAdActivity : AppCompatActivity() {
         }
     }
 
-
-
     override fun getParentActivityIntent(): Intent? {
         return super.getParentActivityIntent()?.putExtra("userID", userID)
     }

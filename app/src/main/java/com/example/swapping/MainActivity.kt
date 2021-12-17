@@ -56,11 +56,14 @@ class MainActivity : AppCompatActivity() {
         navController.setGraph(R.navigation.mobile_navigation, extras)
 
 
-        if(adID != 0){
+        if(adID != 0){ // TODO: Powrót z AdDetailsActivity
 //            val profileFragment = ProfileFragment()
 //            profileFragment.arguments = bundleOf("userID" to userID, "previousFragment" to "AdDetails")
 //            supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment_activity_main, profileFragment).commit()
-              navController.navigate(R.id.navigation_profile, bundleOf("userID" to userID, "previousFragment" to "AdDetails"))
+            if(adID == -1)
+                navController.navigate(R.id.navigation_search, bundleOf("userID" to userID, "previousFragment" to "AdDetails"))
+            else
+                navController.navigate(R.id.navigation_profile, bundleOf("userID" to userID, "previousFragment" to "AdDetails"))
         }
 
         navController.graph.findNode(R.id.navigation_new_announcement)

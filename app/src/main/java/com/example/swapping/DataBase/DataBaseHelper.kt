@@ -311,7 +311,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val getUserQuery = "SELECT * " +
                 "FROM $USER_TABLE " +
-                "WHERE Username LIKE $string OR Name LIKE $string"
+                "WHERE Username LIKE '%$string%' OR Name LIKE '%$string%'"
 
         val cursor = db.rawQuery(getUserQuery, null)
 
@@ -520,6 +520,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         )
         val db = this.writableDatabase
         db.execSQL("DELETE FROM $VOIVODESHIPS_TABLE")
+        db.execSQL("DELETE from sqlite_sequence where name='$VOIVODESHIPS_TABLE'")
         for(name in voivodeships) {
             val values = ContentValues()
             values.put("Name", name)
@@ -544,6 +545,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         )
         val db = this.writableDatabase
         db.execSQL("DELETE FROM $CATEGORIES_TABLE")
+        db.execSQL("DELETE from sqlite_sequence where name='$CATEGORIES_TABLE'")
         for (name in categories) {
             val values = ContentValues()
             values.put("Name", name)
@@ -563,6 +565,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         )
         val db = this.writableDatabase
         db.execSQL("DELETE FROM $STATUS_TABLE")
+        db.execSQL("DELETE from sqlite_sequence where name='$STATUS_TABLE'")
         for (name in statuses) {
             val values = ContentValues()
             values.put("Name", name)
@@ -661,14 +664,17 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun addAnnouncement(ad: Ad) : Long{
         val db = this.writableDatabase
         val values = ContentValues()
+        val categoryID = getCategoryID(ad.category)
+        val voivodeshipID = getVoivodeshipID(ad.voivodeship)
+        val statusID = getStatusID(ad.status)
         values.put("User", ad.user)
         values.put("Title", ad.title)
         values.put("Description", ad.description)
-        values.put("Voivodeship", ad.voivodeship)
+        values.put("Voivodeship", voivodeshipID)
         if(ad.city.isNotBlank())
             values.put("City", ad.city)
-        values.put("Category", ad.category)
-        values.put("Status", ad.status)
+        values.put("Category", categoryID)
+        values.put("Status", statusID)
         values.put("Negotiation", ad.negotiation)
         values.put("Archived", ad.archived)
         if (ad.image.isNotEmpty())
@@ -679,6 +685,66 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
 
         return result
+    }
+
+    private fun getCategoryID(category: String): Int {
+        val db = this.writableDatabase
+        val cursor =
+            db.rawQuery("SELECT ID FROM $CATEGORIES_TABLE WHERE Name = '${category}'", null)
+        if (cursor.count == 1)
+            cursor.moveToFirst()
+        val ID = cursor.getInt(cursor.getColumnIndex("ID"))
+        return ID
+    }
+
+    private fun getCategoryName(ID: Int): String {
+        val db = this.writableDatabase
+        val cursor =
+            db.rawQuery("SELECT Name FROM $CATEGORIES_TABLE WHERE ID = $ID", null)
+        if (cursor.count == 1)
+            cursor.moveToFirst()
+        val name = cursor.getString(cursor.getColumnIndex("Name"))
+        return name
+    }
+
+    private fun getVoivodeshipID(name: String): Int {
+        val db = this.writableDatabase
+        val cursor =
+            db.rawQuery("SELECT ID FROM $VOIVODESHIPS_TABLE WHERE Name = '${name}'", null)
+        if (cursor.count == 1)
+            cursor.moveToFirst()
+        val ID = cursor.getInt(cursor.getColumnIndex("ID"))
+        return ID
+    }
+
+    private fun getVoivodeshipName(ID: Int): String {
+        val db = this.writableDatabase
+        val cursor =
+            db.rawQuery("SELECT Name FROM $VOIVODESHIPS_TABLE WHERE ID = $ID", null)
+        if (cursor.count == 1)
+            cursor.moveToFirst()
+        val name = cursor.getString(cursor.getColumnIndex("Name"))
+        return name
+    }
+
+    private fun getStatusID(name: String): Int {
+        val db = this.writableDatabase
+        val cursor =
+            db.rawQuery("SELECT ID FROM $STATUS_TABLE WHERE Name = '${name}'", null)
+        if (cursor.count == 1)
+            cursor.moveToFirst()
+        val ID = cursor.getInt(cursor.getColumnIndex("ID"))
+        return ID
+    }
+
+    private fun getStatusName(ID: Int): String {
+        val db = this.writableDatabase
+        val cursor =
+            db.rawQuery("SELECT Name FROM $STATUS_TABLE WHERE ID = $ID", null)
+        if (cursor.count == 1)
+            cursor.moveToFirst()
+        val name = cursor.getString(cursor.getColumnIndex("Name"))
+        return name
     }
 
     fun updateAnnouncement(ad: Ad) : Int{
@@ -734,10 +800,10 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 user = cursor.getInt(cursor.getColumnIndex("User"))
                 title = cursor.getString(cursor.getColumnIndex("Title"))
                 description = cursor.getString(cursor.getColumnIndex("Description"))
-                voivodeship = cursor.getString(cursor.getColumnIndex("Voivodeship"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
                 city = cursor.getString(cursor.getColumnIndex("City"))
-                category = cursor.getString(cursor.getColumnIndex("Category"))
-                status = cursor.getString(cursor.getColumnIndex("Status"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
                 purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
@@ -806,10 +872,10 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 user = cursor.getInt(cursor.getColumnIndex("User"))
                 title = cursor.getString(cursor.getColumnIndex("Title"))
                 description = cursor.getString(cursor.getColumnIndex("Description"))
-                voivodeship = cursor.getString(cursor.getColumnIndex("Voivodeship"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
                 city = cursor.getString(cursor.getColumnIndex("City"))
-                category = cursor.getString(cursor.getColumnIndex("Category"))
-                status = cursor.getString(cursor.getColumnIndex("Status"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
                 purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
@@ -871,10 +937,10 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 user = cursor.getInt(cursor.getColumnIndex("User"))
                 title = cursor.getString(cursor.getColumnIndex("Title"))
                 description = cursor.getString(cursor.getColumnIndex("Description"))
-                voivodeship = cursor.getString(cursor.getColumnIndex("Voivodeship"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
                 city = cursor.getString(cursor.getColumnIndex("City"))
-                category = cursor.getString(cursor.getColumnIndex("Category"))
-                status = cursor.getString(cursor.getColumnIndex("Status"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
                 purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
@@ -927,10 +993,10 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             user = cursor.getInt(cursor.getColumnIndex("User"))
             title = cursor.getString(cursor.getColumnIndex("Title"))
             description = cursor.getString(cursor.getColumnIndex("Description"))
-            voivodeship = cursor.getString(cursor.getColumnIndex("Voivodeship"))
+            voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
             city = cursor.getString(cursor.getColumnIndex("City"))
-            category = cursor.getString(cursor.getColumnIndex("Category"))
-            status = cursor.getString(cursor.getColumnIndex("Status"))
+            category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+            status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
             archived = cursor.getInt(cursor.getColumnIndex("Archived"))
             purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
             image = cursor.getBlob(cursor.getColumnIndex("Image"))
@@ -964,6 +1030,202 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         db.close()
 
         return result
+    }
+
+    fun findAds(string: String, userId: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val getAnnouncementQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE Title LIKE '%$string%' " +
+                "AND User != $userId"
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsByCategory(category: String, userId: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val categoryID = getCategoryID(category)
+        println("CATEGORY ID : $categoryID")
+
+        val getAnnouncementQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE Category = $categoryID " +
+                "AND User != $userId"
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        println(ads.size)
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsByVoivodeship(voivodeship: String, userId: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val voivodeshipID = getVoivodeshipID(voivodeship)
+
+        val getAnnouncementQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE Voivodeship = $voivodeshipID " +
+                "AND User != $userId"
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
     }
 
     // LIKED ANNOUNCEMENTS

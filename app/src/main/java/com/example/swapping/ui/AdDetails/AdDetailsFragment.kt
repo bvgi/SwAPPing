@@ -69,9 +69,6 @@ class AdDetailsFragment : Fragment() {
     ): View {
         super.onCreate(savedInstanceState)
         adDetailsViewModel = AdDetailsViewModel()
-        userID = args.userID
-        adID = args.adID
-        profileID = args.profileID
 
         println("AD FRAGMENT: $userID, $adID, $profileID")
 

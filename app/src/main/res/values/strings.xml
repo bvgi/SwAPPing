@@ -64,4 +64,5 @@
     <string name="usersTitle">Użytkownicy</string>
     <string name="categoryTitle">Kategoria</string>
     <string name="localizationTitle">Lokalizacja</string>
+    <string name="like">Polub</string>
 </resources>

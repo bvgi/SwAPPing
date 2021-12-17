@@ -34,6 +34,8 @@ class AdDetailsActivity : AppCompatActivity() {
     private var purchaser = 0
     private var archived = 0
 
+    private lateinit var likeAd: MenuItem
+
     var userID = 0
     var adID = 0
     var profileID = 0
@@ -99,19 +101,53 @@ class AdDetailsActivity : AppCompatActivity() {
         status.text = ad.status
     }
 
+    private fun addToLiked(){
+        println("LIKED::: AdID: $adID, UserID: $userID")
+        if (isLiked()) {
+            dbHelper.deleteLiked(userID, adID)
+            likeAd.setIcon(R.drawable.ic_twotone_favorite_border_24)
+        } else {
+            dbHelper.addLiked(userID, adID)
+            likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
+        }
+    }
+
+    private fun isLiked() : Boolean {
+        val likedAds = dbHelper.getLiked(userID)
+        var exists = false
+        if(likedAds.isEmpty()){
+            exists = false
+        } else {
+            for (ad in likedAds) {
+                if (ad.ID == adID)
+                    exists = true
+            }
+        }
+        return exists
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_ad_details, menu)
         if (menu != null) {
             editAd = menu.findItem(R.id.menu_editAd)
             deleteAd = menu.findItem(R.id.menu_deleteAd)
             purchased = menu.findItem(R.id.menu_purchased)
+            likeAd = menu.findItem(R.id.menu_favAd)
         }
         if(archived == 1){
             editAd.isVisible = false
             deleteAd.isVisible = false
+            likeAd.isVisible = false
             if(purchaser == userID)
                 purchased.isVisible = true
         }
+        if(userID != profileID){
+            editAd.isVisible = false
+            deleteAd.isVisible = false
+            likeAd.isVisible = true
+        }
+        if (isLiked())
+            likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
         return true
     }
 
@@ -119,6 +155,7 @@ class AdDetailsActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.menu_editAd -> editAd = item
             R.id.menu_deleteAd -> deleteAd = item
+            R.id.menu_likeAd -> likeAd = item
         }
 
         when (item.itemId) {
@@ -135,11 +172,18 @@ class AdDetailsActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
+            R.id.menu_likeAd -> {
+                addToLiked()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
     override fun getParentActivityIntent(): Intent? {
-        return super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to adID))
+        return if(userID == profileID)
+            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to adID))
+        else
+            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to -1))
     }
 }

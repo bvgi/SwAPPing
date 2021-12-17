@@ -8,19 +8,33 @@ import com.example.swapping.ui.searching.Localizations
 import com.example.swapping.ui.searching.Users
 
 @Suppress("DEPRECATION")
-internal class ClueWordTabAdapter(var context: Context, fm: FragmentManager, var totalTabs: Int) : FragmentPagerAdapter(fm) {
+internal class ClueWordTabAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+    private final var fragmentList1: ArrayList<Fragment> = ArrayList()
+    private final var fragmentTitleList1: ArrayList<String> = ArrayList()
+    private var searchText = ""
+
+    // returns which item is selected from arraylist of fragments.
     override fun getItem(position: Int): Fragment {
-        return when (position) {
-            0 -> {
-                Ads()
-            }
-            1 -> {
-                Users()
-            }
-            else -> getItem(position)
-        }
+        return fragmentList1[position]
     }
+
+    // returns which item is selected from arraylist of titles.
+    override fun getPageTitle(position: Int): CharSequence {
+        return fragmentTitleList1[position]
+    }
+
+    // returns the number of items present in arraylist.
     override fun getCount(): Int {
-        return totalTabs
+        return fragmentList1.size
+    }
+
+    // this function adds the fragment and title in 2 separate  arraylist.
+    fun addFragment(fragment: Fragment, title: String) {
+        fragmentList1.add(fragment)
+        fragmentTitleList1.add(title)
+    }
+
+    fun setTextQueryChanged(newText: String) {
+        searchText = newText
     }
 }

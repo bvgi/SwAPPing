@@ -171,9 +171,6 @@
             android:id="@+id/action_navigation_search_to_clueWordSearchActivity"
             app:destination="@id/clueWordSearchActivity" />
         <action
-            android:id="@+id/action_navigation_search_to_localizationSearchActivity2"
-            app:destination="@id/localizationSearchActivity" />
-        <action
             android:id="@+id/action_navigation_search_to_categorySearchActivity"
             app:destination="@id/categorySearchActivity" />
     </fragment>
@@ -329,20 +326,10 @@
             android:defaultValue="0"/>
     </activity>
     <activity
-        android:id="@+id/localizationSearchActivity"
-        android:name="com.example.swapping.ui.searching.LocalizationSearchActivity"
-        android:label="activity_localization_search"
-        tools:layout="@layout/activity_localization_search">
-        <argument
-            android:name="userID"
-            app:argType="integer"
-            android:defaultValue="0"/>
-    </activity>
-    <activity
         android:id="@+id/categorySearchActivity"
-        android:name="com.example.swapping.ui.searching.CategorySearchActivity"
+        android:name="com.example.swapping.ui.searching.ResultsSearchActivity"
         android:label="activity_category_search"
-        tools:layout="@layout/activity_category_search" >
+        tools:layout="@layout/activity_search_category" >
         <argument
             android:name="userID"
             app:argType="integer"

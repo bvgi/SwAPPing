@@ -21,20 +21,27 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_round_repeat_24"
-        android:label="Edytuj"
+        android:label="@string/swapping"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SwAPPing"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.searching.LocalizationSearchActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.searching.CategorySearchActivity"
-            android:exported="false" />
+            android:name=".ui.searching.ResultsSearchActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
         <activity
             android:name=".ui.searching.ClueWordSearchActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity"/>
+        </activity>
         <activity
             android:name=".ui.userAds.UserAdsActivity"
             android:exported="false"

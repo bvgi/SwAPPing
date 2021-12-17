@@ -7,9 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.swapping.Models.Ad
 import com.example.swapping.R
 
-class SearchingListAdapter (var dataSet: Array<String>, val context: Context) : RecyclerView.Adapter<SearchingListAdapter.ViewHolder>() {
+class ClueWordSearchingAdapter (var dataSet: Array<Ad>, val context: Context) : RecyclerView.Adapter<ClueWordSearchingAdapter.ViewHolder>() {
     /**
      * Provide a reference to the type of views that you are using
      * (custom ViewHolder).
@@ -55,7 +56,8 @@ class SearchingListAdapter (var dataSet: Array<String>, val context: Context) : 
         // contents of the view with that element
 
         val name = dataSet[position]
-        viewHolder.name.text = name
+        viewHolder.name.text = name.title
+        viewHolder.id = name.ID
     }
 
     override fun getItemCount() = dataSet.size
