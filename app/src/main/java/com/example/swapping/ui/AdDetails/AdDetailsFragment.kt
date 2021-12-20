@@ -50,6 +50,7 @@ class AdDetailsFragment : Fragment() {
     var profileID = 0
     var prev = ""
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -87,6 +88,8 @@ class AdDetailsFragment : Fragment() {
         val photo = adDetailsViewModel.getImage(ad.image)
 
         dbHelper = DataBaseHelper(view.context)
+
+        val userNegotiations = dbHelper.getUserNegotiations(userID)
 
         title = view.findViewById(R.id.Title)
         title.text = ad.title
@@ -141,9 +144,17 @@ class AdDetailsFragment : Fragment() {
         status.text = ad.status
 
         startNegotiation = view.findViewById(R.id.startNegotiationButton)
+        var isInNegotiation = false
+        for(pair in userNegotiations){
+            if(pair.second.adID == adID && pair.second.purchaserID == userID)
+                isInNegotiation = true
+        }
+        if(dbHelper.getUserAnnouncements(userID).isEmpty() || isInNegotiation)
+            startNegotiation.isEnabled = false
         startNegotiation.setOnClickListener {
             if(ad.purchaser_id != userID){
                 val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsActivity()
+                action.profileID = profileID
                 action.userID = userID
                 action.adID = adID
                 view.findNavController().navigate(action)
@@ -167,12 +178,6 @@ class AdDetailsFragment : Fragment() {
                 addToLiked()
                 return true
             }
-//            android.R.id.home -> {
-//                val action = AdDetailsFragmentDirections.actionNavigationAdDetailsToMobileNavigation()
-//                action.userID = userID
-//                root.findNavController().navigate(action)
-//                return true
-//            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -201,6 +206,5 @@ class AdDetailsFragment : Fragment() {
         }
         return exists
     }
-
 
 }

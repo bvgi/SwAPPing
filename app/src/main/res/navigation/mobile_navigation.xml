@@ -144,6 +144,9 @@
         <action
             android:id="@+id/action_navigation_notifications_to_navigation_home"
             app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_notifications_to_negotiationDetailsActivity"
+            app:destination="@id/negotiationDetailsActivity" />
     </fragment>
 
     <fragment
@@ -320,6 +323,10 @@
             android:name="adID"
             app:argType="integer"
             android:defaultValue="0" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
     </activity>
     <activity
         android:id="@+id/clueWordSearchActivity"
@@ -346,5 +353,19 @@
         android:name="com.example.swapping.ui.profile.ProfileViewActivity"
         android:label="activity_profile_view"
         tools:layout="@layout/activity_profile_view" />
+    <activity
+        android:id="@+id/negotiationDetailsActivity"
+        android:name="com.example.swapping.ui.notifications.NegotiationDetailsActivity"
+        android:label="activity_negotiation_details"
+        tools:layout="@layout/activity_negotiation_details" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="negotiationID"
+            app:argType="integer"
+            android:defaultValue="0" />
+    </activity>
 
 </navigation>

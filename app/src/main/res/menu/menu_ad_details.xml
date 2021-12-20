@@ -14,20 +14,4 @@
         android:title="@string/deleteAd"
         android:visible="true"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/menu_favAd"
-        android:checkable="false"
-        android:enabled="true"
-        android:icon="@drawable/ic_twotone_favorite_border_24"
-        android:title="@string/like"
-        android:visible="true"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/menu_purchased"
-        android:checkable="false"
-        android:enabled="false"
-        android:icon="@drawable/bought_icon"
-        android:title="@string/state"
-        android:visible="true"
-        app:showAsAction="always" />
 </menu>

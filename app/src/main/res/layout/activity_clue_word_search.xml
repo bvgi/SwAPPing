@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:queryHint="Znajdź..."
-        android:iconifiedByDefault="false">
-    </SearchView>
+        android:iconifiedByDefault="false"/>
 
     <HorizontalScrollView
         android:layout_width="match_parent"

@@ -51,14 +51,12 @@ class NotificationAdapter(var dataSet: Array<Triple<Pair<Int, String>, Pair<Int,
         return ViewHolder(view)
     }
 
-
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-
         val data = dataSet[position]
         viewHolder.title.text = data.first.second
         viewHolder.username.text = "@" + data.second.second
         when(data.third){
-            -1 -> viewHolder.state.setImageResource(R.drawable.ic_baseline_stop_circle_24)              // odrzucone
+            4 -> viewHolder.state.setImageResource(R.drawable.ic_baseline_stop_circle_24)              // odrzucone
             1 -> viewHolder.state.setImageResource(R.drawable.ic_baseline_new_releases_24)              // rozpoczęte
             2 -> {
                 viewHolder.state.setImageResource(R.drawable.ic_baseline_check_circle_24)

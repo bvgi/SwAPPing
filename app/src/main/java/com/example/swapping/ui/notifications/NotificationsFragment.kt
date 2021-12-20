@@ -1,5 +1,6 @@
 package com.example.swapping.ui.notifications
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentNotificationsBinding
+import com.example.swapping.ui.home.HomeAdapter
+import com.example.swapping.ui.home.HomeFragmentDirections
 
 class NotificationsFragment : Fragment() {
 
@@ -52,29 +56,40 @@ class NotificationsFragment : Fragment() {
 
         dbHelper = DataBaseHelper(root.context)
 
-        val userAds = dbHelper.getUserAnnouncements(userID)
-        val notificationAds = mutableListOf<Triple<Pair<Int, String>, Pair<Int, String>, Int>>()
-        for(ad in userAds){
-            if(ad.negotiation != 0) {
-                val purchaser = dbHelper.getUserById(ad.purchaser_id).username
-                notificationAds.add(
-                    Triple(
-                        Pair(ad.ID, ad.title),
-                        Pair(ad.purchaser_id, purchaser),
-                        ad.negotiation
-                    )
+        val userNegotiations = dbHelper.getUserNegotiations(userID)
+        val ownedAds = mutableListOf<Triple<Pair<Int, String>, Pair<Int, String>, Int>>()
+        for(pair in userNegotiations){
+            val ad = pair.first
+            val negotiation = pair.second
+        println(negotiation.ID)
+            val purchaser = dbHelper.getUserById(negotiation.purchaserID).username
+            ownedAds.add(
+                Triple(
+                    Pair(ad.ID, ad.title),
+                    Pair(negotiation.purchaserID, purchaser),
+                    negotiation.type
                 )
-                println("NOTIFICATIONS::: Title ${ad.title}, User $purchaser, State ${ad.negotiation}")
-            }
+            )
         }
+//                println("NOTIFICATIONS::: Title ${ad.title}, User $purchaser, State ${ad.negotiation}")
 
-        notificationAdapter = NotificationAdapter(notificationAds.toTypedArray(), root.context)
+        notificationAdapter = NotificationAdapter(ownedAds.toTypedArray(), root.context)
         notificationRecyclerView = root.findViewById(R.id.userNotifications)
         notificationRecyclerView.layoutManager = LinearLayoutManager(root.context)
         notificationRecyclerView.adapter = notificationAdapter
         notificationRecyclerView.addItemDecoration(
             DividerItemDecoration(root.context,
                 DividerItemDecoration.VERTICAL)
+        )
+
+        notificationAdapter.setOnClickListener(object : NotificationAdapter.ReviewsClickListener{
+            override fun onClick(pos: Int, aView: View) {
+                val action = NotificationsFragmentDirections.actionNavigationNotificationsToNegotiationDetailsActivity()
+                action.userID = arguments.userID
+                action.negotiationID = userNegotiations[pos].second.ID
+                root.findNavController().navigate(action)
+            }
+        }
         )
 
         // TODO: OnClick -> pokazać szczegóły, tj. tytuł, użytkownik, przedmioty oraz opcje

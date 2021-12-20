@@ -49,6 +49,7 @@ class AdDetailsActivity : AppCompatActivity() {
     var profileID = 0
     var prev = ""
 
+    // TODO(Dodać przycisk rozpoczynania negocjacji)
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -149,37 +150,26 @@ class AdDetailsActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_ad_details, menu)
-        if (menu != null) {
-            editAd = menu.findItem(R.id.menu_editAd)
-            deleteAd = menu.findItem(R.id.menu_deleteAd)
-            purchased = menu.findItem(R.id.menu_purchased)
-            likeAd = menu.findItem(R.id.menu_favAd)
-        }
         if(archived == 1){
-            editAd.isVisible = false
-            deleteAd.isVisible = false
-            likeAd.isVisible = false
-            if(purchaser == userID)
-                purchased.isVisible = true
+            menuInflater.inflate(R.menu.ad_details_archived, menu)
+        } else {
+            if(userID != profileID){
+                menuInflater.inflate(R.menu.menu_home_ad_details, menu)
+                likeAd = menu!!.findItem(R.id.menu_likeAd)
+                if (isLiked())
+                    likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
+            } else {
+                menuInflater.inflate(R.menu.menu_ad_details, menu)
+                if (menu != null) {
+                    editAd = menu.findItem(R.id.menu_editAd)
+                    deleteAd = menu.findItem(R.id.menu_deleteAd)
+                }
+            }
         }
-        if(userID != profileID){
-            editAd.isVisible = false
-            deleteAd.isVisible = false
-            likeAd.isVisible = true
-        }
-        if (isLiked())
-            likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.menu_editAd -> editAd = item
-            R.id.menu_deleteAd -> deleteAd = item
-            R.id.menu_likeAd -> likeAd = item
-        }
-
         when (item.itemId) {
             R.id.menu_editAd -> {
                 val intent = Intent(this, EditAdActivity::class.java)

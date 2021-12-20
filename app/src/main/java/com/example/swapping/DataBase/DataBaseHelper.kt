@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.Negotiation
 import com.example.swapping.Models.Review
 import com.example.swapping.Models.User
 
@@ -24,8 +25,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         const val CATEGORIES_TABLE = "Categories"
         const val STATUS_TABLE = "Status"
         const val LIKED_TABLE = "Liked"
+        const val NEGOTIATION_TABLE = "Negotiations"
 
-        const val DATABASE_VERSION = 3
+        const val DATABASE_VERSION = 5
         const val DATABASE_NAME = "swAPPing.db"
     }
 
@@ -68,7 +70,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "City VARCHAR(50), " +
                 "Category INTEGER NOT NULL, " +
                 "Status INTEGER NOT NULL, " +
-                "Negotiation INTEGER NOT NULL, " +
                 "Archived INTEGER NOT NULL, " +
                 "Purchaser_id INTEGER, " +
                 "Image BLOB, " +
@@ -76,9 +77,20 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FOREIGN KEY(Voivodeship) REFERENCES $VOIVODESHIPS_TABLE(ID), " +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
                 "FOREIGN KEY(Category) REFERENCES $CATEGORIES_TABLE(ID), " +
-                "FOREIGN KEY(Status) REFERENCES $STATUS_TABLE(ID)," +
+                "FOREIGN KEY(Status) REFERENCES $STATUS_TABLE(ID), " +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID))"
         db.execSQL(SQL_CREATE_AD)
+
+        val SQL_CREATE_NEGOTIATIONS = "CREATE TABLE $NEGOTIATION_TABLE (" +
+                "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "Advertisement INTEGER NOT NULL, " +
+                "Owner INTEGER NOT NULL, " + // właściciel ogłoszenia
+                "User INTEGER NOT NULL, " + // osoba wykonująca negocjację
+                "Type INTEGER NOT NULL, " +
+                "Offers STRING NOT NULL, " +
+                "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
+                        "FOREIGN KEY(Advertisement) REFERENCES $ADVERTISEMENT_TABLE(ID))"
+        db.execSQL(SQL_CREATE_NEGOTIATIONS)
 
         val SQL_CREATE_VOIVODESHIPS = "CREATE TABLE $VOIVODESHIPS_TABLE (" +
                 "ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -106,15 +118,15 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     }
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         with(db) {
-            execSQL("DROP TABLE IF EXISTS User")
-            execSQL("DROP TABLE IF EXISTS Review")
-            execSQL("DROP TABLE IF EXISTS FollowedUsers")
-            execSQL("DROP TABLE IF EXISTS Ad")
-            execSQL("DROP TABLE IF EXISTS Voivodeships")
-            execSQL("DROP TABLE IF EXISTS Categories")
-            execSQL("DROP TABLE IF EXISTS Status")
-            execSQL("DROP TABLE IF EXISTS Genre")
-            execSQL("DROP TABLE IF EXISTS Liked")
+            execSQL("DROP TABLE IF EXISTS $USER_TABLE")
+            execSQL("DROP TABLE IF EXISTS $REVIEW_TABLE")
+            execSQL("DROP TABLE IF EXISTS $FOLLOWEDUSERS_TABLE")
+            execSQL("DROP TABLE IF EXISTS $ADVERTISEMENT_TABLE")
+            execSQL("DROP TABLE IF EXISTS $VOIVODESHIPS_TABLE")
+            execSQL("DROP TABLE IF EXISTS $CATEGORIES_TABLE")
+            execSQL("DROP TABLE IF EXISTS $STATUS_TABLE")
+            execSQL("DROP TABLE IF EXISTS $LIKED_TABLE")
+            execSQL("DROP TABLE IF EXISTS $NEGOTIATION_TABLE")
             onCreate(this)
         }
     }
@@ -675,7 +687,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             values.put("City", ad.city)
         values.put("Category", categoryID)
         values.put("Status", statusID)
-        values.put("Negotiation", ad.negotiation)
         values.put("Archived", ad.archived)
         if (ad.image.isNotEmpty())
             values.put("Image", ad.image)
@@ -683,6 +694,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
         val result = db.insert(ADVERTISEMENT_TABLE, null, values)
         db.close()
+        println(result)
 
         return result
     }
@@ -812,7 +824,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var archived: Int
         var purchaserId: Int
         var image: ByteArray
-        var negotiation: Int
         var publishedDate: Int
 
         if(cursor.moveToFirst()){
@@ -828,7 +839,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
                 purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
-                negotiation = cursor.getInt(cursor.getColumnIndex("Negotiation"))
                 publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
 
                 announcements.add(
@@ -844,7 +854,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         archived = archived,
                         purchaser_id = purchaserId,
                         image = image,
-                        negotiation = negotiation,
                         published_date = publishedDate
                     )
                 )
@@ -884,7 +893,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var archived: Int
         var purchaserId: Int
         var image: ByteArray
-        var negotiation: Int
         var publishedDate: Int
 
         if(cursor.moveToFirst()){
@@ -900,7 +908,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 archived = cursor.getInt(cursor.getColumnIndex("Archived"))
                 purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
                 image = cursor.getBlob(cursor.getColumnIndex("Image"))
-                negotiation = cursor.getInt(cursor.getColumnIndex("Negotiation"))
                 publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
 
                 announcements.add(
@@ -916,7 +923,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         archived = archived,
                         purchaser_id = purchaserId,
                         image = image,
-                        negotiation = negotiation,
                         published_date = publishedDate
                     )
                 )
@@ -936,6 +942,68 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val getAnnouncementQuery = "SELECT * " +
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE User != $userId"
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun getFollowingAds(userID: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val getAnnouncementQuery = "SELECT A.* " +
+                "FROM $ADVERTISEMENT_TABLE A " +
+                "JOIN $FOLLOWEDUSERS_TABLE F ON F.User = A.User " +
+                "WHERE F.Followed = $userID " +
+                "AND A.Archived = 0"
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2962,13 +3030,16 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
 
     // NEGOTIATIONS
 
-    fun startNegotiation(adID: Int, purchaserID: Int) : Int {
+    fun startNegotiation(adID: Int, userId: Int, purchaserID: Int, offers: String) : Long {
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("Negotiation", 1)
-        values.put("Purchaser_id", purchaserID)
+        values.put("Advertisement", adID)
+        values.put("Owner", userId)
+        values.put("Type", 1)
+        values.put("User", purchaserID)
+        values.put("Offers", offers)
 
-        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        val result = db.insert(NEGOTIATION_TABLE, null, values)
         db.close()
 
         println("DB::: RESULT: $result")
@@ -2976,10 +3047,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun acceptedNegotiation(adID: Int, purchaserID: Int) : Int {
+    fun archiveAd(adID: Int, purchaserID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("Negotiation", 2)
         values.put("Purchaser_id", purchaserID)
         values.put("Archived", 1)
 
@@ -2989,28 +3059,130 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun rejectedNegotiation(adID: Int, purchaserID: Int) : Int {
+    fun acceptNegotiation(adID: Int, purchaserID: Int, ownerID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("Negotiation", -1)
-        values.put("Purchaser_id", purchaserID)
+        values.put("Type", 2)
 
-        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        val result = db.update(NEGOTIATION_TABLE, values, "Advertisement = ? AND User = ? AND Owner = ?", arrayOf(adID.toString(), purchaserID.toString(), ownerID.toString()))
         db.close()
 
         return result
     }
 
-    fun restartNegotiation(adID: Int, purchaserID: Int) : Int {
+    fun rejectedNegotiation(negotiationID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
-        values.put("Negotiation", 0)
-        values.put("Purchaser_id", 0)
+        values.put("Type", 4)
 
-        val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(adID.toString()))
+        val result = db.update(NEGOTIATION_TABLE, values, "ID = ?", arrayOf(negotiationID.toString()))
         db.close()
 
         return result
+    }
+
+    fun riseNegotiation(negotiationID: Int) : Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put("Type", 3)
+
+        val result = db.update(NEGOTIATION_TABLE, values, "ID = ?", arrayOf(negotiationID.toString()))
+        db.close()
+
+        return result
+    }
+
+    fun updateNegotiation(negotiationID: Int, offers: String) : Int {
+        val db = this.writableDatabase
+        val values = ContentValues()
+        values.put("Type", 1)
+        values.put("Offers", offers.toString())
+
+        val result = db.update(NEGOTIATION_TABLE, values, "ID = ?", arrayOf(negotiationID.toString()))
+        db.close()
+
+        return result
+    }
+
+    fun getUserNegotiations(userID: Int) : Array<Pair<Ad, Negotiation>> {
+        val db = this.readableDatabase
+        val result = mutableListOf<Pair<Ad, Negotiation>>()
+        val cursor: Cursor?
+
+        val getNegotiationsQuery = "SELECT * " +
+                "FROM $NEGOTIATION_TABLE " +
+                "WHERE Owner = $userID " +
+                "OR User = $userID"
+
+        try{
+            cursor = db.rawQuery(getNegotiationsQuery, null)
+        } catch (e: SQLiteException){
+            db.execSQL(getNegotiationsQuery)
+            return emptyArray()
+        }
+
+        if(cursor.moveToFirst()){
+            do{
+                val ID = cursor.getInt(cursor.getColumnIndex("ID"))
+                val adID = cursor.getInt(cursor.getColumnIndex("Advertisement"))
+                val ownerID = cursor.getInt(cursor.getColumnIndex("Owner"))
+                val purchaserID = cursor.getInt(cursor.getColumnIndex("User"))
+                val type = cursor.getInt(cursor.getColumnIndex("Type"))
+                val offers = cursor.getString(cursor.getColumnIndex("Offers"))
+                result.add(Pair(getAnnouncement(adID), Negotiation(
+                    ID = ID,
+                    adID = adID,
+                    ownerID = ownerID,
+                    purchaserID = purchaserID,
+                    type = type,
+                    offers = offers
+                )))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return result.toTypedArray()
+    }
+
+    fun getNegotiation(ID: Int) : Negotiation {
+        val db = this.readableDatabase
+        val cursor: Cursor
+
+        val getNegotiationsQuery = "SELECT * " +
+                "FROM $NEGOTIATION_TABLE " +
+                "WHERE ID = $ID"
+
+        cursor = db.rawQuery(getNegotiationsQuery, null)
+
+        var ID = 0
+        var adID = 0
+        var ownerID = 0
+        var purchaserID = 0
+        var type = 0
+        var offers = ""
+        if(cursor.moveToFirst()){
+            ID = cursor.getInt(cursor.getColumnIndex("ID"))
+            adID = cursor.getInt(cursor.getColumnIndex("Advertisement"))
+            ownerID = cursor.getInt(cursor.getColumnIndex("Owner"))
+            purchaserID = cursor.getInt(cursor.getColumnIndex("User"))
+            type = cursor.getInt(cursor.getColumnIndex("Type"))
+            offers = cursor.getString(cursor.getColumnIndex("Offers"))
+        }
+
+        cursor.close()
+        db.close()
+
+        return Negotiation(
+            ID = ID,
+            adID = adID,
+            ownerID = ownerID,
+            purchaserID = purchaserID,
+            type = type,
+            offers = offers
+        )
+
     }
 
 }

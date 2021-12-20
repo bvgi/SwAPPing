@@ -37,6 +37,11 @@ class UserAdsActivity : AppCompatActivity() {
     val arguments: UserAdsActivityArgs by navArgs()
     var userID = 0
     var adID = 0
+    var profileID = 0
+    var prev = ""
+    var negotiationID = 0
+    var type = 0
+    private var chosedAds = mutableListOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,22 +49,32 @@ class UserAdsActivity : AppCompatActivity() {
         arguments.let {
             userID = it.userID
             adID = it.adID
+            profileID = it.profileID
+        }
+
+        val extras: Bundle? = intent.extras
+        if(extras != null){
+            prev = extras.getString("prev").toString()
+            negotiationID = extras.getInt("negotiationID")
         }
 
         dbHelper = DataBaseHelper(this)
 
-        var chosedAds = mutableListOf<Ad>()
+        val negotiation = dbHelper.getNegotiation(negotiationID)
+        type = negotiation.type
 
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel()::class.java)
 
-        ads = homeViewModel.getUserAnnouncements(userID, this)
+        val adsList = homeViewModel.getUserAnnouncements(userID, this).toMutableList()
 
-        for(ad in ads){
+        for(ad in adsList){
             if(ad.archived == 1){
-                ads.drop(ads.indexOf(ad))
+                adsList.drop(adsList.indexOf(ad))
             }
-        }
+        } //TODO: Usunąć ogłoszenia które biorą już udział w negocjacjach
+
+        ads = adsList.toTypedArray()
 
         adapter = UserAdsAdapter(arrayOf(), this)
         println("USERADS::: Num of ads: ${ads.size}, userID: $userID")
@@ -73,13 +88,11 @@ class UserAdsActivity : AppCompatActivity() {
             override fun onClick(pos: Int, aView: View) {
                 val checkbox: CheckBox = aView as CheckBox
                 if(checkbox.isChecked)
-                    chosedAds.add(ads[pos])
+                    chosedAds.add(ads[pos].ID)
                 else
-                    chosedAds.remove(ads[pos])
+                    chosedAds.remove(ads[pos].ID)
             }
         })
-
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -90,17 +103,25 @@ class UserAdsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_saveData -> {
-
-                dbHelper.startNegotiation(adID, userID) // TODO: zapisywanie, co zostało zaoferowane
-                onBackPressed()
-
-                Handler(Looper.getMainLooper()).postDelayed({
-                    Snackbar.make(
-                        findViewById(android.R.id.content),
-                        "Negocjacja rozpoczęta",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }, 5000)
+                if(type == 3){
+                    dbHelper.updateNegotiation(negotiationID, chosedAds.toString())
+                    onBackPressed()
+                } else {
+                    dbHelper.startNegotiation(
+                        adID,
+                        profileID,
+                        userID,
+                        chosedAds.toString()
+                    ) // TODO: zapisywanie, co zostało zaoferowane
+                    onBackPressed()
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        Snackbar.make(
+                            findViewById(android.R.id.content),
+                            "Negocjacja rozpoczęta",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }, 5000)
+                }
                 return true
             }
         }

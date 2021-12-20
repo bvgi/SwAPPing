@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -25,6 +26,8 @@ import com.example.swapping.databinding.FragmentHomeBinding
 import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.AdDetails.AdDetailsFragment
 import com.example.swapping.ui.profile.ProfileFragmentDirections
+import java.util.*
+import kotlin.random.Random
 
 class HomeFragment : Fragment() {
 
@@ -33,6 +36,7 @@ class HomeFragment : Fragment() {
     lateinit var adapter: HomeAdapter
     lateinit var homeRecycler: RecyclerView
     lateinit var ads: Array<Ad>
+    private lateinit var noFav: TextView
 
     val arguments: HomeFragmentArgs by navArgs()
     var userID = 0
@@ -54,9 +58,36 @@ class HomeFragment : Fragment() {
         userID = arguments.userID
         when(arguments.previousFragment){
             "Profile" -> ads = homeViewModel.getUserAnnouncements(userID, root.context) + homeViewModel.getPurchasedAnnouncements(userID, root.context)
-            "Liked" -> ads = homeViewModel.getUserLiked(userID, root.context)
-            else -> ads = homeViewModel.getAnnouncements(userID, root.context)
-        }
+            "Liked" -> {
+                ads = homeViewModel.getUserLiked(userID, root.context)
+                if(ads.isEmpty()) {
+                    noFav = root.findViewById(R.id.noFav)
+                    noFav.visibility = View.VISIBLE
+                }
+            }
+            else -> {
+                val tmp = homeViewModel.getFollowersAnnouncements(userID, root.context)
+                if(tmp.isEmpty()) {
+                    val adsList =
+                        homeViewModel.getAnnouncements(userID, root.context).toMutableList()
+                    val randomAds = mutableListOf<Ad>()
+                    for(ad in adsList){
+                        if(ad.archived == 1)
+                            adsList.drop(adsList.indexOf(ad))
+                    }
+                    var max = 20
+                    if(adsList.size < 10)
+                         max = adsList.size
+                    for(i in 1..max){
+                        val random = Random.nextInt(adsList.size)
+                        if(!randomAds.contains(adsList[random]))
+                            randomAds.add(adsList[random])
+                    }
+                    ads = randomAds.toTypedArray()
+                }
+                else
+                    ads = tmp
+            }}
 
         if(arguments.previousFragment != "Profile"){
             for(ad in ads){

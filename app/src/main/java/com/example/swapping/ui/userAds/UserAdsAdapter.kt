@@ -73,12 +73,4 @@ class  UserAdsAdapter (var dataset: Array<Ad>, val context: Context) : RecyclerV
     fun getImage(image: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(image, 0, image.size)
     }
-
-
-
-
-
-
-
-
 }

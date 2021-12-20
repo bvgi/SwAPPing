@@ -16,9 +16,6 @@ import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
 import com.example.swapping.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import android.content.Intent
-
-
 
 
 class ProfileFragment : Fragment() {

@@ -41,4 +41,11 @@ class HomeViewModel : ViewModel() {
 
         return ads
     }
+
+    fun getFollowersAnnouncements(userID: Int, context: Context): Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getFollowingAds(userID)
+
+        return ads
+    }
 }
