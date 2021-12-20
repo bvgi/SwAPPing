@@ -1110,6 +1110,602 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             } while (cursor.moveToNext())
         }
 
+        println(ads.size)
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAds(string: String, userId: Int, sort: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        var getAnnouncementQuery: String = when(sort){
+            1 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND User != $userId " +
+                    "ORDER BY Published_date ASC"
+            2 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND User != $userId " +
+                    "ORDER BY Published_date DESC"
+            3 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND A.User != $userId " +
+                    "ORDER BY Mean_rate ASC"
+            else -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND A.User != $userId " +
+                    "ORDER BY Mean_rate DESC"
+        }
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsByStatus(string: String, userId: Int, filter: String) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+        val statusID = getStatusID(filter)
+        val getAnnouncementQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                "AND User != $userId " +
+                "AND Status = $statusID"
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsByStatus(string: String, userId: Int, filter: String, sort: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val getAnnouncementQuery: String
+        val statusID = getStatusID(filter)
+
+        getAnnouncementQuery = when(sort){
+            1 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND User != $userId " +
+                    "AND Status = $statusID " +
+                    "ORDER BY Published_date ASC"
+            2 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND User != $userId " +
+                    "AND Status = $statusID " +
+                    "ORDER BY Published_date DESC"
+            3 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE A " +
+                    "JOIN $USER_TABLE U ON A.User = U.ID " +
+                    "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                    "AND A.User != $userId " +
+                    "AND A.Status = $statusID " +
+                    "ORDER BY U.Mean_rate ASC"
+            else -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE A " +
+                    "JOIN $USER_TABLE U ON A.User = U.ID " +
+                    "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                    "AND A.User != $userId " +
+                    "AND A.Status = $statusID " +
+                    "ORDER BY U.Mean_rate DESC"
+        }
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsByRate(string: String, userId: Int, filter: String) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val getAnnouncementQuery =
+            if(filter[0] < '5')
+                "SELECT A.* " +
+                        "FROM $ADVERTISEMENT_TABLE A " +
+                        "JOIN $USER_TABLE U ON A.User = U.ID " +
+                        "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                        "AND A.User != $userId " +
+                        "AND U.Mean_rate >= ${filter[0]}"
+            else
+                "SELECT A.* " +
+                        "FROM $ADVERTISEMENT_TABLE A " +
+                        "JOIN $USER_TABLE U ON A.User = U.ID " +
+                        "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                        "AND A.User != $userId " +
+                        "AND U.Mean_rate = ${filter[0]}"
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsByRate(string: String, userId: Int, filter: String, sort: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        var getAnnouncementQuery = when(sort){
+            1 -> {
+                if(filter[0] < '5')
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate >= ${filter[0]} " +
+                            "ORDER BY A.Published_date ASC"
+                else
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate = ${filter[0]} " +
+                            "ORDER BY A.Published_date ASC"
+            }
+            2 -> {
+                if(filter[0] < '5')
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate >= ${filter[0]} " +
+                            "ORDER BY A.Published_date DESC"
+                else
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate = ${filter[0]} " +
+                            "ORDER BY A.Published_date DESC"
+            }
+            3 -> {
+                if(filter[0] < '5')
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate >= ${filter[0]} " +
+                            "ORDER BY U.Mean_rate ASC"
+                else
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate = ${filter[0]} " +
+                            "ORDER BY U.Mean_rate ASC"
+            }
+            else ->
+                if(filter[0] < '5')
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate >= ${filter[0]} " +
+                            "ORDER BY U.Mean_rate DESC"
+                else
+                    "SELECT A.* " +
+                            "FROM $ADVERTISEMENT_TABLE A " +
+                            "JOIN $USER_TABLE U ON A.User = U.ID " +
+                            "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                            "AND A.User != $userId " +
+                            "AND U.Mean_rate = ${filter[0]} " +
+                            "ORDER BY U.Mean_rate DESC"
+        }
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsCategory(string: String, userId: Int, filter: String) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+        val categoryID = getCategoryID(filter)
+        val getAnnouncementQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                "AND User != $userId " +
+                "AND Status = $categoryID"
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return ads.toTypedArray()
+    }
+
+    fun findAdsCategory(string: String, userId: Int, filter: String, sort: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val ads = mutableListOf<Ad>()
+
+        val getAnnouncementQuery: String
+        val categoryID = getCategoryID(filter)
+
+        getAnnouncementQuery = when(sort){
+            1 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND User != $userId " +
+                    "AND Category = $categoryID " +
+                    "ORDER BY Published_date ASC"
+            2 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE " +
+                    "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
+                    "AND User != $userId " +
+                    "AND Category = $categoryID " +
+                    "ORDER BY Published_date DESC"
+            3 -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE A " +
+                    "JOIN $USER_TABLE U ON A.User = U.ID " +
+                    "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                    "AND A.User != $userId " +
+                    "AND A.Category = $categoryID " +
+                    "ORDER BY Mean_rate ASC"
+            else -> "SELECT * " +
+                    "FROM $ADVERTISEMENT_TABLE A " +
+                    "JOIN $USER_TABLE U ON A.User = U.ID " +
+                    "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
+                    "AND A.User != $userId " +
+                    "AND A.Category = $categoryID " +
+                    "ORDER BY Mean_rate DESC"
+        }
+
+        println(getAnnouncementQuery)
+
+        val cursor = db.rawQuery(getAnnouncementQuery, null)
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+                ads.add(Ad(
+                    ID = id,
+                    user = user,
+                    title = title,
+                    description = description,
+                    voivodeship = voivodeship,
+                    city = city,
+                    category = category,
+                    status = status,
+                    archived = archived,
+                    purchaser_id = purchaserId,
+                    image = image,
+                    published_date = publishedDate
+                ))
+            } while (cursor.moveToNext())
+        }
+
         cursor.close()
         db.close()
 
@@ -1429,9 +2025,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val categoryID = getCategoryID(categoryName)
         println("CATEGORY ID : $categoryID")
 
-        var getAnnouncementQuery = ""
-
-        getAnnouncementQuery =
+        var getAnnouncementQuery =
             if(filter[0] < '5')
                 "SELECT A.* " +
                         "FROM $ADVERTISEMENT_TABLE A " +
@@ -1505,9 +2099,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val categoryID = getCategoryID(categoryName)
         println("CATEGORY ID : $categoryID")
 
-        var getAnnouncementQuery = ""
-
-        getAnnouncementQuery = when(sort){
+        var getAnnouncementQuery = when(sort){
             1 -> {
                 if(filter[0] < '5')
                     "SELECT A.* " +

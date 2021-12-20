@@ -67,4 +67,5 @@
     <string name="like">Polub</string>
     <string name="sort">Sortuj</string>
     <string name="reset">Resetuj</string>
+    <string name="noResults">Nic nie znaleziono</string>
 </resources>

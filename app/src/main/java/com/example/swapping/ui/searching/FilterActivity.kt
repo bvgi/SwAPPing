@@ -29,6 +29,7 @@ class FilterActivity : AppCompatActivity() {
     private var categoryList = ""
     private var voivodeship = ""
     private var sort = 0
+    private var query = ""
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,6 +43,7 @@ class FilterActivity : AppCompatActivity() {
             voivodeship = extras.getString("voivodeship").toString()
             filter = extras.get("filter") as HashMap<String, String>
             sort = extras.getInt("sort")
+            query = extras.getString("query").toString()
         }
 
         val dbHelper = DataBaseHelper(this)
@@ -140,7 +142,8 @@ class FilterActivity : AppCompatActivity() {
                 "filterS" to if(status.checkedRadioButtonId != -1) status.findViewById<RadioButton>(status.checkedRadioButtonId).text.toString() else "null",
                 "filterC" to if(category.checkedRadioButtonId != -1) category.findViewById<RadioButton>(category.checkedRadioButtonId).text.toString() else "null",
                 "filterR" to if(rate.checkedRadioButtonId != -1) rate.findViewById<RadioButton>(rate.checkedRadioButtonId).text.toString() else "null",
-                "sort" to sort))
+                "sort" to sort,
+                "query" to query))
             startActivity(intent)
         }
 

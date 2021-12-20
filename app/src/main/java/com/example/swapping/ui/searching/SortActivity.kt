@@ -24,6 +24,7 @@ class SortActivity : AppCompatActivity() {
     private var category = ""
     private var voivodeship = ""
     private var sort = 0
+    private var query = ""
     private lateinit var filter: HashMap<String, String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,6 +36,7 @@ class SortActivity : AppCompatActivity() {
             category = extras.getString("category").toString()
             voivodeship = extras.getString("voivodeship").toString()
             sort = extras.getInt("sort")
+            query = extras.getString("query").toString()
             if(extras.get("filter") != null)
                 filter = extras.get("filter") as HashMap<String, String>
             else
@@ -66,15 +68,15 @@ class SortActivity : AppCompatActivity() {
         button.setOnClickListener {
             val intent = Intent(this, ResultsSearchActivity::class.java)
             if(dataASC.isChecked){
-                intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 1, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 1, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
             } else if(dataDESC.isChecked){
-                intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 2, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 2, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
             } else if(rateASC.isChecked){
-                intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 3, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 3, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
             } else if(rateDESC.isChecked){
-                intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 4, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 4, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
             } else {
-                intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 0, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 0, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
             }
             startActivity(intent)
         }

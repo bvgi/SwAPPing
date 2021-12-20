@@ -1,36 +1,40 @@
 package com.example.swapping.ui.searching
 
-import ClueWordTabAdapter
-import SearchingTabAdapter
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.GridLayout
+import android.widget.Button
 import android.widget.SearchView
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.R
 import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.home.HomeAdapter
-import com.google.android.material.tabs.TabLayout
 
 class ClueWordSearchActivity : AppCompatActivity() {
-//    private lateinit var clueWordTabLayout: TabLayout
-//    private lateinit var clueWordViewPager: ViewPager
     private lateinit var clueWordSearchView: SearchView
     private lateinit var resultRecyclerView: RecyclerView
     private lateinit var resultAdapter: HomeAdapter
     private lateinit var results: Array<Ad>
 
+    private lateinit var sortItem: Button
+    private lateinit var filterItem: Button
+    private lateinit var noResults: TextView
+
     private val arguments: ClueWordSearchActivityArgs by navArgs()
     private var userID = 0
+    private var sort = 0
+    private var filterS = ""
+    private var filterC = ""
+    private var filterR = ""
+    private var query = ""
+    private lateinit var dbHelper : DataBaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,47 +42,43 @@ class ClueWordSearchActivity : AppCompatActivity() {
         arguments.let {
             userID = it.userID
         }
+        val extras: Bundle? = intent.extras
+        if(extras != null){
+            sort = extras.getInt("sort")
+            filterS = extras.getString("filterS").toString()
+            filterR = extras.getString("filterR").toString()
+            filterC = extras.getString("filterC").toString()
+            query = extras.getString("query").toString()
+        }
 
-        val dbHelper = DataBaseHelper(this)
+        dbHelper = DataBaseHelper(this)
+
+        noResults = findViewById(R.id.nothingFound)
 
         resultRecyclerView = findViewById(R.id.resultList)
         resultRecyclerView.layoutManager = GridLayoutManager(this, 3)
         resultAdapter = HomeAdapter(emptyArray(), this)
         resultRecyclerView.adapter = resultAdapter
 
-
-//        clueWordTabLayout = findViewById(R.id.clueWordTabLayout)
-//        clueWordViewPager = findViewById(R.id.clueWordPager)
-//
-//        val adapter = ClueWordTabAdapter(supportFragmentManager)
-//        adapter.addFragment(Ads(), "Ogłoszenia")
-//        adapter.addFragment(Users(), "Użytkownicy")
-//        clueWordViewPager.adapter = adapter
-//        clueWordTabLayout.setupWithViewPager(clueWordViewPager)
-////        clueWordViewPager.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(clueWordTabLayout))
-//        clueWordTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-//            override fun onTabSelected(tab: TabLayout.Tab) {
-//                clueWordViewPager.currentItem = tab.position
-//            }
-//            override fun onTabUnselected(tab: TabLayout.Tab) {}
-//            override fun onTabReselected(tab: TabLayout.Tab) {}
-//        })
-
-
-//        println("CLUEWORD::: current tab : ${clueWordViewPager.currentItem}")
-
         clueWordSearchView = findViewById(R.id.clueWord)
+        if(query != "null")
+            clueWordSearchView.setQuery(query, true)
+        val con = this
         clueWordSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
                 if(p0 != null && p0 != "") {
-                    results = dbHelper.findAds(p0, userID)
-                    results.iterator().forEach { ad: Ad -> println(ad.title) }
-                    resultAdapter.dataset = results
-                    resultAdapter.notifyDataSetChanged()
+                    val intent = Intent(con, ResultsSearchActivity::class.java)
+                    intent.putExtras(bundleOf("query" to p0, "userID" to userID, "category" to "", "voivodeship" to "", "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC), "sort" to sort))
+                    startActivity(intent)
                 } else {
                     results = emptyArray()
                     resultAdapter.dataset = results
                     resultAdapter.notifyDataSetChanged()
+                    if(results.isEmpty()){
+                        noResults.visibility = View.VISIBLE
+                    } else {
+                        noResults.visibility = View.GONE
+                    }
                 }
                 return false
             }
@@ -88,10 +88,20 @@ class ClueWordSearchActivity : AppCompatActivity() {
                     results = dbHelper.findAds(p0, userID)
                     resultAdapter.dataset = results
                     resultAdapter.notifyDataSetChanged()
+                    if(results.isEmpty()){
+                        noResults.visibility = View.VISIBLE
+                    } else {
+                        noResults.visibility = View.GONE
+                    }
                 } else {
                     results = emptyArray()
                     resultAdapter.dataset = results
                     resultAdapter.notifyDataSetChanged()
+                    if(results.isEmpty()){
+                        noResults.visibility = View.VISIBLE
+                    } else {
+                        noResults.visibility = View.GONE
+                    }
                 }
                 return false
             }
@@ -106,6 +116,7 @@ class ClueWordSearchActivity : AppCompatActivity() {
             }
             })
     }
+
 
     override fun getParentActivityIntent(): Intent? {
         return super.getParentActivityIntent()?.putExtras(bundleOf("userID" to userID, "adID" to -1))
