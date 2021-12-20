@@ -65,4 +65,6 @@
     <string name="categoryTitle">Kategoria</string>
     <string name="localizationTitle">Lokalizacja</string>
     <string name="like">Polub</string>
+    <string name="sort">Sortuj</string>
+    <string name="reset">Resetuj</string>
 </resources>

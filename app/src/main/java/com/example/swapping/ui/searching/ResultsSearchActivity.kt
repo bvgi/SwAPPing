@@ -3,10 +3,8 @@ package com.example.swapping.ui.searching
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
-import android.widget.Toolbar
+import android.widget.*
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,29 +19,49 @@ class ResultsSearchActivity : AppCompatActivity() {
     private lateinit var resultRecyclerView: RecyclerView
     private lateinit var resultAdapter: HomeAdapter
     private lateinit var results: Array<Ad>
-    private lateinit var toolbar: Toolbar
-    private lateinit var sortItem: MenuItem
-    private lateinit var filterItem: MenuItem
+    private lateinit var sortItem: Button
+    private lateinit var filterItem: Button
     private var userID = 0
     private var category = ""
     private var voivodeship = ""
+    private var sort = 0
+    private var filterS = ""
+    private var filterC = ""
+    private var filterR = ""
+    private lateinit var dbHelper : DataBaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results_search)
-
-        toolbar = findViewById(R.id.resultsToolbar)
 
         val extras: Bundle? = intent.extras
         if(extras != null){
             userID = extras.getInt("userID")
             category = extras.getString("category").toString()
             voivodeship = extras.getString("voivodeship").toString()
+            sort = extras.getInt("sort")
+            filterS = extras.getString("filterS").toString()
+            filterR = extras.getString("filterR").toString()
+            filterC = extras.getString("filterC").toString()
         }
 
-        val dbHelper = DataBaseHelper(this)
+        println("Status: $filterS, rate: $filterR")
 
+        dbHelper = DataBaseHelper(this)
 
+        sortItem = findViewById(R.id.sortButton)
+        filterItem = findViewById(R.id.filterButton)
+        sortItem.setOnClickListener{
+            val intent = Intent(this, SortActivity::class.java)
+            intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to sort, "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC)))
+            startActivity(intent)
+        }
+
+        filterItem.setOnClickListener{
+            val intent = Intent(this, FilterActivity::class.java)
+            intent.putExtras(bundleOf("userID" to userID, "category" to category, "voivodeship" to voivodeship, "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC), "sort" to sort))
+            startActivity(intent)
+        }
 
         resultRecyclerView = findViewById(R.id.resultsRecyclerView)
         resultRecyclerView.layoutManager = GridLayoutManager(this, 3)
@@ -52,14 +70,29 @@ class ResultsSearchActivity : AppCompatActivity() {
 
         if(category != "") {
             title = "Kategoria: $category"
-            results = dbHelper.findAdsByCategory(category, userID)
+            if(sort != 0) {
+                results = getCategorySortResult(filterS, filterR, sort)
+                resultAdapter.dataset = results
+                resultAdapter.notifyDataSetChanged()
+            } else {
+                results = getCategoryResult(filterS, filterR)
+                resultAdapter.dataset = results
+                resultAdapter.notifyDataSetChanged()
+            }
         }
         if(voivodeship != "") {
-            title = "Województwo: $voivodeship"
-            results = dbHelper.findAdsByVoivodeship(voivodeship, userID)
+            if(sort != 0) {
+                title = "Województwo: $voivodeship"
+                results = getVoivodeshipSortResult(filterS, filterR, filterC, sort)
+                resultAdapter.dataset = results
+                resultAdapter.notifyDataSetChanged()
+            } else {
+                title = "Województwo: $voivodeship"
+                results = getVoivodeshipResult(filterS, filterR, filterC)
+                resultAdapter.dataset = results
+                resultAdapter.notifyDataSetChanged()
+            }
         }
-        resultAdapter.dataset = results
-        resultAdapter.notifyDataSetChanged()
 
         val context = this
 
@@ -76,30 +109,194 @@ class ResultsSearchActivity : AppCompatActivity() {
         return super.getParentActivityIntent()?.putExtras(bundleOf("userID" to userID, "adID" to -1))
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.profile_menu, menu)
-
-        sortItem = menu?.findItem(R.id.menu_sortBy)!!
-        filterItem = menu.findItem(R.id.menu_filter)
-
-        // Configure the search info and add any event listeners...
-
-        return super.onCreateOptionsMenu(menu)
+    private fun getCategorySortResult(filterS: String, filterR: String, sort: Int) : Array<Ad> {
+        println("Status: $filterS, Rate: $filterR")
+        val result = if(filterS != "null" && filterR == "null") {
+            dbHelper.findAdsByCategoryByStatus(category, userID, sort, filterS)
+        } else if(filterS != "null" && filterR != "null"){
+            val statusResult = dbHelper.findAdsByCategoryByStatus(category, userID, sort, filterS)
+            val rateResult = dbHelper.findAdsByCategoryByRate(category, userID, sort, filterR)
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(r in rateResult){
+                    if(s.ID == r.ID){
+                        tmp.add(s)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS == "null" && filterR != "null"){
+            dbHelper.findAdsByCategoryByRate(category, userID, sort, filterR)
+        }  else {
+            dbHelper.findAdsByCategory(category, userID, sort)
+        }
+        return result
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.menu_filter -> {
-            // User chose the "Settings" item, show the app settings UI...
-            true
+    private fun getCategoryResult(filterS: String, filterR: String) : Array<Ad> {
+        println("Status: $filterS, Rate: $filterR")
+        val result = if(filterS != "null" && filterR == "null") {
+            dbHelper.findAdsByCategoryByStatus(category, userID, filterS)
+        } else if(filterS != "null" && filterR != "null"){
+            val statusResult = dbHelper.findAdsByCategoryByStatus(category, userID, filterS)
+            val rateResult = dbHelper.findAdsByCategoryByRate(category, userID, filterR)
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(r in rateResult){
+                    if(s.ID == r.ID){
+                        tmp.add(s)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS == "null" && filterR != "null"){
+            dbHelper.findAdsByCategoryByRate(category, userID, filterR)
+        }  else {
+            dbHelper.findAdsByCategory(category, userID)
         }
-
-        R.id.menu_sortBy -> {
-            // User chose the "Favorite" action, mark the current item
-            // as a favorite...
-            true
-        }
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
+        return result
     }
+
+    private fun getVoivodeshipSortResult(filterS: String, filterR: String, filterC: String, sort: Int) : Array<Ad> {
+        println("Status: $filterS, Rate: $filterR")
+        val result = if(filterS != "null" && filterR == "null" && filterC == "null") {
+            dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
+        } else if(filterS != "null" && filterR != "null" && filterC == "null"){
+            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
+            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(r in rateResult){
+                    if(s.ID == r.ID){
+                        tmp.add(s)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS == "null" && filterR != "null" && filterC == "null"){
+            dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
+        } else if(filterS == "null" && filterR == "null" && filterC != "null"){
+            dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
+        } else if(filterS != "null" && filterR == "null" && filterC != "null"){
+            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
+            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(c in categoryResult){
+                    if(s.ID == c.ID){
+                        tmp.add(s)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS == "null" && filterR != "null" && filterC != "null"){
+            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
+            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
+            val tmp = mutableListOf<Ad>()
+            for(r in rateResult){
+                for(c in categoryResult){
+                    if(c.ID == r.ID){
+                        tmp.add(c)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS != "null" && filterR != "null" && filterC != "null") {
+            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
+            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
+            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
+            val firstResult = mutableListOf<Ad>()
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(r in rateResult){
+                    if(s.ID == r.ID){
+                        firstResult.add(s)
+                    }
+                }
+            }
+            for(f in firstResult){
+                for(c in categoryResult){
+                    if(f.ID == c.ID){
+                        tmp.add(f)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else {
+            dbHelper.findAdsByVoivodeship(voivodeship, userID, sort)
+        }
+        return result
+    }
+
+    private fun getVoivodeshipResult(filterS: String, filterR: String, filterC: String) : Array<Ad> {
+        println("Status: $filterS, Rate: $filterR")
+        val result = if(filterS != "null" && filterR == "null" && filterC == "null") {
+            dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
+        } else if(filterS != "null" && filterR != "null" && filterC == "null"){
+            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
+            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(r in rateResult){
+                    if(s.ID == r.ID){
+                        tmp.add(s)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS == "null" && filterR != "null" && filterC == "null"){
+            dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
+        } else if(filterS == "null" && filterR == "null" && filterC != "null"){
+            dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
+        } else if(filterS != "null" && filterR == "null" && filterC != "null"){
+            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
+            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(c in categoryResult){
+                    if(s.ID == c.ID){
+                        tmp.add(s)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS == "null" && filterR != "null" && filterC != "null"){
+            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
+            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
+            val tmp = mutableListOf<Ad>()
+            for(r in rateResult){
+                for(c in categoryResult){
+                    if(c.ID == r.ID){
+                        tmp.add(c)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else if(filterS != "null" && filterR != "null" && filterC != "null") {
+            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
+            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
+            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
+            val firstResult = mutableListOf<Ad>()
+            val tmp = mutableListOf<Ad>()
+            for(s in statusResult){
+                for(r in rateResult){
+                    if(s.ID == r.ID){
+                        firstResult.add(s)
+                    }
+                }
+            }
+            for(f in firstResult){
+                for(c in categoryResult){
+                    if(f.ID == c.ID){
+                        tmp.add(f)
+                    }
+                }
+            }
+            tmp.toTypedArray()
+        } else {
+            dbHelper.findAdsByVoivodeship(voivodeship, userID)
+        }
+        return result
+    }
+
 }

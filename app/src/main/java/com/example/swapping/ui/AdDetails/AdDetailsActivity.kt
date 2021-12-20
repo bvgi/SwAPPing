@@ -2,17 +2,23 @@ package com.example.swapping.ui.AdDetails
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.navigation.NavDeepLinkBuilder
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.User
 import com.example.swapping.R
+import com.example.swapping.ui.profile.ProfileViewActivity
+import com.example.swapping.ui.profile.ProfileViewFragment
 
 class AdDetailsActivity : AppCompatActivity() {
 
@@ -33,12 +39,15 @@ class AdDetailsActivity : AppCompatActivity() {
     private lateinit var dbHelper: DataBaseHelper
     private var purchaser = 0
     private var archived = 0
+    private lateinit var goToUserArrow: ImageView
+    private lateinit var goToUser: LinearLayout
 
     private lateinit var likeAd: MenuItem
 
     var userID = 0
     var adID = 0
     var profileID = 0
+    var prev = ""
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +62,7 @@ class AdDetailsActivity : AppCompatActivity() {
             userID = extras.getInt("userID")
             profileID = extras.getInt("profileID")
             adID = extras.getInt("adID")
+            prev = extras.getString("previous").toString()
         }
 
         println("AD FRAGMENT: $userID, $adID, $profileID")
@@ -68,7 +78,7 @@ class AdDetailsActivity : AppCompatActivity() {
         title.text = ad.title
 
         adPhoto = findViewById(R.id.AdImage)
-        adPhoto.setImageBitmap(photo) // TODO: Poprawić rozdzielczość
+        adPhoto.setImageBitmap(photo)
 
         description = findViewById(R.id.adDescription)
         description.text = ad.description
@@ -87,6 +97,18 @@ class AdDetailsActivity : AppCompatActivity() {
         rateStars = arrayOf(star1, star2, star3, star4, star5)
         adDetailsViewModel.changeStars(rateStars, user.mean_rate)
         println("AD::::${user.ID}, RATE: ${user.mean_rate}")
+
+        goToUserArrow = findViewById(R.id.goToUserArrow)
+
+        if(userID != profileID)
+            goToUserArrow.visibility = View.VISIBLE
+
+        goToUser = findViewById(R.id.goToUser)
+        goToUser.setOnClickListener {
+            val intent = Intent(this, ProfileViewActivity::class.java)
+            intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID))
+            startActivity(intent)
+        }
 
         location = findViewById(R.id.locationName)
         if (ad.city != "-")
@@ -186,4 +208,6 @@ class AdDetailsActivity : AppCompatActivity() {
         else
             super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to -1))
     }
+
+
 }

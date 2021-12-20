@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.swapping">
+    package="com.example.swapping" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -25,27 +25,51 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SwAPPing"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true" >
+        <activity
+            android:name=".ui.searching.FilterActivity"
+            android:exported="false"
+            android:label="Filtruj"/>
+        <activity
+            android:name=".ui.profile.UsersListActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.profile.ProfileViewActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.profile.ProfileViewActivity" />
+        </activity>
+        <activity
+            android:name=".ui.profile.ProfileViewActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.AdDetails.AdDetailsActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ui.AdDetails.AdDetailsActivity" />
+        </activity>
+        <activity
+            android:name=".ui.searching.SortActivity"
+            android:exported="false"
+            android:label="Sortuj"/>
         <activity
             android:name=".ui.searching.ResultsSearchActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".ui.searching.ClueWordSearchActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"/>
+                android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".ui.userAds.UserAdsActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -53,7 +77,7 @@
         <activity
             android:name=".ui.AdDetails.EditAdActivity"
             android:exported="false"
-            android:parentActivityName=".ui.AdDetails.AdDetailsActivity">
+            android:parentActivityName=".ui.AdDetails.AdDetailsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.AdDetails.AdDetailsActivity" />
@@ -62,14 +86,14 @@
             android:name=".ui.AdDetails.AdDetailsActivity"
             android:exported="false"
             android:label="@string/title_activity_ad_details"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
         <activity
             android:name=".ui.userLogin.RegisterActivity"
-            android:parentActivityName=".ui.userLogin.LoginActivity">
+            android:parentActivityName=".ui.userLogin.LoginActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.userLogin.LoginActivity" />
@@ -81,7 +105,7 @@
             android:name=".ui.userLogin.LoginActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:noHistory="true">
+            android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -91,7 +115,7 @@
         <activity
             android:name=".ui.newAd.NewAdActivity"
             android:label="Dodaj ogłoszenie"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -99,7 +123,7 @@
         <activity
             android:name=".ui.profile.EditProfileActivity"
             android:label="Edytuj profil"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

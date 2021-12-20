@@ -272,6 +272,9 @@
             android:name="previous"
             app:argType="string"
             android:defaultValue=" " />
+        <action
+            android:id="@+id/action_usersListFragment_to_profileViewActivity2"
+            app:destination="@id/profileViewActivity" />
     </fragment>
     <fragment
         android:id="@+id/adDetailsFragment"
@@ -300,6 +303,9 @@
         <action
             android:id="@+id/action_adDetailsFragment_to_userAdsActivity"
             app:destination="@id/userAdsActivity" />
+        <action
+            android:id="@+id/action_adDetailsFragment_to_profileViewActivity2"
+            app:destination="@id/profileViewActivity" />
     </fragment>
     <activity
         android:id="@+id/userAdsActivity"
@@ -335,5 +341,10 @@
             app:argType="integer"
             android:defaultValue="0"/>
     </activity>
+    <activity
+        android:id="@+id/profileViewActivity"
+        android:name="com.example.swapping.ui.profile.ProfileViewActivity"
+        android:label="activity_profile_view"
+        tools:layout="@layout/activity_profile_view" />
 
 </navigation>

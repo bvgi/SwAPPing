@@ -7,13 +7,46 @@
     android:orientation="vertical"
     tools:context=".ui.searching.ResultsSearchActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/resultsToolbar"
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme" />
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/filterButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="Filtruj"
+                    android:textColor="@color/black"
+                    android:textSize="13dp"
+                    android:backgroundTint="@color/gray"
+                    android:layout_weight="1"
+                    android:drawableLeft="@drawable/ic_baseline_filter_alt_24" />
+
+                <Button
+                    android:id="@+id/sortButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="Sortuj"
+                    android:textColor="@color/black"
+                    android:textSize="13dp"
+                    android:backgroundTint="@color/gray"
+                    android:layout_weight="1"
+                    android:drawableLeft="@drawable/ic_baseline_sort_24" />
+            </LinearLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

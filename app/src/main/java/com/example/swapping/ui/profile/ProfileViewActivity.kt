@@ -1,0 +1,280 @@
+package com.example.swapping.ui.profile
+
+import android.*
+import android.content.Intent
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.Review
+import com.example.swapping.R
+import com.example.swapping.databinding.ActivityProfileViewBinding
+import com.google.android.material.snackbar.Snackbar
+import kotlin.math.round
+
+class ProfileViewActivity : AppCompatActivity() {
+
+    var userID = 0
+    var profileID = 0
+    var prev = ""
+    private lateinit var profileViewViewModel: ProfileViewViewModel
+    private var _binding: ActivityProfileViewBinding? = null
+    private lateinit var dbHelper: DataBaseHelper
+    private lateinit var username: TextView
+    private lateinit var email: TextView
+    private lateinit var phoneNumber: TextView
+    private lateinit var observeButton: Button
+    private lateinit var addOpinionLayout: LinearLayout
+    private lateinit var profileAds: TextView
+    private lateinit var rateStars: Array<ImageView>
+    private lateinit var rateDescription: EditText
+    private lateinit var addReviewButton: Button
+    private lateinit var meanRate: TextView
+    private lateinit var alert: TextView
+    private lateinit var reviewsContent: LinearLayout
+    private lateinit var followers: TextView
+    private lateinit var following: TextView
+    private lateinit var reviewTitle: TextView
+    private lateinit var profileName: TextView
+
+    private lateinit var reviews: Array<Review>
+    private lateinit var reviewsRecycler: RecyclerView
+    private lateinit var reviewsAdapter: ReviewsAdapter
+
+    private lateinit var reportUser: MenuItem
+
+    var finalrate = 0
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_profile_view)
+
+        val extras: Bundle? = intent.extras
+        if(extras != null){
+            userID = extras.getInt("userID")
+            profileID = extras.getInt("profileID")
+        }
+
+        profileViewViewModel =
+            ViewModelProvider(this).get(ProfileViewViewModel::class.java)
+
+        reviewsContent = findViewById(R.id.reviewsContents)
+        reviews = profileViewViewModel.getReviews(profileID, this)
+        println(reviews)
+        reviewTitle = findViewById(R.id.reviewTitle)
+
+        if(reviews.size == 0)
+            reviewTitle.visibility = View.GONE
+
+        var reviewIndex = 0
+
+        for(review in reviews){
+            if(review.reviewer == profileID){
+                reviewIndex = reviews.indexOf(review)
+            }
+        }
+
+        println(reviewIndex)
+
+        observeButton = findViewById(R.id.observeButton)
+        addOpinionLayout = findViewById(R.id.addOpinionLayout)
+        profileAds = findViewById(R.id.profileAds)
+        rateDescription = findViewById(R.id.reviewContent)
+
+
+        if (profileID == userID) {
+            observeButton.visibility = View.GONE
+            addOpinionLayout.visibility = View.GONE
+            profileAds.visibility = View.GONE
+        }
+
+        if(profileViewViewModel.isFollower(userID, profileID, this)){
+            observeButton.text = "Przestań obserwować"
+//                observeButton.setBackgroundColor(Color.GRAY)
+        }
+        else{
+            observeButton.text = resources.getString(R.string.follow)
+//                observeButton.setBackgroundColor(ContextCompat.getColor(context, R.color.light_green))
+        }
+
+
+        if(profileViewViewModel.isReviewer(userID, profileID, this))
+            addOpinionLayout.visibility = View.GONE
+
+        dbHelper = DataBaseHelper(this)
+
+        reviewsRecycler = findViewById(R.id.reviews)
+        reviewsRecycler.layoutManager = LinearLayoutManager(this)
+        reviewsAdapter = ReviewsAdapter(Pair(userID, reviews), this)
+        reviewsRecycler.isNestedScrollingEnabled = false
+        reviewsRecycler.adapter = reviewsAdapter
+
+        val context = this
+
+        reviewsAdapter.setOnClickListener(object : ReviewsAdapter.ReviewsClickListener{
+            override fun onClick(pos: Int, aView: View) {
+                dbHelper.deleteReview(profileID, userID)
+                reviews = profileViewViewModel.getReviews(profileID, context)
+                dbHelper.updateMeanRate(profileID, round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0))
+                reviewsAdapter.notifyItemRemoved(pos)
+                reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
+            }
+        })
+
+        val userData = dbHelper.getUserById(profileID)
+
+        profileName = findViewById(R.id.profileName)
+        profileName.text = userData.name
+
+        username = findViewById(R.id.profileUsername)
+        username.text = "@" + userData.username
+
+        email = findViewById(R.id.profileEmail)
+        email.text = email.text.toString() + userData.email
+
+        phoneNumber = findViewById(R.id.profilePhoneNumber)
+        if(phoneNumber.text != "") {
+            phoneNumber.visibility = View.VISIBLE
+            phoneNumber.text = phoneNumber.text.toString() + userData.phone_number
+        }
+
+        followers = findViewById(R.id.followersNumber)
+        following = findViewById(R.id.followingNumber)
+
+        followers.text = dbHelper.getFollowers(profileID).size.toString()
+        followers.setOnClickListener {
+            val intent = Intent(this, UsersListActivity::class.java)
+            intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 0))
+            startActivity(intent)
+        }
+        following.text = dbHelper.getFollowing(profileID).size.toString()
+        following.setOnClickListener {
+            val intent = Intent(this, UsersListActivity::class.java)
+            intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 1))
+            startActivity(intent)
+        }
+
+        observeButton.setOnClickListener {
+            if(!profileViewViewModel.isFollower(userID, profileID, context)){
+                dbHelper.addFollower(profileID, userID)
+                println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
+                observeButton.text = "Przestań obserwować"
+                followers.text = dbHelper.getFollowers(profileID).size.toString()
+
+//                observeButton.setBackgroundColor(Color.GRAY)
+            }
+            else{
+                dbHelper.deleteFollower(profileID, userID)
+                observeButton.text = resources.getString(R.string.follow)
+                followers.text = dbHelper.getFollowers(profileID).size.toString()
+//                observeButton.setBackgroundColor(ContextCompat.getColor(context, R.color.light_green))
+            }
+        }
+
+        val star1 = findViewById<ImageView>(R.id.star1)
+        val star2 = findViewById<ImageView>(R.id.star2)
+        val star3 = findViewById<ImageView>(R.id.star3)
+        val star4 = findViewById<ImageView>(R.id.star4)
+        val star5 = findViewById<ImageView>(R.id.star5)
+        rateStars = arrayOf(star1, star2, star3, star4, star5)
+
+
+        star1.setOnClickListener {
+            profileViewViewModel.changeStars(rateStars, 1)
+            finalrate = 1
+        }
+
+        star2.setOnClickListener {
+            profileViewViewModel.changeStars(rateStars, 2)
+            finalrate = 2
+        }
+
+        star3.setOnClickListener {
+            profileViewViewModel.changeStars(rateStars, 3)
+            finalrate = 3
+        }
+
+        star4.setOnClickListener {
+            profileViewViewModel.changeStars(rateStars, 4)
+            finalrate = 4
+        }
+
+        star5.setOnClickListener {
+            profileViewViewModel.changeStars(rateStars, 5)
+            finalrate = 5
+        }
+
+        val countedMeanRate = profileViewViewModel.getMeanRate(reviews)
+        meanRate = findViewById(R.id.meanRateValue)
+        if (reviews.isNotEmpty())
+            meanRate.text = countedMeanRate.toString()
+
+        println("Review: $profileID, $userID, $finalrate, ${rateDescription.text}")
+
+        alert = findViewById(R.id.rateAlert)
+
+        addReviewButton = findViewById(R.id.saveReviewButton)
+        addReviewButton.setOnClickListener {
+            if(finalrate != 0) {
+                val description = rateDescription.text.toString()
+
+                val review = Review(
+                    user = profileID,
+                    reviewer = userID,
+                    rate = finalrate,
+                    description = description
+                )
+                dbHelper.addReview(review)
+                reviews = mutableListOf(review).toTypedArray() + reviews
+                println("Size: " + reviews.size)
+                reviewsAdapter.notifyItemInserted(0)
+                reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
+                reviewsRecycler.adapter = reviewsAdapter
+                val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                dbHelper.updateMeanRate(profileID, mean_rate)
+                meanRate.text = mean_rate.toString()
+                Snackbar.make(
+                    findViewById(R.id.reviewInformation),
+                    "Ocena została dodana",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                alert.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.profile_menu, menu)
+        if(menu != null)
+            reportUser = menu.findItem(R.id.menu_reportUser)
+        if(profileID == userID)
+            reportUser.isVisible = false
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId){
+            android.R.id.home -> {
+                return true
+            }
+            R.id.menu_reportUser -> {
+                Snackbar.make(
+                    findViewById(R.id.reviewInformation),
+                    "Zgłoszono użytkownika",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+}
