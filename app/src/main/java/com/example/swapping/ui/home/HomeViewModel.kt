@@ -48,4 +48,11 @@ class HomeViewModel : ViewModel() {
 
         return ads
     }
+
+    fun getNotArchivedAds(userID: Int, context: Context) : Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getUserAnnouncementsNotArchived(userID)
+
+        return ads
+    }
 }

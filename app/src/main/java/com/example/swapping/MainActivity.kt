@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var DBHelper: DataBaseHelper
-    lateinit var registerLink: TextView
     lateinit var navView: BottomNavigationView
     var userID = 0
     var adID = 0
@@ -39,10 +38,6 @@ class MainActivity : AppCompatActivity() {
             adID = extras.getInt("adID")
         }
 
-
-        println("MAIN::$userID $adID")
-
-
         navView = binding.navView
 
         if(savedInstanceState == null)
@@ -51,15 +46,12 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
 
         val appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.navigation_home, R.id.navigation_search, R.id.navigation_new_announcement, R.id.navigation_notifications, R.id.navigation_profile, R.id.navigation_profile_view))
+                R.id.navigation_home, R.id.navigation_search, R.id.navigation_new_announcement, R.id.navigation_notifications, R.id.navigation_profile))
 
         navController.setGraph(R.navigation.mobile_navigation, extras)
 
 
-        if(adID != 0){ // TODO: Powrót z AdDetailsActivity
-//            val profileFragment = ProfileFragment()
-//            profileFragment.arguments = bundleOf("userID" to userID, "previousFragment" to "AdDetails")
-//            supportFragmentManager.beginTransaction().replace(R.id.nav_host_fragment_activity_main, profileFragment).commit()
+        if(adID != 0){
             if(adID == -1)
                 navController.navigate(R.id.navigation_search, bundleOf("userID" to userID, "previousFragment" to "AdDetails"))
             else
@@ -105,5 +97,9 @@ class MainActivity : AppCompatActivity() {
 ////            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
 ////            startActivity(intent)
         }
+    }
+
+    public fun setActionBarTitle(title: String){
+        setTitle(title)
     }
 }

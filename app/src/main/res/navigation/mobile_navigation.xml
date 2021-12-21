@@ -44,6 +44,9 @@
             android:name="previousFragment"
             app:argType="string"
             android:defaultValue=" " />
+        <action
+            android:id="@+id/action_navigation_profile_to_userAdsFragment"
+            app:destination="@id/userAdsFragment" />
     </fragment>
 
     <fragment
@@ -90,10 +93,6 @@
                 android:defaultValue="0"
                 app:argType="integer" />
         </action>
-        <argument
-            android:name="previousFragment"
-            app:argType="string"
-            android:defaultValue="MainActivity" />
 
     </fragment>
 
@@ -192,6 +191,10 @@
             app:argType="integer"
             android:defaultValue="0" />
         <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
             android:name="previous"
             app:argType="string"
             android:defaultValue=" " />
@@ -201,11 +204,14 @@
         <action
             android:id="@+id/action_navigation_profile_view_to_usersListFragment"
             app:destination="@id/usersListFragment" />
+        <action
+            android:id="@+id/action_navigation_profile_view_to_adDetailsFragment"
+            app:destination="@id/adDetailsFragment" />
     </fragment>
     <activity
         android:id="@+id/navigation_edit_profile_activity"
         android:name="com.example.swapping.ui.profile.EditProfileActivity"
-        android:label="EditProfileActivity"
+        android:label="Edytuj profil"
         tools:layout="@layout/activity_edit_profile">
         <argument
             android:name="userID"
@@ -215,7 +221,7 @@
     <activity
         android:id="@+id/new_announcement_activity"
         android:name="com.example.swapping.ui.newAd.NewAdActivity"
-        android:label="NewAnnouncementActivity"
+        android:label="Nowe ogłoszenie"
         tools:layout="@layout/activity_new_ad">
         <argument
             android:name="userID"
@@ -225,7 +231,7 @@
     <activity
         android:id="@+id/navigation_login_activity"
         android:name="com.example.swapping.ui.userLogin.LoginActivity"
-        android:label="LoginActivity"
+        android:label="Zaloguj"
         tools:layout="@layout/activity_login">
         <argument
             android:name="userID"
@@ -235,7 +241,7 @@
     <activity
         android:id="@+id/adDetailsActivity"
         android:name="com.example.swapping.ui.AdDetails.AdDetailsActivity"
-        android:label="activity_ad_details"
+        android:label="Szczegóły ogłoszenia"
         tools:layout="@layout/activity_ad_details" >
         <argument
             android:name="userID"
@@ -250,11 +256,10 @@
             app:argType="integer"
             android:defaultValue="0" />
     </activity>
-<!--    <include app:graph="@navigation/ad_user_navigation" />-->
     <fragment
         android:id="@+id/usersListFragment"
         android:name="com.example.swapping.ui.profile.UsersListFragment"
-        android:label="fragment_users_list"
+        android:label="Lista użytkowników"
         tools:layout="@layout/fragment_users_list" >
         <action
             android:id="@+id/action_usersListFragment_to_navigation_profile_view"
@@ -284,9 +289,6 @@
         android:name="com.example.swapping.ui.AdDetails.AdDetailsFragment"
         android:label="Szczegóły ogłoszenia"
         tools:layout="@layout/fragment_ad_details" >
-        <action
-            android:id="@+id/action_adDetailsFragment_to_navigation_profile_view"
-            app:destination="@id/navigation_profile_view" />
         <argument
             android:name="userID"
             app:argType="integer"
@@ -309,11 +311,20 @@
         <action
             android:id="@+id/action_adDetailsFragment_to_profileViewActivity2"
             app:destination="@id/profileViewActivity" />
+        <action
+            android:id="@+id/action_adDetailsFragment_to_navigation_home"
+            app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_adDetailsFragment_to_navigation_profile_view"
+            app:destination="@id/navigation_profile_view" />
+        <action
+            android:id="@+id/action_adDetailsFragment_to_userAdsFragment"
+            app:destination="@id/userAdsFragment" />
     </fragment>
     <activity
         android:id="@+id/userAdsActivity"
         android:name="com.example.swapping.ui.userAds.UserAdsActivity"
-        android:label="activity_user_ads"
+        android:label="Twoje ogłoszenia"
         tools:layout="@layout/activity_user_ads">
         <argument
             android:name="userID"
@@ -367,5 +378,28 @@
             app:argType="integer"
             android:defaultValue="0" />
     </activity>
+    <fragment
+        android:id="@+id/userAdsFragment"
+        android:name="com.example.swapping.ui.userAds.UserAdsFragment"
+        android:label="fragment_user_ads"
+        tools:layout="@layout/fragment_user_ads" >
+        <argument
+            android:name="userID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="previousFragment"
+            app:argType="string"
+            android:defaultValue=" "/>
+        <action
+            android:id="@+id/action_userAdsFragment_to_navigation_profile"
+            app:destination="@id/navigation_profile" />
+        <action
+            android:id="@+id/action_userAdsFragment_to_adDetailsActivity"
+            app:destination="@id/adDetailsActivity" />
+        <action
+            android:id="@+id/action_userAdsFragment_to_adDetailsFragment"
+            app:destination="@id/adDetailsFragment" />
+    </fragment>
 
 </navigation>

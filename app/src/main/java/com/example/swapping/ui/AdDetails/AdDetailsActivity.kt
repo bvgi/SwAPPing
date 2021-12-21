@@ -13,12 +13,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.findNavController
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.ui.profile.ProfileViewActivity
 import com.example.swapping.ui.profile.ProfileViewFragment
+import com.example.swapping.ui.userAds.UserAdsActivity
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class AdDetailsActivity : AppCompatActivity() {
 
@@ -35,12 +38,13 @@ class AdDetailsActivity : AppCompatActivity() {
     private lateinit var category: TextView
     private lateinit var status: TextView
     private lateinit var rateStars: Array<ImageView>
-    private lateinit var goToProfile: ImageView
     private lateinit var dbHelper: DataBaseHelper
     private var purchaser = 0
     private var archived = 0
     private lateinit var goToUserArrow: ImageView
     private lateinit var goToUser: LinearLayout
+    private lateinit var publishedDate: TextView
+    private lateinit var startNegotiation: FloatingActionButton
 
     private lateinit var likeAd: MenuItem
 
@@ -49,7 +53,6 @@ class AdDetailsActivity : AppCompatActivity() {
     var profileID = 0
     var prev = ""
 
-    // TODO(Dodać przycisk rozpoczynania negocjacji)
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +69,8 @@ class AdDetailsActivity : AppCompatActivity() {
             prev = extras.getString("previous").toString()
         }
 
+        val userNegotiations = dbHelper.getUserNegotiations(userID)
+
         println("AD FRAGMENT: $userID, $adID, $profileID")
 
         val user = adDetailsViewModel.getUserInfo(profileID, this)
@@ -80,6 +85,9 @@ class AdDetailsActivity : AppCompatActivity() {
 
         adPhoto = findViewById(R.id.AdImage)
         adPhoto.setImageBitmap(photo)
+
+        publishedDate = findViewById(R.id.publishedDate)
+        publishedDate.text = "${ad.published_date.toString().substring(6,8)}.${ad.published_date.toString().substring(4,6)}.${ad.published_date.toString().substring(0,4)}"
 
         description = findViewById(R.id.adDescription)
         description.text = ad.description
@@ -122,6 +130,21 @@ class AdDetailsActivity : AppCompatActivity() {
 
         status = findViewById(R.id.adStatus)
         status.text = ad.status
+
+        startNegotiation = findViewById(R.id.startNegotiationButton)
+        var isInNegotiation = false
+        for(pair in userNegotiations){
+            if(pair.second.adID == adID && pair.second.purchaserID == userID)
+                isInNegotiation = true
+        }
+        if(dbHelper.getUserAnnouncements(userID).isEmpty() || isInNegotiation)
+            startNegotiation.isEnabled = false
+        startNegotiation.setOnClickListener {
+            if(ad.purchaser_id != userID){
+                val intent = Intent(this, UserAdsActivity::class.java)
+                intent.putExtras(bundleOf("profileID" to profileID, "userID" to userID, "adID" to adID))
+            }
+        }
     }
 
     private fun addToLiked(){
@@ -188,16 +211,20 @@ class AdDetailsActivity : AppCompatActivity() {
                 addToLiked()
                 return true
             }
+            android.R.id.home ->{
+                onBackPressed()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun getParentActivityIntent(): Intent? {
-        return if(userID == profileID)
-            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to adID))
-        else
-            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to -1))
-    }
+//    override fun getParentActivityIntent(): Intent? {
+//        return if(userID == profileID)
+//            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to adID))
+//        else
+//            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to -1))
+//    }
 
 
 }

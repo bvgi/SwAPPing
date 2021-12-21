@@ -135,13 +135,14 @@ class EditProfileActivity : AppCompatActivity() {
                     )
                 DBHelper.updateUser(user)
 
-//                val index = bundleOf("userID" to userID)
-//                navCon.navigate(R.id.navigation_profile, index)
-
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtra("userID", userID)
-//                setResult(2, intent) // TODO: powrót do fragmentu z profilem
-                startActivity(intent)
+//                val intent = Intent(this, MainActivity::class.java)
+//                intent.putExtra("userID", userID)
+//                startActivity(intent)
+                onBackPressed()
+                return true
+            }
+            android.R.id.home -> {
+                onBackPressed()
                 return true
             }
         }

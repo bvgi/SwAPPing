@@ -10,6 +10,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.R
@@ -19,11 +20,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class ProfileFragment : Fragment() {
-    var index = 0
-    var previousFragment = " "
+    private var userID = 0
+    private var previousFragment = " "
     private lateinit var profileViewModel: ProfileViewModel
     private var _binding: FragmentProfileBinding? = null
-    lateinit var logOutButton: FloatingActionButton
+    private lateinit var logOutButton: FloatingActionButton
     private lateinit var dbHelper: DataBaseHelper
     private lateinit var editTextView: TextView
     private lateinit var profileViewLayout: LinearLayout
@@ -40,7 +41,7 @@ class ProfileFragment : Fragment() {
             savedInstanceState: Bundle?
     ): View {
 
-        index = args.userID
+        userID = args.userID
         previousFragment = args.previousFragment
 
 
@@ -53,7 +54,7 @@ class ProfileFragment : Fragment() {
 
         if(previousFragment == "AdDetails"){
             val homeFragment = HomeFragment()
-            homeFragment.setArguments(bundleOf("userID" to index, "previousFragment" to "Profile"))
+            homeFragment.setArguments(bundleOf("userID" to userID, "previousFragment" to "Profile"))
             fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
         }
 
@@ -63,44 +64,43 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        println("PROFILE:::" + index)
+        println("PROFILE:::" + userID)
 
         userAds = view.findViewById(R.id.userAds)
         userAds.setOnClickListener {
-            val homeFragment = HomeFragment()
-            homeFragment.setArguments(bundleOf("userID" to index, "previousFragment" to "Profile"))
-            fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
+            val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
+            action.previousFragment = "Profile"
+            action.userID = userID
+            findNavController().navigate(action)
         }
 
 
         logOutButton = view.findViewById(R.id.logoutButton)
         logOutButton.setOnClickListener {
-            dbHelper.setLoggedOut(index)
-            val action = ProfileFragmentDirections.actionNavigationProfileToLoginActivity().setUserID(index)
+            dbHelper.setLoggedOut(userID)
+            val action = ProfileFragmentDirections.actionNavigationProfileToLoginActivity().setUserID(userID)
             view.findNavController().navigate(action)
-//            val loginIntent = Intent(view.context, LoginActivity::class.java)
-//            loginIntent.putExtra("userid", index)
-//            startActivityForResult(loginIntent, 2)
         }
 
         userFavs = view.findViewById(R.id.userFavs)
         userFavs.setOnClickListener {
-            val homeFragment = HomeFragment()
-            homeFragment.setArguments(bundleOf("userID" to index, "previousFragment" to "Liked"))
-            fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
+            val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
+            action.previousFragment = "Liked"
+            action.userID = userID
+            findNavController().navigate(action)
         }
 
         editTextView = view.findViewById(R.id.editProfile)
         editTextView.setOnClickListener {
-            val action = ProfileFragmentDirections.actionNavigationProfileToEditProfileActivity().setUserID(index)
+            val action = ProfileFragmentDirections.actionNavigationProfileToEditProfileActivity().setUserID(userID)
             view.findNavController().navigate(action)
         }
 
         profileViewLayout = view.findViewById(R.id.profileViewLayout)
         profileViewLayout.setOnClickListener {
             val action = ProfileFragmentDirections.actionNavigationProfileToProfileViewFragment()
-            action.userID = index
-            action.profileID = index
+            action.userID = userID
+            action.profileID = userID
             view.findNavController().navigate(action)
         }
 

@@ -66,15 +66,7 @@ class UserAdsActivity : AppCompatActivity() {
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel()::class.java)
 
-        val adsList = homeViewModel.getUserAnnouncements(userID, this).toMutableList()
-
-        for(ad in adsList){
-            if(ad.archived == 1){
-                adsList.drop(adsList.indexOf(ad))
-            }
-        } //TODO: Usunąć ogłoszenia które biorą już udział w negocjacjach
-
-        ads = adsList.toTypedArray()
+        ads = homeViewModel.getNotArchivedAds(userID, this)
 
         adapter = UserAdsAdapter(arrayOf(), this)
         println("USERADS::: Num of ads: ${ads.size}, userID: $userID")
@@ -112,15 +104,8 @@ class UserAdsActivity : AppCompatActivity() {
                         profileID,
                         userID,
                         chosedAds.toString()
-                    ) // TODO: zapisywanie, co zostało zaoferowane
+                    )
                     onBackPressed()
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        Snackbar.make(
-                            findViewById(android.R.id.content),
-                            "Negocjacja rozpoczęta",
-                            Snackbar.LENGTH_SHORT
-                        ).show()
-                    }, 5000)
                 }
                 return true
             }

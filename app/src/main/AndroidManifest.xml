@@ -27,8 +27,16 @@
         android:theme="@style/Theme.SwAPPing"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.notifications.NegotiationDetailsActivity"
+            android:name=".ui.InternetConnectionActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.notifications.NegotiationDetailsActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".ui.searching.FilterActivity"
             android:exported="false"

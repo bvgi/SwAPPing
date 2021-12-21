@@ -28,6 +28,7 @@ import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
 import com.example.swapping.databinding.FragmentProfileViewBinding
 import com.example.swapping.ui.AdDetails.AdDetailsFragment
+import com.example.swapping.ui.AdDetails.AdDetailsFragmentDirections
 import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.home.HomeFragmentDirections
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -35,13 +36,14 @@ import com.google.android.material.snackbar.Snackbar
 import org.w3c.dom.Text
 import kotlin.math.round
 
-// TODO: Dodawanie i usuwanie ocen, przegląd followersów, napis na action bar
+// TODO: Dodawanie i usuwanie ocen
 
 class ProfileViewFragment : Fragment() {
 
     var userID = 0
     var profileID = 0
     var prev = ""
+    var adID = 0
     private lateinit var profileViewViewModel: ProfileViewViewModel
     private var _binding: FragmentProfileViewBinding? = null
     private lateinit var dbHelper: DataBaseHelper
@@ -83,6 +85,7 @@ class ProfileViewFragment : Fragment() {
             profileID = it.profileID // ID profilu na który wchodzimy
             userID = it.userID // ID użytkownika korzystającego z aplikacji
             prev = it.previous // poprzedni fragment
+            adID = it.adID
         }
     }
 
@@ -103,45 +106,8 @@ class ProfileViewFragment : Fragment() {
         println(reviews)
         reviewTitle = root.findViewById(R.id.reviewTitle)
 
-        if(reviews.size == 0)
+        if(reviews.isEmpty())
             reviewTitle.visibility = View.GONE
-
-//        reviewsAdapter.button?.setOnClickListener {
-//            dbHelper.deleteReview(userID, profileID)
-//            var reviewIndex = 0
-//            for(review in reviews){
-//                if(review.reviewer == profileID){
-//                    reviewIndex = reviews.indexOf(review)
-//                }
-//            }
-//            reviews.drop(reviewIndex)
-//            println(reviews.size)
-//            reviewsAdapter.notifyItemRemoved(reviewIndex)
-//            reviewsAdapter.notifyItemRangeChanged(reviewIndex, reviews.size)
-//        }
-        var reviewIndex = 0
-//        val button = inflater.inflate(R.layout.review_row, container, false).findViewById<ImageButton>(R.id.deleteReview)
-//        button.setOnClickListener {
-//            dbHelper.deleteReview(userID, profileID)
-//
-//            for(review in reviews){
-//                if(review.reviewer == profileID){
-//                    reviewIndex = reviews.indexOf(review)
-//                }
-//            }
-//            reviews.drop(reviewIndex)
-//            println(reviews.size)
-//            reviewsAdapter.notifyItemRemoved(reviewIndex)
-//            reviewsAdapter.notifyItemRangeChanged(reviewIndex, reviews.size)
-//        }
-
-        for(review in reviews){
-            if(review.reviewer == profileID){
-                reviewIndex = reviews.indexOf(review)
-            }
-        }
-
-        println(reviewIndex)
 
         observeButton = root.findViewById(R.id.observeButton)
         addOpinionLayout = root.findViewById(R.id.addOpinionLayout)
@@ -156,12 +122,10 @@ class ProfileViewFragment : Fragment() {
         }
 
         if(profileViewViewModel.isFollower(userID, profileID, root.context)){
-            observeButton.text = "Przestań obserwować"
-//                observeButton.setBackgroundColor(Color.GRAY)
+            observeButton.text = getString(R.string.unfollow)
         }
         else{
-            observeButton.text = resources.getString(R.string.follow)
-//                observeButton.setBackgroundColor(ContextCompat.getColor(view.context, R.color.light_green))
+            observeButton.text = getString(R.string.follow)
         }
 
 
@@ -171,7 +135,6 @@ class ProfileViewFragment : Fragment() {
         return root
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -216,35 +179,35 @@ class ProfileViewFragment : Fragment() {
 
         followers.text = dbHelper.getFollowers(profileID).size.toString()
         followers.setOnClickListener {
-            if(prev == "Liked"){
-                val usersList = UsersListFragment()
-                usersList.arguments =
-                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 0, "previousFragment" to "Liked")
-                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
-            } else {
+//            if(prev == "Liked"){
+//                val usersList = UsersListFragment()
+//                usersList.arguments =
+//                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 0, "previousFragment" to "Liked")
+//                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
+//            } else {
                 val action =
                     ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
                 action.followersOrFollowing = 0
                 action.profileID = profileID
                 action.userID = userID
                 findNavController().navigate(action)
-            }
+//            }
         }
         following.text = dbHelper.getFollowing(profileID).size.toString()
         following.setOnClickListener {
-            if(prev == "Liked"){
-                val usersList = UsersListFragment()
-                usersList.arguments =
-                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 1, "previous" to "Liked")
-                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
-            } else {
+//            if(prev == "Liked"){
+//                val usersList = UsersListFragment()
+//                usersList.arguments =
+//                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 1, "previous" to "Liked")
+//                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
+//            } else {
                 val action =
                     ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
                 action.followersOrFollowing = 1
                 action.profileID = profileID
                 action.userID = userID
                 findNavController().navigate(action)
-            }
+//            }
         }
 
         observeButton.setOnClickListener {
@@ -254,17 +217,13 @@ class ProfileViewFragment : Fragment() {
                 observeButton.text = "Przestań obserwować"
                 followers.text = dbHelper.getFollowers(profileID).size.toString()
 
-//                observeButton.setBackgroundColor(Color.GRAY)
             }
             else{
                 dbHelper.deleteFollower(profileID, userID)
-                observeButton.text = resources.getString(R.string.follow)
+                observeButton.text = getString(R.string.follow)
                 followers.text = dbHelper.getFollowers(profileID).size.toString()
-//                observeButton.setBackgroundColor(ContextCompat.getColor(view.context, R.color.light_green))
             }
         }
-
-        println("PHONE_NUMBER: ${userData.phone_number}")
 
         val star1 = view.findViewById<ImageView>(R.id.star1)
         val star2 = view.findViewById<ImageView>(R.id.star2)
@@ -303,8 +262,6 @@ class ProfileViewFragment : Fragment() {
         meanRate = view.findViewById(R.id.meanRateValue)
         if (reviews.isNotEmpty())
             meanRate.text = countedMeanRate.toString()
-        
-        println("Review: $profileID, $userID, $finalrate, ${rateDescription.text}")
 
         alert = view.findViewById(R.id.rateAlert)
 
@@ -312,7 +269,6 @@ class ProfileViewFragment : Fragment() {
         addReviewButton.setOnClickListener {
             if(finalrate != 0) {
                 val description = rateDescription.text.toString()
-
                 val review = Review(
                     user = profileID,
                     reviewer = userID,
@@ -321,7 +277,6 @@ class ProfileViewFragment : Fragment() {
                 )
                 dbHelper.addReview(review)
                 reviews = mutableListOf(review).toTypedArray() + reviews
-                println("Size: " + reviews.size)
                 reviewsAdapter.notifyItemInserted(0)
                 reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
                 reviewsRecycler.adapter = reviewsAdapter
@@ -344,37 +299,50 @@ class ProfileViewFragment : Fragment() {
         reportUser = menu.findItem(R.id.menu_reportUser)
         if(profileID == userID)
             reportUser.isVisible = false
-
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == R.id.menu_reportUser){
+            reportUser = item
+        }
         when (item.itemId){
-            android.R.id.home -> {
-                return true
-            }
             R.id.menu_reportUser -> {
                 Snackbar.make(
                     root.findViewById(R.id.reviewInformation),
                     "Zgłoszono użytkownika",
                     Snackbar.LENGTH_SHORT
                 ).show()
+                return true
+            }
+            android.R.id.home -> {
+                if(userID == profileID) {
+                    val action =
+                        ProfileViewFragmentDirections.actionNavigationProfileViewToNavigationProfile()
+                    action.userID = userID
+                    findNavController().navigate(action)
+                } else {
+                    if(prev == "Liked"){
+                        val action =
+                            ProfileViewFragmentDirections.actionNavigationProfileViewToAdDetailsFragment()
+                        action.userID = userID
+                        action.adID = adID
+                        action.profileID = profileID
+                        action.previousFragment = "Liked"
+                        findNavController().navigate(action)
+                    } else {
+                        val action =
+                            ProfileViewFragmentDirections.actionNavigationProfileViewToAdDetailsFragment()
+                        action.userID = userID
+                        action.adID = adID
+                        action.profileID = profileID
+                        action.previousFragment = "Profile"
+                        findNavController().navigate(action)
+                    }
+                }
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        if(item.itemId == R.id.menu_likeAd)
-//            likeAd = item
-//
-//        when (item.itemId) {
-//            R.id.menu_likeAd -> {
-//                addToLiked()
-//                return true
-//            }
-//        }
-//        return super.onOptionsItemSelected(item)
-//    }
 
 }

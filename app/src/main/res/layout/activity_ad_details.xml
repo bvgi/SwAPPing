@@ -37,6 +37,14 @@
                 app:srcCompat="@drawable/ic_baseline_no_photography_24"
                 android:padding="10dp"/>
 
+            <TextView
+                android:id="@+id/publishedDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="@string/date"
+                android:gravity="end"/>
+
             <LinearLayout
                 android:id="@+id/goToUser"
                 android:layout_width="match_parent"
@@ -205,4 +213,14 @@
 
         </LinearLayout>
     </ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/startNegotiationButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:clickable="true"
+        android:src="@drawable/ic_baseline_repeat_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 </androidx.constraintlayout.widget.ConstraintLayout>

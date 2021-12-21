@@ -42,6 +42,7 @@ class ClueWordSearchActivity : AppCompatActivity() {
         arguments.let {
             userID = it.userID
         }
+        title = "Wyszukaj"
         val extras: Bundle? = intent.extras
         if(extras != null){
             sort = extras.getInt("sort")

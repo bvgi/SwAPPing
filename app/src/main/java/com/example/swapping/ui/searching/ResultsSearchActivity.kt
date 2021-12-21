@@ -110,6 +110,7 @@ class ResultsSearchActivity : AppCompatActivity() {
 
         println("CAT: $category, VOI: $voivodeship")
         if(category == "" && voivodeship == ""){
+            title = "Wyniki wyszukiwania"
             results = if(sort != 0) {
                 getSortResult(query, filterS, filterR, filterC, sort)
             } else {

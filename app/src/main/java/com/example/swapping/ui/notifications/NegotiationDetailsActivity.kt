@@ -3,6 +3,7 @@ package com.example.swapping.ui.notifications
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -21,6 +22,10 @@ import com.example.swapping.ui.AdDetails.AdDetailsFragmentDirections
 import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.profile.ProfileViewActivity
 import com.example.swapping.ui.userAds.UserAdsActivity
+import android.widget.Toast
+
+
+
 
 class NegotiationDetailsActivity : AppCompatActivity() {
     private lateinit var negotiationType: TextView
@@ -96,11 +101,22 @@ class NegotiationDetailsActivity : AppCompatActivity() {
         for(id in offersID){
             offersAd.add(dbHelper.getAnnouncement(id))
         }
-        println(offersAd)
+
         adapter = HomeAdapter(offersAd.toTypedArray(), this)
         offers.layoutManager = GridLayoutManager(this, 3)
         offers.adapter = adapter
         adapter.notifyDataSetChanged()
+
+        val context = this
+
+        adapter.setOnClickListener(object : HomeAdapter.ClickListener{
+            override fun onClick(pos: Int, aView: View) {
+                val intent = Intent(context, AdDetailsActivity::class.java)
+                intent.putExtras( bundleOf("userID" to userID, "profileID" to owner.ID, "adID" to offersAd[pos].ID))
+                startActivity(intent)
+
+            }
+        })
 
         if(user.ID == userID){
             accept.visibility = View.GONE
@@ -138,7 +154,13 @@ class NegotiationDetailsActivity : AppCompatActivity() {
                 dbHelper.riseNegotiation(negotiationID)
             }
         }
-
-
     }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> onBackPressed()
+        }
+        return true
+    }
+
 }

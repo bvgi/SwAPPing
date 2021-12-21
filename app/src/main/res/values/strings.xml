@@ -68,4 +68,8 @@
     <string name="sort">Sortuj</string>
     <string name="reset">Resetuj</string>
     <string name="noResults">Nic nie znaleziono</string>
+    <string name="date">date</string>
+    <string name="unfollow">Przestań obserwować</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

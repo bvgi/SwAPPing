@@ -1,8 +1,7 @@
 package com.example.swapping.ui.AdDetails
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.media.Image
+import android.app.ActionBar
 import android.os.Bundle
 import android.view.*
 import android.widget.ImageView
@@ -10,13 +9,11 @@ import android.widget.TextView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
-import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentAdDetailsBinding
-import com.example.swapping.ui.newAd.NewAdFragmentDirections
 import com.example.swapping.ui.profile.ProfileViewFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -41,6 +38,7 @@ class AdDetailsFragment : Fragment() {
     private lateinit var rateStars: Array<ImageView>
     private lateinit var goToProfile: ImageView
     private lateinit var startNegotiation: FloatingActionButton
+    private lateinit var publishedDate: TextView
 
     private lateinit var likeAd: MenuItem
     private lateinit var dbHelper : DataBaseHelper
@@ -71,6 +69,7 @@ class AdDetailsFragment : Fragment() {
         super.onCreate(savedInstanceState)
         adDetailsViewModel = AdDetailsViewModel()
 
+
         println("AD FRAGMENT: $userID, $adID, $profileID")
 
         _binding = FragmentAdDetailsBinding.inflate(inflater, container, false)
@@ -80,6 +79,7 @@ class AdDetailsFragment : Fragment() {
         return root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -97,6 +97,11 @@ class AdDetailsFragment : Fragment() {
         adPhoto = view.findViewById(R.id.AdImage)
         adPhoto.setImageBitmap(photo)
 
+        publishedDate = view.findViewById(R.id.publishedDate)
+        println(ad.published_date)
+        publishedDate.text = "${ad.published_date.toString().substring(6,8)}.${ad.published_date.toString().substring(4,6)}.${ad.published_date.toString().substring(0,4)}"
+
+
         description = view.findViewById(R.id.adDescription)
         description.text = ad.description
 
@@ -108,15 +113,22 @@ class AdDetailsFragment : Fragment() {
 
         goToProfile = view.findViewById(R.id.goToUserProfile)
         goToProfile.setOnClickListener {
-            if(args.previousFragment == "Liked"){
-                val profileViewFragment = ProfileViewFragment()
-                profileViewFragment.arguments =
-                    bundleOf("userID" to userID, "profileID" to profileID, "previous" to "Liked")
-                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, profileViewFragment)?.commit()
+            if(prev == "Liked"){
+                val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationProfileView()
+                action.userID = userID
+                action.profileID = profileID
+                action.previous = "Liked"
+                action.adID = adID
+                findNavController().navigate(action)
+//                val profileViewFragment = ProfileViewFragment()
+//                profileViewFragment.arguments =
+//                    bundleOf("userID" to userID, "profileID" to profileID, "previous" to "Liked")
+//                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, profileViewFragment)?.commit()
             } else {
                 val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationProfileView()
                 action.profileID = profileID
                 action.userID = userID
+                action.adID = adID
                 view.findNavController().navigate(action)
             }
 
@@ -177,6 +189,20 @@ class AdDetailsFragment : Fragment() {
             R.id.menu_likeAd -> {
                 addToLiked()
                 return true
+            }
+            android.R.id.home -> {
+                if(prev == "Liked"){
+                    val action =
+                        AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsFragment()
+                    action.userID = userID
+                    action.previousFragment = "Liked"
+                    findNavController().navigate(action)
+                } else {
+                    val action =
+                        AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationHome()
+                    action.userID = userID
+                    findNavController().navigate(action)
+                }
             }
         }
         return super.onOptionsItemSelected(item)
