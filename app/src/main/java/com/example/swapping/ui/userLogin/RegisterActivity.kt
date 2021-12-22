@@ -10,8 +10,10 @@ import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.User
 import com.example.swapping.R
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
 class RegisterActivity : AppCompatActivity() {
@@ -27,6 +29,8 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var dateOfBirthCheckBox: CheckBox
     private lateinit var phoneNumberLayout: TextInputLayout
     private lateinit var cityLayout: TextInputLayout
+
+    private val networkConnection = NetworkConnection()
 
     private val emailLiveData = MutableLiveData<String>()
     private val passwordLiveData = MutableLiveData<String>()
@@ -88,9 +92,6 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
-    //    private var binding: ActivityLoginBinding? = null
-    private lateinit var makeAccount: TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -137,46 +138,50 @@ class RegisterActivity : AppCompatActivity() {
         }
 
 
-
-
         signUpButton.setOnClickListener {
-            var fine = false
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do internetu",
+                    Snackbar.LENGTH_INDEFINITE
+                ).show()
+            } else {
+                var fine = false
 
-            isValidLiveData.observe(this) { isValid ->
-                fine = registerViewModel.registerErrors(
-                    isValid,
-                    dateOfBirthCheckBox,
-                    permissionCheck,
-                    emailLayout,
-                    passwordLayout,
-                    usernameLayout
-                )
-            }
+                isValidLiveData.observe(this) { isValid ->
+                    fine = registerViewModel.registerErrors(
+                        isValid,
+                        dateOfBirthCheckBox,
+                        permissionCheck,
+                        emailLayout,
+                        passwordLayout,
+                        usernameLayout
+                    )
+                }
 
-            if(fine) {
-                val username = findViewById<TextView>(R.id.usernameRegister)
-                val email = findViewById<TextView>(R.id.emailRegister)
-                val name = findViewById<TextView>(R.id.nameRegister)
-                val phoneNumber = findViewById<TextView>(R.id.phoneRegister)
-                val city = findViewById<TextView>(R.id.cityRegister)
-                val password = findViewById<TextView>(R.id.passwordRegister)
+                if (fine) {
+                    val username = findViewById<TextView>(R.id.usernameRegister)
+                    val email = findViewById<TextView>(R.id.emailRegister)
+                    val name = findViewById<TextView>(R.id.nameRegister)
+                    val phoneNumber = findViewById<TextView>(R.id.phoneRegister)
+                    val city = findViewById<TextView>(R.id.cityRegister)
+                    val password = findViewById<TextView>(R.id.passwordRegister)
 
-                val user = User(username = username.text.toString(),
-                    email = email.text.toString(),
-                    name = name.text.toString(),
-                    phone_number = phoneNumber.text.toString(),
-                    city = city.text.toString(),
-                    password = password.text.toString()
-                )
+                    val user = User(
+                        username = username.text.toString(),
+                        email = email.text.toString(),
+                        name = name.text.toString(),
+                        phone_number = phoneNumber.text.toString(),
+                        city = city.text.toString(),
+                        password = password.text.toString()
+                    )
 
-                println("USER: $user")
-                DBHelper.addUser(user)
+                    DBHelper.addUser(user)
 
-                val loginIntent = Intent(this, LoginActivity::class.java)
-                startActivity(loginIntent)
+                    val loginIntent = Intent(this, LoginActivity::class.java)
+                    startActivity(loginIntent)
+                }
             }
         }
-
     }
-
 }

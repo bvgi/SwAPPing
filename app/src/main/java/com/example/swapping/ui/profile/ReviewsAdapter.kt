@@ -21,7 +21,6 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
      */
 
     lateinit var mClickListener: ReviewsClickListener
-    lateinit var deleteButton: Button
 
     interface ReviewsClickListener {
         fun onClick(pos: Int, aView: View)
@@ -42,7 +41,6 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
         val star5: ImageView
 
         init {
-            view.setOnClickListener(this)
             username = view.findViewById(R.id.reviewerName)
             deleteReview = view.findViewById(R.id.deleteReview)
             description = view.findViewById(R.id.rateDescription)
@@ -51,6 +49,7 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
             star3 = view.findViewById(R.id.reviewStar3)
             star4 = view.findViewById(R.id.reviewStar4)
             star5 = view.findViewById(R.id.reviewStar5)
+            deleteReview.setOnClickListener(this)
         }
 
         override fun onClick(p0: View?) {
@@ -84,15 +83,11 @@ class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context
         val stars = arrayOf(viewHolder.star1, viewHolder.star2, viewHolder.star3, viewHolder.star4, viewHolder.star5)
         if(dataSet.first == reviewerID)
             viewHolder.deleteReview.visibility = View.VISIBLE
+        else
+            viewHolder.deleteReview.visibility = View.GONE
         viewHolder.username.text = reviewerUsername
         viewHolder.description.text = review.description
         changeStars(stars, review.rate)
-
-        viewHolder.deleteReview.setOnClickListener {
-            dbHelper.deleteReview(userID, reviewerID)
-            notifyItemRemoved(position)
-            notifyItemRangeChanged(position, dataSet.second.size - 1)
-        }
 
     }
 

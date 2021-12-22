@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.userAds.UserAdsActivity">
+    tools:context=".ui.userAds.UserAdsActivity"
+    android:orientation="vertical">
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/startOfNegotiation"
         android:layout_width="match_parent"
@@ -25,6 +26,13 @@
 
     </ScrollView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/noInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </LinearLayout>

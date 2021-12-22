@@ -12,12 +12,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentHomeBinding
 import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.home.HomeViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class UserAdsFragment : Fragment() {
 
@@ -28,17 +31,23 @@ class UserAdsFragment : Fragment() {
     lateinit var ads: Array<Ad>
     private lateinit var noFav: TextView
 
-    val arguments: UserAdsFragmentArgs by navArgs()
-    var userID = 0
-    var previous = ""
+    private val arguments: UserAdsFragmentArgs by navArgs()
+    private var userID = 0
+    private var previous = ""
+    private var profileID = 0
+    private var profileName = ""
+    private var adID = 0
+    private val networkConnection = NetworkConnection()
 
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments.let {
-            userID = arguments.userID
-            previous = arguments.previousFragment
+            userID = it.userID
+            previous = it.previousFragment
+            profileID = it.profileID
+            adID = it.prevAdID
         }
         if (previous == "Liked" || previous == "Profile")
             setHasOptionsMenu(true)
@@ -46,6 +55,8 @@ class UserAdsFragment : Fragment() {
             (activity as MainActivity?)?.supportActionBar?.title = "Polubione"
         if(previous == "Profile")
             (activity as MainActivity?)?.supportActionBar?.title = "Moje ogłoszenia"
+        if (previous == "Profile" && profileID != userID)
+            (activity as MainActivity?)?.supportActionBar?.title = "Ogłoszenia użytkownika"
     }
 
     override fun onCreateView(
@@ -59,7 +70,12 @@ class UserAdsFragment : Fragment() {
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel()::class.java)
         when(arguments.previousFragment){
-            "Profile" -> ads = homeViewModel.getUserAnnouncements(userID, root.context) + homeViewModel.getPurchasedAnnouncements(userID, root.context)
+            "Profile" ->
+                ads = if(userID == profileID)
+                    homeViewModel.getUserAnnouncements(userID, root.context) + homeViewModel.getPurchasedAnnouncements(userID, root.context)
+                else
+                    homeViewModel.getNotArchivedAds(profileID, root.context)
+
             "Liked" -> {
                 ads = homeViewModel.getUserLiked(userID, root.context)
                 if(ads.isEmpty()) {
@@ -77,6 +93,9 @@ class UserAdsFragment : Fragment() {
             }
         }
 
+        val dbHelper = DataBaseHelper(root.context)
+        profileName = dbHelper.getUserById(profileID).name
+
         adapter = HomeAdapter(arrayOf(), root.context)
         homeRecycler = root.findViewById(R.id.RecyclerViewHome)
         homeRecycler.layoutManager = GridLayoutManager(root.context, 3)
@@ -90,23 +109,44 @@ class UserAdsFragment : Fragment() {
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
 
+        println("USERSADS:::${arguments.previousFragment}")
+
         adapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                when(arguments.previousFragment){
-                    "Profile" -> {
-                        val action = UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsActivity()
-                        action.adID = ads[pos].ID
-                        action.profileID = userID
-                        action.userID = userID
-                        findNavController().navigate(action)
-                    }
-                    "Liked" -> {
-                        val action = UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsFragment()
-                        action.adID = ads[pos].ID
-                        action.profileID = ads[pos].ID
-                        action.userID = userID
-                        action.previousFragment = "Liked"
-                        findNavController().navigate(action)
+                if (!networkConnection.isNetworkAvailable(root.context)) {
+                    Snackbar.make(
+                        root.findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    when (arguments.previousFragment) {
+                        "Profile" -> {
+                            if (userID == profileID) {
+                                val action =
+                                    UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsActivity()
+                                action.adID = ads[pos].ID
+                                action.profileID = userID
+                                action.userID = userID
+                                findNavController().navigate(action)
+                            } else {
+                                val action =
+                                    UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsActivity()
+                                action.adID = ads[pos].ID
+                                action.profileID = profileID
+                                action.userID = userID
+                                findNavController().navigate(action)
+                            }
+                        }
+                        "Liked" -> {
+                            val action =
+                                UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsFragment()
+                            action.adID = ads[pos].ID
+                            action.profileID = ads[pos].user
+                            action.userID = userID
+                            action.previousFragment = "Liked"
+                            findNavController().navigate(action)
+                        }
                     }
                 }
             }
@@ -116,9 +156,19 @@ class UserAdsFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                val action = UserAdsFragmentDirections.actionUserAdsFragmentToNavigationProfile()
-                action.userID = userID
-                findNavController().navigate(action)
+                if(userID == profileID) {
+                    val action =
+                        UserAdsFragmentDirections.actionUserAdsFragmentToNavigationProfile()
+                    action.userID = userID
+                    findNavController().navigate(action)
+                } else {
+                    val action =
+                        UserAdsFragmentDirections.actionUserAdsFragmentToNavigationProfileView()
+                    action.userID = userID
+                    action.profileID = profileID
+                    action.adID = adID
+                    findNavController().navigate(action)
+                }
             }
         }
         return super.onOptionsItemSelected(item)

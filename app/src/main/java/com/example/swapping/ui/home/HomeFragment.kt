@@ -19,12 +19,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentHomeBinding
 import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.AdDetails.AdDetailsFragment
 import com.example.swapping.ui.AdDetails.AdDetailsFragmentDirections
 import com.example.swapping.ui.profile.ProfileFragmentDirections
+import com.google.android.material.snackbar.Snackbar
 import java.util.*
 import kotlin.random.Random
 
@@ -35,6 +37,7 @@ class HomeFragment : Fragment() {
     lateinit var adapter: HomeAdapter
     lateinit var homeRecycler: RecyclerView
     lateinit var ads: Array<Ad>
+    private val networkConnection = NetworkConnection()
 
     val arguments: HomeFragmentArgs by navArgs()
     var userID = 0
@@ -88,16 +91,13 @@ class HomeFragment : Fragment() {
                 ads.drop(ads.indexOf(ad))
             }
         }
-
-
+        ads = ads.toMutableList().shuffled().toTypedArray()
         adapter = HomeAdapter(arrayOf(), root.context)
-        println("HOME::: Num of ads: ${ads.size}, userID: $userID")
         homeRecycler = root.findViewById(R.id.RecyclerViewHome)
         homeRecycler.layoutManager = GridLayoutManager(root.context, 3)
         homeRecycler.adapter = adapter
         adapter.dataset = ads
         adapter.notifyDataSetChanged()
-
         return root
     }
 
@@ -106,14 +106,20 @@ class HomeFragment : Fragment() {
 
         adapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val action = HomeFragmentDirections.actionNavigationHomeToAdDetails() // TODO: czy to nie powinno być activity
-                action.userID = arguments.userID
-                action.profileID = ads[pos].user
-                println(ads[pos].user)
-                action.adID = ads[pos].ID
-                root.findNavController().navigate(action)
-
-
+                if (!networkConnection.isNetworkAvailable(root.context)) {
+                    Snackbar.make(
+                        root.findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val action = HomeFragmentDirections.actionNavigationHomeToAdDetails()
+                    action.userID = arguments.userID
+                    action.profileID = ads[pos].user
+                    println(ads[pos].user)
+                    action.adID = ads[pos].ID
+                    root.findNavController().navigate(action)
+                }
             }
         })
     }

@@ -13,10 +13,12 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
 import com.example.swapping.ui.home.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 
 class ProfileFragment : Fragment() {
@@ -31,6 +33,8 @@ class ProfileFragment : Fragment() {
     private lateinit var userAds: LinearLayout
     private lateinit var userFavs: LinearLayout
 
+    private val networkConnection = NetworkConnection()
+
     private val args: ProfileFragmentArgs by navArgs()
 
     private val binding get() = _binding!!
@@ -43,7 +47,6 @@ class ProfileFragment : Fragment() {
 
         userID = args.userID
         previousFragment = args.previousFragment
-
 
         profileViewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 
@@ -64,14 +67,21 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        println("PROFILE:::" + userID)
-
         userAds = view.findViewById(R.id.userAds)
         userAds.setOnClickListener {
-            val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
-            action.previousFragment = "Profile"
-            action.userID = userID
-            findNavController().navigate(action)
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
+                action.previousFragment = "Profile"
+                action.userID = userID
+                action.profileID = userID
+                findNavController().navigate(action)
+            }
         }
 
 
@@ -84,26 +94,53 @@ class ProfileFragment : Fragment() {
 
         userFavs = view.findViewById(R.id.userFavs)
         userFavs.setOnClickListener {
-            val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
-            action.previousFragment = "Liked"
-            action.userID = userID
-            findNavController().navigate(action)
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
+                action.previousFragment = "Liked"
+                action.userID = userID
+                action.profileID = userID
+                findNavController().navigate(action)
+            }
         }
 
         editTextView = view.findViewById(R.id.editProfile)
         editTextView.setOnClickListener {
-            val action = ProfileFragmentDirections.actionNavigationProfileToEditProfileActivity().setUserID(userID)
-            view.findNavController().navigate(action)
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val action =
+                    ProfileFragmentDirections.actionNavigationProfileToEditProfileActivity()
+                        .setUserID(userID)
+                view.findNavController().navigate(action)
+            }
         }
 
         profileViewLayout = view.findViewById(R.id.profileViewLayout)
         profileViewLayout.setOnClickListener {
-            val action = ProfileFragmentDirections.actionNavigationProfileToProfileViewFragment()
-            action.userID = userID
-            action.profileID = userID
-            view.findNavController().navigate(action)
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val action =
+                    ProfileFragmentDirections.actionNavigationProfileToProfileViewFragment()
+                action.userID = userID
+                action.profileID = userID
+                view.findNavController().navigate(action)
+            }
         }
-
     }
 
     override fun onDestroyView() {

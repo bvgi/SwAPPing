@@ -20,9 +20,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.Review
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
@@ -44,15 +46,17 @@ class ProfileViewFragment : Fragment() {
     var profileID = 0
     var prev = ""
     var adID = 0
+
     private lateinit var profileViewViewModel: ProfileViewViewModel
     private var _binding: FragmentProfileViewBinding? = null
+
     private lateinit var dbHelper: DataBaseHelper
+
     private lateinit var username: TextView
     private lateinit var email: TextView
     private lateinit var phoneNumber: TextView
     private lateinit var observeButton: Button
     private lateinit var addOpinionLayout: LinearLayout
-    private lateinit var profileAds: TextView
     private lateinit var rateStars: Array<ImageView>
     private lateinit var rateDescription: EditText
     private lateinit var addReviewButton: Button
@@ -63,12 +67,14 @@ class ProfileViewFragment : Fragment() {
     private lateinit var following: TextView
     private lateinit var reviewTitle: TextView
     private lateinit var profileName: TextView
+    private lateinit var goToUserAds: LinearLayout
 
     private lateinit var reviews: Array<Review>
     private lateinit var reviewsRecycler: RecyclerView
     private lateinit var reviewsAdapter: ReviewsAdapter
 
     private lateinit var reportUser: MenuItem
+    private val networkConnection = NetworkConnection()
 
     var finalrate = 0
 
@@ -103,7 +109,6 @@ class ProfileViewFragment : Fragment() {
 
         reviewsContent = root.findViewById(R.id.reviewsContents)
         reviews = profileViewViewModel.getReviews(profileID, root.context)
-        println(reviews)
         reviewTitle = root.findViewById(R.id.reviewTitle)
 
         if(reviews.isEmpty())
@@ -111,14 +116,14 @@ class ProfileViewFragment : Fragment() {
 
         observeButton = root.findViewById(R.id.observeButton)
         addOpinionLayout = root.findViewById(R.id.addOpinionLayout)
-        profileAds = root.findViewById(R.id.profileAds)
         rateDescription = root.findViewById(R.id.reviewContent)
+        goToUserAds = root.findViewById(R.id.goToUserAds)
 
 
         if (profileID == userID) {
             observeButton.visibility = View.GONE
             addOpinionLayout.visibility = View.GONE
-            profileAds.visibility = View.GONE
+            goToUserAds.visibility = View.GONE
         }
 
         if(profileViewViewModel.isFollower(userID, profileID, root.context)){
@@ -146,14 +151,26 @@ class ProfileViewFragment : Fragment() {
         reviewsAdapter = ReviewsAdapter(Pair(userID, reviews), view.context)
         reviewsRecycler.isNestedScrollingEnabled = false
         reviewsRecycler.adapter = reviewsAdapter
+        reviewsRecycler.addItemDecoration(
+            DividerItemDecoration(view.context,
+                DividerItemDecoration.VERTICAL)
+        )
 
         reviewsAdapter.setOnClickListener(object : ReviewsAdapter.ReviewsClickListener{
             override fun onClick(pos: Int, aView: View) {
                 dbHelper.deleteReview(profileID, userID)
+                Snackbar.make(
+                    view.findViewById(R.id.reviewInformation),
+                    "Usunięto ocenę",
+                    Snackbar.LENGTH_SHORT
+                ).show()
                 reviews = profileViewViewModel.getReviews(profileID, root.context)
+                println(reviews.size)
                 dbHelper.updateMeanRate(profileID, round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0))
+                meanRate.text = profileViewViewModel.getMeanRate(reviews).toString()
                 reviewsAdapter.notifyItemRemoved(pos)
                 reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
+                reviewsAdapter.notifyDataSetChanged()
             }
         })
 
@@ -179,49 +196,60 @@ class ProfileViewFragment : Fragment() {
 
         followers.text = dbHelper.getFollowers(profileID).size.toString()
         followers.setOnClickListener {
-//            if(prev == "Liked"){
-//                val usersList = UsersListFragment()
-//                usersList.arguments =
-//                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 0, "previousFragment" to "Liked")
-//                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
-//            } else {
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
                 val action =
                     ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
                 action.followersOrFollowing = 0
                 action.profileID = profileID
                 action.userID = userID
+                action.adID = adID
                 findNavController().navigate(action)
-//            }
+            }
         }
         following.text = dbHelper.getFollowing(profileID).size.toString()
         following.setOnClickListener {
-//            if(prev == "Liked"){
-//                val usersList = UsersListFragment()
-//                usersList.arguments =
-//                    bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 1, "previous" to "Liked")
-//                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, usersList)?.commit()
-//            } else {
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
                 val action =
                     ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
                 action.followersOrFollowing = 1
                 action.profileID = profileID
                 action.userID = userID
+                action.adID = adID
                 findNavController().navigate(action)
-//            }
+            }
         }
 
         observeButton.setOnClickListener {
-            if(!profileViewViewModel.isFollower(userID, profileID, view.context)){
-                dbHelper.addFollower(profileID, userID)
-                println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
-                observeButton.text = "Przestań obserwować"
-                followers.text = dbHelper.getFollowers(profileID).size.toString()
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                if (!profileViewViewModel.isFollower(userID, profileID, view.context)) {
+                    dbHelper.addFollower(profileID, userID)
+                    println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
+                    observeButton.text = "Przestań obserwować"
+                    followers.text = dbHelper.getFollowers(profileID).size.toString()
 
-            }
-            else{
-                dbHelper.deleteFollower(profileID, userID)
-                observeButton.text = getString(R.string.follow)
-                followers.text = dbHelper.getFollowers(profileID).size.toString()
+                } else {
+                    dbHelper.deleteFollower(profileID, userID)
+                    observeButton.text = getString(R.string.follow)
+                    followers.text = dbHelper.getFollowers(profileID).size.toString()
+                }
             }
         }
 
@@ -263,33 +291,59 @@ class ProfileViewFragment : Fragment() {
         if (reviews.isNotEmpty())
             meanRate.text = countedMeanRate.toString()
 
+        goToUserAds.setOnClickListener {
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val action =
+                    ProfileViewFragmentDirections.actionNavigationProfileViewToUserAdsFragment()
+                action.userID = userID
+                action.previousFragment = "Profile"
+                action.profileID = profileID
+                action.prevAdID = adID
+                findNavController().navigate(action)
+            }
+        }
+
         alert = view.findViewById(R.id.rateAlert)
 
         addReviewButton = view.findViewById(R.id.saveReviewButton)
         addReviewButton.setOnClickListener {
-            if(finalrate != 0) {
-                val description = rateDescription.text.toString()
-                val review = Review(
-                    user = profileID,
-                    reviewer = userID,
-                    rate = finalrate,
-                    description = description
-                )
-                dbHelper.addReview(review)
-                reviews = mutableListOf(review).toTypedArray() + reviews
-                reviewsAdapter.notifyItemInserted(0)
-                reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
-                reviewsRecycler.adapter = reviewsAdapter
-                val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
-                dbHelper.updateMeanRate(profileID, mean_rate)
-                meanRate.text = mean_rate.toString()
+            if (!networkConnection.isNetworkAvailable(view.context)) {
                 Snackbar.make(
-                    view.findViewById(R.id.reviewInformation),
-                    "Ocena została dodana",
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
                     Snackbar.LENGTH_SHORT
                 ).show()
             } else {
-                alert.visibility = View.VISIBLE
+                if (finalrate != 0) {
+                    val description = rateDescription.text.toString()
+                    val review = Review(
+                        user = profileID,
+                        reviewer = userID,
+                        rate = finalrate,
+                        description = description
+                    )
+                    dbHelper.addReview(review)
+                    reviews = mutableListOf(review).toTypedArray() + reviews
+                    reviewsAdapter.notifyItemInserted(0)
+                    reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
+                    reviewsRecycler.adapter = reviewsAdapter
+                    val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                    dbHelper.updateMeanRate(profileID, mean_rate)
+                    meanRate.text = mean_rate.toString()
+                    Snackbar.make(
+                        view.findViewById(R.id.reviewInformation),
+                        "Ocena została dodana",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    alert.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -307,11 +361,19 @@ class ProfileViewFragment : Fragment() {
         }
         when (item.itemId){
             R.id.menu_reportUser -> {
-                Snackbar.make(
-                    root.findViewById(R.id.reviewInformation),
-                    "Zgłoszono użytkownika",
-                    Snackbar.LENGTH_SHORT
-                ).show()
+                if (!networkConnection.isNetworkAvailable(requireView().context)) {
+                    Snackbar.make(
+                        requireView().findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Snackbar.make(
+                        root.findViewById(R.id.reviewInformation),
+                        "Zgłoszono użytkownika",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
                 return true
             }
             android.R.id.home -> {
@@ -321,15 +383,32 @@ class ProfileViewFragment : Fragment() {
                     action.userID = userID
                     findNavController().navigate(action)
                 } else {
-                    if(prev == "Liked"){
-                        val action =
-                            ProfileViewFragmentDirections.actionNavigationProfileViewToAdDetailsFragment()
-                        action.userID = userID
-                        action.adID = adID
-                        action.profileID = profileID
-                        action.previousFragment = "Liked"
-                        findNavController().navigate(action)
-                    } else {
+                    when(prev) {
+                        "Liked" -> {
+                            val action =
+                                ProfileViewFragmentDirections.actionNavigationProfileViewToAdDetailsFragment()
+                            action.userID = userID
+                            action.adID = adID
+                            action.profileID = profileID
+                            action.previousFragment = "Liked"
+                            findNavController().navigate(action)
+                        }
+                        "Followers" -> {
+                            val action = ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
+                            action.followersOrFollowing = 0
+                            action.profileID = profileID
+                            action.userID = userID
+                            findNavController().navigate(action)
+                        }
+                        "Following" -> {
+                            val action =
+                                ProfileViewFragmentDirections.actionNavigationProfileViewToUsersListFragment()
+                            action.followersOrFollowing = 1
+                            action.profileID = profileID
+                            action.userID = userID
+                            findNavController().navigate(action)
+                        }
+                        else -> {
                         val action =
                             ProfileViewFragmentDirections.actionNavigationProfileViewToAdDetailsFragment()
                         action.userID = userID
@@ -337,6 +416,7 @@ class ProfileViewFragment : Fragment() {
                         action.profileID = profileID
                         action.previousFragment = "Profile"
                         findNavController().navigate(action)
+                    }
                     }
                 }
             }

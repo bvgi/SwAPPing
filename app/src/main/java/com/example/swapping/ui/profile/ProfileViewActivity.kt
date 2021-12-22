@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.Review
 import com.example.swapping.R
 import com.example.swapping.databinding.ActivityProfileViewBinding
@@ -25,7 +26,7 @@ class ProfileViewActivity : AppCompatActivity() {
     var profileID = 0
     var prev = ""
     private lateinit var profileViewViewModel: ProfileViewViewModel
-    private var _binding: ActivityProfileViewBinding? = null
+
     private lateinit var dbHelper: DataBaseHelper
     private lateinit var username: TextView
     private lateinit var email: TextView
@@ -50,7 +51,8 @@ class ProfileViewActivity : AppCompatActivity() {
 
     private lateinit var reportUser: MenuItem
 
-    var finalrate = 0
+    private var finalrate = 0
+    private val networkConnection = NetworkConnection()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,7 +104,6 @@ class ProfileViewActivity : AppCompatActivity() {
         }
         else{
             observeButton.text = resources.getString(R.string.follow)
-//                observeButton.setBackgroundColor(ContextCompat.getColor(context, R.color.light_green))
         }
 
 
@@ -121,11 +122,22 @@ class ProfileViewActivity : AppCompatActivity() {
 
         reviewsAdapter.setOnClickListener(object : ReviewsAdapter.ReviewsClickListener{
             override fun onClick(pos: Int, aView: View) {
-                dbHelper.deleteReview(profileID, userID)
-                reviews = profileViewViewModel.getReviews(profileID, context)
-                dbHelper.updateMeanRate(profileID, round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0))
-                reviewsAdapter.notifyItemRemoved(pos)
-                reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    dbHelper.deleteReview(profileID, userID)
+                    reviews = profileViewViewModel.getReviews(profileID, context)
+                    dbHelper.updateMeanRate(
+                        profileID,
+                        round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                    )
+                    reviewsAdapter.notifyItemRemoved(pos)
+                    reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
+                }
             }
         })
 
@@ -151,31 +163,63 @@ class ProfileViewActivity : AppCompatActivity() {
 
         followers.text = dbHelper.getFollowers(profileID).size.toString()
         followers.setOnClickListener {
-            val intent = Intent(this, UsersListActivity::class.java)
-            intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 0))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, UsersListActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "userID" to userID,
+                        "profileID" to profileID,
+                        "followersOrFollowing" to 0
+                    )
+                )
+                startActivity(intent)
+            }
         }
         following.text = dbHelper.getFollowing(profileID).size.toString()
         following.setOnClickListener {
-            val intent = Intent(this, UsersListActivity::class.java)
-            intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID, "followersOrFollowing" to 1))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, UsersListActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "userID" to userID,
+                        "profileID" to profileID,
+                        "followersOrFollowing" to 1
+                    )
+                )
+                startActivity(intent)
+            }
         }
 
         observeButton.setOnClickListener {
-            if(!profileViewViewModel.isFollower(userID, profileID, context)){
-                dbHelper.addFollower(profileID, userID)
-                println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
-                observeButton.text = "Przestań obserwować"
-                followers.text = dbHelper.getFollowers(profileID).size.toString()
-
-//                observeButton.setBackgroundColor(Color.GRAY)
-            }
-            else{
-                dbHelper.deleteFollower(profileID, userID)
-                observeButton.text = resources.getString(R.string.follow)
-                followers.text = dbHelper.getFollowers(profileID).size.toString()
-//                observeButton.setBackgroundColor(ContextCompat.getColor(context, R.color.light_green))
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                if (!profileViewViewModel.isFollower(userID, profileID, context)) {
+                    dbHelper.addFollower(profileID, userID)
+                    println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
+                    observeButton.text = "Przestań obserwować"
+                    followers.text = dbHelper.getFollowers(profileID).size.toString()
+                } else {
+                    dbHelper.deleteFollower(profileID, userID)
+                    observeButton.text = resources.getString(R.string.follow)
+                    followers.text = dbHelper.getFollowers(profileID).size.toString()
+                }
             }
         }
 
@@ -223,31 +267,39 @@ class ProfileViewActivity : AppCompatActivity() {
 
         addReviewButton = findViewById(R.id.saveReviewButton)
         addReviewButton.setOnClickListener {
-            if(finalrate != 0) {
-                val description = rateDescription.text.toString()
-
-                val review = Review(
-                    user = profileID,
-                    reviewer = userID,
-                    rate = finalrate,
-                    description = description
-                )
-                dbHelper.addReview(review)
-                reviews = mutableListOf(review).toTypedArray() + reviews
-                println("Size: " + reviews.size)
-                reviewsAdapter.notifyItemInserted(0)
-                reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
-                reviewsRecycler.adapter = reviewsAdapter
-                val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
-                dbHelper.updateMeanRate(profileID, mean_rate)
-                meanRate.text = mean_rate.toString()
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
                 Snackbar.make(
-                    findViewById(R.id.reviewInformation),
-                    "Ocena została dodana",
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
                     Snackbar.LENGTH_SHORT
                 ).show()
             } else {
-                alert.visibility = View.VISIBLE
+                if (finalrate != 0) {
+                    val description = rateDescription.text.toString()
+
+                    val review = Review(
+                        user = profileID,
+                        reviewer = userID,
+                        rate = finalrate,
+                        description = description
+                    )
+                    dbHelper.addReview(review)
+                    reviews = mutableListOf(review).toTypedArray() + reviews
+                    println("Size: " + reviews.size)
+                    reviewsAdapter.notifyItemInserted(0)
+                    reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
+                    reviewsRecycler.adapter = reviewsAdapter
+                    val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                    dbHelper.updateMeanRate(profileID, mean_rate)
+                    meanRate.text = mean_rate.toString()
+                    Snackbar.make(
+                        findViewById(R.id.reviewInformation),
+                        "Ocena została dodana",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    alert.visibility = View.VISIBLE
+                }
             }
         }
     }
@@ -264,6 +316,7 @@ class ProfileViewActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId){
             android.R.id.home -> {
+                onBackPressed()
                 return true
             }
             R.id.menu_reportUser -> {

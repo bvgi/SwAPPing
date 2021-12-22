@@ -20,8 +20,10 @@ import androidx.core.view.children
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.User
 import com.example.swapping.R
+import com.google.android.material.snackbar.Snackbar
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 
@@ -41,6 +43,7 @@ class EditAdActivity : AppCompatActivity() {
     private lateinit var category: RadioGroup
     private lateinit var status: RadioGroup
     private lateinit var changedPhoto: ByteArray
+    private val networkConnection = NetworkConnection()
 
     private lateinit var adDetails: Ad
 
@@ -138,7 +141,6 @@ class EditAdActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.menu_saveData -> {
-
                 var cityName = "-"
                 if (!city.text.isNullOrBlank())
                     cityName = city.text.toString()
@@ -151,11 +153,7 @@ class EditAdActivity : AppCompatActivity() {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream)
                     val bitmapdata = stream.toByteArray()
                     changedPhoto = bitmapdata
-
                 }
-
-                println("Ad Details ::: " + adDetails.user)
-
                 val ad = Ad(
                     ID = adDetails.ID,
                     user = adDetails.user,
@@ -172,15 +170,24 @@ class EditAdActivity : AppCompatActivity() {
                     negotiation = 0,
                     archived = 0
                 )
-                println(ad)
-                dbHelper.updateAnnouncement(ad)
-
-//                val index = bundleOf("userID" to userID)
-//                navCon.navigate(R.id.navigation_profile, index)
-
-                val intent = Intent(this, AdDetailsActivity::class.java)
-                intent.putExtras(bundleOf("userID" to adDetails.user, "profileID" to adDetails.user, "adID" to adDetails.ID))
-                startActivity(intent)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    dbHelper.updateAnnouncement(ad)
+                    val intent = Intent(this, AdDetailsActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "userID" to adDetails.user,
+                            "profileID" to adDetails.user,
+                            "adID" to adDetails.ID
+                        )
+                    )
+                    startActivity(intent)
+                }
                 return true
             }
         }
@@ -222,10 +229,7 @@ class EditAdActivity : AppCompatActivity() {
     }
 
     fun getBytes(bitmap: Bitmap): ByteArray {
-//        val stream = ByteArrayOutputStream()
-//        bitmap.compress(CompressFormat.PNG, 0, stream)
-//        return stream.toByteArray()
-        val bitmap =  addedPhoto.drawable.toBitmap(addedPhoto.drawable.intrinsicWidth, addedPhoto.drawable.intrinsicHeight)
+        val bitmap = addedPhoto.drawable.toBitmap(addedPhoto.drawable.intrinsicWidth, addedPhoto.drawable.intrinsicHeight)
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream)
         return stream.toByteArray()

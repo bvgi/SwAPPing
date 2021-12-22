@@ -31,6 +31,7 @@ import androidx.navigation.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentNewAdBinding
 import com.google.android.material.snackbar.Snackbar
@@ -47,6 +48,7 @@ class NewAdActivity : AppCompatActivity() {
     private lateinit var imageView: ImageView
     private var userID: Int = 0
     private lateinit var image: ByteArray
+    private val networkConnection = NetworkConnection()
 
     val arg: NewAdActivityArgs by navArgs()
 
@@ -185,84 +187,74 @@ class NewAdActivity : AppCompatActivity() {
         }
 
         addAnnouncement.setOnClickListener {
-            var fine = false
-            voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
-            isValidLiveData.observe(this) { isValid ->
-                fine = newAdViewModel.registerErrors(
-                    isValid,
-                    titleLayout,
-                    descriptionLayout,
-                    voivodeshipLayout,
-                    categoryLayout,
-                    statusLayout
-                )
-                println(" ${titleLiveData.value},  ${descriptionLiveData.value}, ${voivodeshipLiveData.value}, ${categoryLiveData.value}, ${statusLiveData.value}")
-            }
-            if (fine) {
-                var cityName = "-"
-                if (!city.text.isNullOrBlank())
-                    cityName = city.text.toString()
-
-                if(image.isEmpty()){
-                    val nophoto = resources.getDrawable(R.drawable.ic_baseline_no_photography_24, null)
-                    imageView.setImageResource(R.drawable.ic_baseline_no_photography_24)
-                    val bitmap =  imageView.drawable.toBitmap(nophoto.intrinsicWidth, nophoto.intrinsicHeight)
-                    val stream = ByteArrayOutputStream()
-                    bitmap.compress(CompressFormat.PNG, 0, stream)
-                    val bitmapdata = stream.toByteArray()
-                    image = bitmapdata
-
-                }
-
-                println(userID)
-
-
-//                image = getByteArray(imageView)
-                val ann = Ad(
-                    user = userID,
-                    title = title.text.toString(),
-                    description = description.text.toString(),
-                    voivodeship = dropdownVoivodeship.selectedItem.toString(),
-                    category = radioCategoryGroup.findViewById<RadioButton>(
-                        radioCategoryGroup.checkedRadioButtonId
-                    ).text.toString(),
-                    city = cityName,
-                    status = radioStatusGroup.findViewById<RadioButton>(radioStatusGroup.checkedRadioButtonId).text.toString(),
-                    image = image,
-                    published_date = LocalDate.now().year * 10000 + LocalDate.now().monthValue * 100 + LocalDate.now().dayOfMonth,
-                    negotiation = 0,
-                    archived = 0
-                )
-                DBHelper.addAnnouncement(ann)
-
-                println(ann)
-
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
                 Snackbar.make(
-                    findViewById(R.id.myCoordinatorLayout),
-                    "Ogłoszenie zostało dodane",
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
                     Snackbar.LENGTH_SHORT
                 ).show()
+            } else {
+                var fine = false
+                voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
+                isValidLiveData.observe(this) { isValid ->
+                    fine = newAdViewModel.registerErrors(
+                        isValid,
+                        titleLayout,
+                        descriptionLayout,
+                        voivodeshipLayout,
+                        categoryLayout,
+                        statusLayout
+                    )
+                    println(" ${titleLiveData.value},  ${descriptionLiveData.value}, ${voivodeshipLiveData.value}, ${categoryLiveData.value}, ${statusLiveData.value}")
+                }
+                if (fine) {
+                    var cityName = "-"
+                    if (!city.text.isNullOrBlank())
+                        cityName = city.text.toString()
 
-                val homeIntent = Intent(this, MainActivity::class.java)
-                homeIntent.putExtra("userID", userID)
-                startActivity(homeIntent)
+                    if (image.isEmpty()) {
+                        val nophoto =
+                            resources.getDrawable(R.drawable.ic_baseline_no_photography_24, null)
+                        imageView.setImageResource(R.drawable.ic_baseline_no_photography_24)
+                        val bitmap = imageView.drawable.toBitmap(
+                            nophoto.intrinsicWidth,
+                            nophoto.intrinsicHeight
+                        )
+                        val stream = ByteArrayOutputStream()
+                        bitmap.compress(CompressFormat.PNG, 0, stream)
+                        val bitmapdata = stream.toByteArray()
+                        image = bitmapdata
 
+                    }
+                    val ann = Ad(
+                        user = userID,
+                        title = title.text.toString(),
+                        description = description.text.toString(),
+                        voivodeship = dropdownVoivodeship.selectedItem.toString(),
+                        category = radioCategoryGroup.findViewById<RadioButton>(
+                            radioCategoryGroup.checkedRadioButtonId
+                        ).text.toString(),
+                        city = cityName,
+                        status = radioStatusGroup.findViewById<RadioButton>(radioStatusGroup.checkedRadioButtonId).text.toString(),
+                        image = image,
+                        published_date = LocalDate.now().year * 10000 + LocalDate.now().monthValue * 100 + LocalDate.now().dayOfMonth,
+                        negotiation = 0,
+                        archived = 0
+                    )
+                    DBHelper.addAnnouncement(ann)
+
+                    Snackbar.make(
+                        findViewById(R.id.myCoordinatorLayout),
+                        "Ogłoszenie zostało dodane",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+
+                    val homeIntent = Intent(this, MainActivity::class.java)
+                    homeIntent.putExtra("userID", userID)
+                    startActivity(homeIntent)
+                }
             }
         }
-
-
-
-
-//        _binding = FragmentNewAnnouncementBinding.inflate(inflater, container, false)
-//        binding.root.context
-//        val root: View = binding.root
-
-//        val title: TextView = binding.addTitle
-//
-//        newAdViewModel.text.observe(viewLifecycleOwner, Observer {
-//            title.text = it
-//        })
-//        if ()
     }
 
     private fun startCamera() {
@@ -272,8 +264,6 @@ class NewAdActivity : AppCompatActivity() {
         } catch (e: ActivityNotFoundException) {
             println("ERROR")
         }
-
-
     }
 
     private fun cameraRequest() {
@@ -290,19 +280,6 @@ class NewAdActivity : AppCompatActivity() {
 
     }
 
-        fun getByteArray(imageView: Bitmap): ByteArray {
-        return try {
-//            val bitmap = (imageView.drawable).toBitmap()
-            val stream = ByteArrayOutputStream()
-            imageView.compress(Bitmap.CompressFormat.JPEG, 100, stream)
-            val imageByteArray = stream.toByteArray()
-            stream.close()
-            imageByteArray
-        } catch (e: Exception) {
-            e.printStackTrace()
-            byteArrayOf(1)
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -310,15 +287,11 @@ class NewAdActivity : AppCompatActivity() {
             val imageBitmap = data.extras?.get("data") as Bitmap
             imageView.setImageBitmap(imageBitmap)
             image = getBytes(imageBitmap)
-//            val compressed = imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, ByteArrayOutputStream)
             imageView.visibility = View.VISIBLE
         }
     }
 
     fun getBytes(bitmap: Bitmap): ByteArray {
-//        val stream = ByteArrayOutputStream()
-//        bitmap.compress(CompressFormat.PNG, 0, stream)
-//        return stream.toByteArray()
         val bitmap =  imageView.drawable.toBitmap(imageView.drawable.intrinsicWidth, imageView.drawable.intrinsicHeight)
         val stream = ByteArrayOutputStream()
         bitmap.compress(CompressFormat.PNG, 0, stream)
@@ -345,9 +318,4 @@ class NewAdActivity : AppCompatActivity() {
     override fun getParentActivityIntent(): Intent? {
         return super.getParentActivityIntent()?.putExtra("userID", userID)
     }
-
-//    override fun onBackPressed() {
-////        super.onBackPressed()
-//        NavUtils.navigateUpFromSameTask(this);
-//    }
 }

@@ -28,7 +28,13 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.InternetConnectionActivity"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.notifications.NegotiationDetailsActivity"
             android:exported="false"
@@ -114,14 +120,14 @@
             android:label="@string/app_name" />
         <activity
             android:name=".ui.userLogin.LoginActivity"
-            android:exported="true"
+            android:exported="false"
             android:label="@string/app_name"
             android:noHistory="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
         </activity>
         <activity
             android:name=".ui.newAd.NewAdActivity"

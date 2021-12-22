@@ -11,15 +11,18 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var LoginViewModel: LoginViewModel
     private lateinit var DBHelper: DataBaseHelper
-    //    private var binding: ActivityLoginBinding? = null
     private lateinit var makeAccount: TextView
+
+    private val networkConnection = NetworkConnection()
 
     private val usernameLiveData = MutableLiveData<String>()
     private val passwordLiveData = MutableLiveData<String>()
@@ -50,14 +53,10 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        LoginViewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
-//        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_login)
+
         LoginViewModel = LoginViewModel()
         DBHelper = DataBaseHelper(applicationContext)
-        DBHelper.addCategories()
-        DBHelper.addVoivodeships()
-        DBHelper.addStatuses()
         val usernameLayout = findViewById<TextInputLayout>(R.id.usernameLoginLayout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.passwordLoginLayout)
         val signInButton = findViewById<Button>(R.id.buttonLogin)
@@ -72,23 +71,29 @@ class LoginActivity : AppCompatActivity() {
         }
 
         signInButton.setOnClickListener {
-            var fine = false
-            isValidLiveData.observe(this) { isValid ->
-                LoginViewModel.loginErrors(isValid, usernameLayout, passwordLayout)
-                if (isValid == 0)
-                    fine = true
-            }
-            if(fine) {
-                val userID = DBHelper.getUserByUsername(usernameLiveData.value.toString()).ID
-                DBHelper.setLoggedIn(userID)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                var fine = false
+                isValidLiveData.observe(this) { isValid ->
+                    LoginViewModel.loginErrors(isValid, usernameLayout, passwordLayout)
+                    if (isValid == 0)
+                        fine = true
+                }
+                if (fine) {
+                    val userID = DBHelper.getUserByUsername(usernameLiveData.value.toString()).ID
+                    DBHelper.setLoggedIn(userID)
 
-                val homeIntent = Intent(this, MainActivity::class.java)
-                homeIntent.putExtra("userID", userID)
-                startActivity(homeIntent)
+                    val homeIntent = Intent(this, MainActivity::class.java)
+                    homeIntent.putExtra("userID", userID)
+                    startActivity(homeIntent)
+                }
             }
-
         }
-
 
         makeAccount = findViewById(R.id.registerLink)
         makeAccount.setOnClickListener {
@@ -97,41 +102,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-
-//    override fun onCreate(
-//            inflater: LayoutInflater,
-//            container: ViewGroup?,
-//            savedInstanceState: Bundle?
-//    ): View? {
-//        userProfileViewModel =
-//                ViewModelProvider(this).get(RegisterViewModel::class.java)
-//
-//        _binding = ActivityLoginBinding.inflate(inflater, container, false)
-//        val root: View = binding.root
-//
-//        val login: EditText = binding.loginEmail
-//        val passwd: EditText = binding.password
-//
-////        userProfileViewModel.text.observe(viewLifecycleOwner, Observer {
-////            textView.text = it
-////        })
-//        return root
-//    }
-//
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        val registerView: TextView = binding.registerLink
-//        registerView.setOnClickListener {
-//            val transaction: FragmentTransaction = requireFragmentManager().beginTransaction()
-//            transaction.replace(R.id.login_fragment, RegisterFragment)
-//            transaction.addToBackStack(null)
-//            transaction.commit()
-//
-//        }
-//    }
-//
-//    override fun onDestroyView() {
-//        super.onDestroyView()
-//        _binding = null
-//    }
+    override fun onBackPressed() {
+        finishAffinity()
+    }
 }

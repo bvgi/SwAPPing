@@ -135,7 +135,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     app:boxBackgroundColor="#F3F3F3">
-
                     <EditText
                         android:id="@+id/cityEdit"
                         android:layout_width="match_parent"
@@ -146,12 +145,18 @@
                         android:inputType="textNoSuggestions"
                         android:maxLines="1"
                         android:singleLine="true" />
-
                 </com.google.android.material.textfield.TextInputLayout>
-
-
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
     </ScrollView>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/noInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

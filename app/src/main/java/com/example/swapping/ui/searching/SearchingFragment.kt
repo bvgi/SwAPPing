@@ -12,17 +12,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.viewpager.widget.ViewPager
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentSearchingBinding
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 
 class SearchingFragment : Fragment() {
 
     private lateinit var notificationsViewModel: SearchingViewModel
     private var _binding: FragmentSearchingBinding? = null
-    val arguments: SearchingFragmentArgs by navArgs()
-    var userID = 0
+    private val arguments: SearchingFragmentArgs by navArgs()
+    private var userID = 0
 
+    private val networkConnection = NetworkConnection()
 
     private val binding get() = _binding!!
 
@@ -50,15 +53,21 @@ class SearchingFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val clueWord: LinearLayout = binding.searchClueWord
         clueWord.setOnClickListener {
-            val action = SearchingFragmentDirections.actionNavigationSearchToClueWordSearchActivity()
-            action.userID = userID
-            view.findNavController().navigate(action)
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val action =
+                    SearchingFragmentDirections.actionNavigationSearchToClueWordSearchActivity()
+                action.userID = userID
+                view.findNavController().navigate(action)
+            }
         }
 
         val tabLayout: TabLayout = view.findViewById(R.id.tabLayout)
-//
-//        tabLayout.addTab(tabLayout.newTab().setText("Kategorie"))
-//        tabLayout.addTab(tabLayout.newTab().setText("Lokalizacja"))
 
         val viewPager: ViewPager = view.findViewById(R.id.viewPager)
         val adapter = SearchingTabAdapter(childFragmentManager)

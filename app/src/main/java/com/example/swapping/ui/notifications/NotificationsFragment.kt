@@ -15,21 +15,22 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentNotificationsBinding
 import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.home.HomeFragmentDirections
+import com.google.android.material.snackbar.Snackbar
 
 class NotificationsFragment : Fragment() {
 
     private lateinit var notificationsViewModel: NotificationsViewModel
     private var _binding: FragmentNotificationsBinding? = null
-
+    private val networkConnection = NetworkConnection()
     private var userID = 0
 
     private lateinit var notificationRecyclerView: RecyclerView
     private lateinit var notificationAdapter: NotificationAdapter
-    private lateinit var notificationArray: Array<Triple<String, String, Int>>
 
     private val binding get() = _binding!!
     private val arguments: NotificationsFragmentArgs by navArgs()
@@ -61,7 +62,6 @@ class NotificationsFragment : Fragment() {
         for(pair in userNegotiations){
             val ad = pair.first
             val negotiation = pair.second
-        println(negotiation.ID)
             val purchaser = dbHelper.getUserById(negotiation.purchaserID).username
             ownedAds.add(
                 Triple(
@@ -71,7 +71,6 @@ class NotificationsFragment : Fragment() {
                 )
             )
         }
-//                println("NOTIFICATIONS::: Title ${ad.title}, User $purchaser, State ${ad.negotiation}")
 
         notificationAdapter = NotificationAdapter(ownedAds.toTypedArray(), root.context)
         notificationRecyclerView = root.findViewById(R.id.userNotifications)
@@ -84,16 +83,21 @@ class NotificationsFragment : Fragment() {
 
         notificationAdapter.setOnClickListener(object : NotificationAdapter.ReviewsClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val action = NotificationsFragmentDirections.actionNavigationNotificationsToNegotiationDetailsActivity()
-                action.userID = arguments.userID
-                action.negotiationID = userNegotiations[pos].second.ID
-                root.findNavController().navigate(action)
+                if (!networkConnection.isNetworkAvailable(root.context)) {
+                    Snackbar.make(
+                        root.findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val action =
+                        NotificationsFragmentDirections.actionNavigationNotificationsToNegotiationDetailsActivity()
+                    action.userID = arguments.userID
+                    action.negotiationID = userNegotiations[pos].second.ID
+                    root.findNavController().navigate(action)
+                }
             }
-        }
-        )
-
-        // TODO: OnClick -> pokazać szczegóły, tj. tytuł, użytkownik, przedmioty oraz opcje
-
+        })
 
         return root
     }

@@ -21,9 +21,11 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
 class EditProfileActivity : AppCompatActivity() {
@@ -34,13 +36,13 @@ class EditProfileActivity : AppCompatActivity() {
     private var userID: Int = 0
     private lateinit var userData: User
     private lateinit var DBHelper: DataBaseHelper
+    private val networkConnection = NetworkConnection()
 
     private lateinit var emailLayout: TextInputLayout
     private lateinit var usernameLayout: TextInputLayout
     private lateinit var passwordLayout: TextInputLayout
     private lateinit var phoneNumberLayout: TextInputLayout
     private lateinit var cityLayout: TextInputLayout
-
     private lateinit var email: EditText
     private lateinit var username: EditText
     private lateinit var password: EditText
@@ -51,10 +53,6 @@ class EditProfileActivity : AppCompatActivity() {
     private val args: EditProfileActivityArgs by navArgs()
 
     private lateinit var saveDataItem: MenuItem
-
-    private val binding get() = _binding!!
-
-    private lateinit var navCon: NavController
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -133,12 +131,16 @@ class EditProfileActivity : AppCompatActivity() {
                         city = city.text.toString(),
                         phone_number = phoneNumber.text.toString()
                     )
-                DBHelper.updateUser(user)
-
-//                val intent = Intent(this, MainActivity::class.java)
-//                intent.putExtra("userID", userID)
-//                startActivity(intent)
-                onBackPressed()
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    DBHelper.updateUser(user)
+                    onBackPressed()
+                }
                 return true
             }
             android.R.id.home -> {

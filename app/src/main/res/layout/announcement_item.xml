@@ -10,7 +10,8 @@
         android:id="@+id/homeImage"
         android:layout_width="120dp"
         android:layout_height="160dp"
-        android:contentDescription="@string/announcement_image" />
+        android:contentDescription="@string/announcement_image"
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/homeTitle"

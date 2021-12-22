@@ -11,18 +11,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentUsersListBinding
+import com.google.android.material.snackbar.Snackbar
 
 class UsersListActivity : AppCompatActivity() {
     private var userID: Int = 0
     private var listType: Int = 0
     private var profileID: Int = 0
-    private var prev: String = ""
 
     lateinit var adapter: UsersListAdapter
     lateinit var userListRecycler: RecyclerView
     lateinit var users: Array<Triple<Int, String, String>>
+
+    private val networkConnection = NetworkConnection()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,9 +60,17 @@ class UsersListActivity : AppCompatActivity() {
 
         adapter.setOnClickListener(object : UsersListAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val intent = Intent(context, ProfileViewActivity::class.java)
-                intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID))
-                startActivity(intent)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val intent = Intent(context, ProfileViewActivity::class.java)
+                    intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID))
+                    startActivity(intent)
+                }
             }
         })
 

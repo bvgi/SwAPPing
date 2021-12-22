@@ -121,8 +121,7 @@
                     android:layout_weight="1"
                     android:layout_marginLeft="100dp"
                     android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
-                    android:layout_gravity="right|center"
-                    android:visibility="gone"/>
+                    android:layout_gravity="right|center"/>
 
             </LinearLayout>
 
@@ -210,7 +209,6 @@
                     android:layout_gravity="start"
                     android:text="@string/addState"/>
             </LinearLayout>
-
         </LinearLayout>
     </ScrollView>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -223,4 +221,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/noInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

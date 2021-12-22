@@ -23,8 +23,8 @@ import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.profile.ProfileViewActivity
 import com.example.swapping.ui.userAds.UserAdsActivity
 import android.widget.Toast
-
-
+import com.example.swapping.Models.NetworkConnection
+import com.google.android.material.snackbar.Snackbar
 
 
 class NegotiationDetailsActivity : AppCompatActivity() {
@@ -36,6 +36,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
     private lateinit var accept: Button
     private lateinit var rise: Button
     private lateinit var reject: Button
+    private val networkConnection = NetworkConnection()
 
     private var userID = 0
     private var negotiationID = 0
@@ -83,17 +84,39 @@ class NegotiationDetailsActivity : AppCompatActivity() {
             username.text = owner.username
 
         username.setOnClickListener {
-            val intent = Intent(this, ProfileViewActivity::class.java)
-            intent.putExtras(bundleOf("userID" to userID, "profileID" to owner.ID))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, ProfileViewActivity::class.java)
+                intent.putExtras(bundleOf("userID" to userID, "profileID" to owner.ID))
+                startActivity(intent)
+            }
         }
 
         title.text = ad.title
 
         title.setOnClickListener {
-            val intent = Intent(this, AdDetailsActivity::class.java)
-            intent.putExtras( bundleOf("userID" to userID, "profileID" to owner.ID, "adID" to ad.ID))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, AdDetailsActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "userID" to userID,
+                        "profileID" to owner.ID,
+                        "adID" to ad.ID
+                    )
+                )
+                startActivity(intent)
+            }
         }
 
         val offersID = negotiation.offers.removeSurrounding("[", "]").split(", ").map { it.toInt() }
@@ -111,10 +134,23 @@ class NegotiationDetailsActivity : AppCompatActivity() {
 
         adapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val intent = Intent(context, AdDetailsActivity::class.java)
-                intent.putExtras( bundleOf("userID" to userID, "profileID" to owner.ID, "adID" to offersAd[pos].ID))
-                startActivity(intent)
-
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val intent = Intent(context, AdDetailsActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "userID" to userID,
+                            "profileID" to owner.ID,
+                            "adID" to offersAd[pos].ID
+                        )
+                    )
+                    startActivity(intent)
+                }
             }
         })
 
@@ -129,29 +165,53 @@ class NegotiationDetailsActivity : AppCompatActivity() {
         }
 
         accept.setOnClickListener {
-            dbHelper.acceptNegotiation(ad.ID, userID, owner.ID)
-            dbHelper.archiveAd(ad.ID, userID)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                dbHelper.acceptNegotiation(ad.ID, userID, owner.ID)
+                dbHelper.archiveAd(ad.ID, userID)
+            }
         }
 
         reject.setOnClickListener {
-            dbHelper.rejectedNegotiation(negotiationID)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                dbHelper.rejectedNegotiation(negotiationID)
+            }
         }
 
         rise.setOnClickListener {
-            if(user.ID == userID) {
-                val intent = Intent(this, UserAdsActivity::class.java)
-                intent.putExtras(
-                    bundleOf(
-                        "profileID" to owner.ID,
-                        "userID" to userID,
-                        "adID" to ad.ID,
-                        "prev" to "Rise",
-                        "negotiationID" to negotiationID
-                    )
-                )
-                startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             } else {
-                dbHelper.riseNegotiation(negotiationID)
+                if (user.ID == userID) {
+                    val intent = Intent(this, UserAdsActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "profileID" to owner.ID,
+                            "userID" to userID,
+                            "adID" to ad.ID,
+                            "prev" to "Rise",
+                            "negotiationID" to negotiationID
+                        )
+                    )
+                    startActivity(intent)
+                } else {
+                    dbHelper.riseNegotiation(negotiationID)
+                }
             }
         }
     }

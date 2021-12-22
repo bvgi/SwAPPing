@@ -12,8 +12,10 @@ import androidx.core.os.bundleOf
 import androidx.core.view.children
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.AdDetails.EditAdActivity
+import com.google.android.material.snackbar.Snackbar
 
 class FilterActivity : AppCompatActivity() {
     private lateinit var statusTitle: LinearLayout
@@ -23,6 +25,8 @@ class FilterActivity : AppCompatActivity() {
     private lateinit var category: RadioGroup
     private lateinit var rate: RadioGroup
     private lateinit var confirmButton: Button
+
+    private val networkConnection = NetworkConnection()
 
     private var userID = 0
     private lateinit var filter: HashMap<String, String>
@@ -134,17 +138,34 @@ class FilterActivity : AppCompatActivity() {
 
         confirmButton = findViewById(R.id.confirmFilter)
         confirmButton.setOnClickListener {
-            val intent = Intent(this, ResultsSearchActivity::class.java)
-            intent.putExtras(bundleOf(
-                "userID" to userID,
-                "category" to categoryList,
-                "voivodeship" to voivodeship,
-                "filterS" to if(status.checkedRadioButtonId != -1) status.findViewById<RadioButton>(status.checkedRadioButtonId).text.toString() else "null",
-                "filterC" to if(category.checkedRadioButtonId != -1) category.findViewById<RadioButton>(category.checkedRadioButtonId).text.toString() else "null",
-                "filterR" to if(rate.checkedRadioButtonId != -1) rate.findViewById<RadioButton>(rate.checkedRadioButtonId).text.toString() else "null",
-                "sort" to sort,
-                "query" to query))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, ResultsSearchActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "userID" to userID,
+                        "category" to categoryList,
+                        "voivodeship" to voivodeship,
+                        "filterS" to if (status.checkedRadioButtonId != -1) status.findViewById<RadioButton>(
+                            status.checkedRadioButtonId
+                        ).text.toString() else "null",
+                        "filterC" to if (category.checkedRadioButtonId != -1) category.findViewById<RadioButton>(
+                            category.checkedRadioButtonId
+                        ).text.toString() else "null",
+                        "filterR" to if (rate.checkedRadioButtonId != -1) rate.findViewById<RadioButton>(
+                            rate.checkedRadioButtonId
+                        ).text.toString() else "null",
+                        "sort" to sort,
+                        "query" to query
+                    )
+                )
+                startActivity(intent)
+            }
         }
 
     }

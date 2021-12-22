@@ -13,7 +13,9 @@
             android:id="@+id/UsersList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
-
     </ScrollView>
-
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/noInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </FrameLayout>

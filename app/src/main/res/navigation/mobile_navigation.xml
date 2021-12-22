@@ -207,6 +207,9 @@
         <action
             android:id="@+id/action_navigation_profile_view_to_adDetailsFragment"
             app:destination="@id/adDetailsFragment" />
+        <action
+            android:id="@+id/action_navigation_profile_view_to_userAdsFragment"
+            app:destination="@id/userAdsFragment" />
     </fragment>
     <activity
         android:id="@+id/navigation_edit_profile_activity"
@@ -283,6 +286,10 @@
         <action
             android:id="@+id/action_usersListFragment_to_profileViewActivity2"
             app:destination="@id/profileViewActivity" />
+        <argument
+            android:name="adID"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
     <fragment
         android:id="@+id/adDetailsFragment"
@@ -400,6 +407,17 @@
         <action
             android:id="@+id/action_userAdsFragment_to_adDetailsFragment"
             app:destination="@id/adDetailsFragment" />
+        <argument
+            android:name="profileID"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <action
+            android:id="@+id/action_userAdsFragment_to_navigation_profile_view"
+            app:destination="@id/navigation_profile_view" />
+        <argument
+            android:name="prevAdID"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
 
 </navigation>

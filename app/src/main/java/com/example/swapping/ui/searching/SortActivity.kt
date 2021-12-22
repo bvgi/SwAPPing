@@ -10,7 +10,9 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.core.os.bundleOf
 import androidx.recyclerview.widget.RecyclerView
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
+import com.google.android.material.snackbar.Snackbar
 
 class SortActivity : AppCompatActivity() {
     private lateinit var dataASC: RadioButton
@@ -19,6 +21,8 @@ class SortActivity : AppCompatActivity() {
     private lateinit var rateDESC: RadioButton
     private lateinit var button: Button
     private lateinit var radioGroup: RadioGroup
+
+    private val networkConnection = NetworkConnection()
 
     private var userID = 0
     private var category = ""
@@ -66,19 +70,82 @@ class SortActivity : AppCompatActivity() {
 
         button = findViewById(R.id.confirmSort)
         button.setOnClickListener {
-            val intent = Intent(this, ResultsSearchActivity::class.java)
-            if(dataASC.isChecked){
-                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 1, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
-            } else if(dataDESC.isChecked){
-                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 2, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
-            } else if(rateASC.isChecked){
-                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 3, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
-            } else if(rateDESC.isChecked){
-                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 4, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             } else {
-                intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to 0, "filterS" to filter["S"], "filterR" to filter["R"], "filterC" to filter["C"]))
+                val intent = Intent(this, ResultsSearchActivity::class.java)
+                if (dataASC.isChecked) {
+                    intent.putExtras(
+                        bundleOf(
+                            "query" to query,
+                            "userID" to userID,
+                            "category" to category,
+                            "voivodeship" to voivodeship,
+                            "sort" to 1,
+                            "filterS" to filter["S"],
+                            "filterR" to filter["R"],
+                            "filterC" to filter["C"]
+                        )
+                    )
+                } else if (dataDESC.isChecked) {
+                    intent.putExtras(
+                        bundleOf(
+                            "query" to query,
+                            "userID" to userID,
+                            "category" to category,
+                            "voivodeship" to voivodeship,
+                            "sort" to 2,
+                            "filterS" to filter["S"],
+                            "filterR" to filter["R"],
+                            "filterC" to filter["C"]
+                        )
+                    )
+                } else if (rateASC.isChecked) {
+                    intent.putExtras(
+                        bundleOf(
+                            "query" to query,
+                            "userID" to userID,
+                            "category" to category,
+                            "voivodeship" to voivodeship,
+                            "sort" to 3,
+                            "filterS" to filter["S"],
+                            "filterR" to filter["R"],
+                            "filterC" to filter["C"]
+                        )
+                    )
+                } else if (rateDESC.isChecked) {
+                    intent.putExtras(
+                        bundleOf(
+                            "query" to query,
+                            "userID" to userID,
+                            "category" to category,
+                            "voivodeship" to voivodeship,
+                            "sort" to 4,
+                            "filterS" to filter["S"],
+                            "filterR" to filter["R"],
+                            "filterC" to filter["C"]
+                        )
+                    )
+                } else {
+                    intent.putExtras(
+                        bundleOf(
+                            "query" to query,
+                            "userID" to userID,
+                            "category" to category,
+                            "voivodeship" to voivodeship,
+                            "sort" to 0,
+                            "filterS" to filter["S"],
+                            "filterR" to filter["R"],
+                            "filterC" to filter["C"]
+                        )
+                    )
+                }
+                startActivity(intent)
             }
-            startActivity(intent)
         }
 
     }

@@ -1,11 +1,12 @@
 package com.example.swapping.ui.profile
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -13,13 +14,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.Models.Ad
-import com.example.swapping.Models.User
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
-import com.example.swapping.databinding.FragmentHomeBinding
 import com.example.swapping.databinding.FragmentUsersListBinding
-import com.example.swapping.ui.home.HomeAdapter
-import com.example.swapping.ui.home.HomeViewModel
+import com.example.swapping.ui.userAds.UserAdsFragmentDirections
+import com.google.android.material.snackbar.Snackbar
 
 class UsersListFragment : Fragment() {
 
@@ -34,14 +33,19 @@ class UsersListFragment : Fragment() {
     lateinit var adapter: UsersListAdapter
     lateinit var userListRecycler: RecyclerView
     lateinit var users: Array<Triple<Int, String, String>>
+    private var adID = 0
+
+    private val networkConnection = NetworkConnection()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         arguments.let {
             profileID = it.profileID
             userID = it.userID
             listType = it.followersOrFollowing
             prev = it.previous
+            adID = it.adID
         }
     }
 
@@ -76,20 +80,57 @@ class UsersListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         adapter.setOnClickListener(object : UsersListAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                if(prev == "Liked"){
-                    val profileViewFragment = ProfileViewFragment()
-                    profileViewFragment.arguments =
-                        bundleOf("userID" to userID, "profileID" to profileID, "previous" to "Liked")
-                    fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, profileViewFragment)?.commit()
+                if (!networkConnection.isNetworkAvailable(view.context)) {
+                    Snackbar.make(
+                        view.findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 } else {
-                    val action =
-                        UsersListFragmentDirections.actionUsersListFragmentToNavigationProfileView()
-                    action.profileID = users[pos].first
-                    action.userID = userID
-                    view.findNavController().navigate(action)
+                    if (prev == "Liked") {
+                        val action =
+                            UsersListFragmentDirections.actionUsersListFragmentToNavigationProfileView()
+                        action.userID = userID
+                        action.profileID = profileID
+                        if(listType == 0)
+                            action.previous = "Followers"
+                        else
+                            action.previous = "Following"
+                        view.findNavController().navigate(action)
+//                    val profileViewFragment = ProfileViewFragment()
+//                    profileViewFragment.arguments =
+//                        bundleOf("userID" to userID, "profileID" to profileID, "previous" to "Liked")
+//                    fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, profileViewFragment)?.commit()
+                    } else {
+                        val action =
+                            UsersListFragmentDirections.actionUsersListFragmentToNavigationProfileView()
+                        action.profileID = users[pos].first
+                        action.userID = userID
+                        if(listType == 0)
+                            action.previous = "Followers"
+                        else
+                            action.previous = "Following"
+                        view.findNavController().navigate(action)
+                    }
                 }
             }
         })
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                val action = UsersListFragmentDirections.actionUsersListFragmentToNavigationProfileView()
+                action.userID = userID
+                action.profileID = profileID
+                action.adID = adID
+                if(prev == "Liked")
+                    action.previous = "Liked"
+                findNavController().navigate(action)
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 }

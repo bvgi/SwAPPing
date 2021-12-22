@@ -11,9 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.home.HomeAdapter
+import com.google.android.material.snackbar.Snackbar
 
 class ResultsSearchActivity : AppCompatActivity() {
 
@@ -33,6 +35,8 @@ class ResultsSearchActivity : AppCompatActivity() {
     private var query = ""
     private lateinit var dbHelper : DataBaseHelper
 
+    private val networkConnection = NetworkConnection()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results_search)
@@ -49,8 +53,6 @@ class ResultsSearchActivity : AppCompatActivity() {
             query = extras.getString("query").toString()
         }
 
-        println("Status: $filterS, rate: $filterR")
-
         dbHelper = DataBaseHelper(this)
 
         noResults = findViewById(R.id.nothingFound)
@@ -58,15 +60,49 @@ class ResultsSearchActivity : AppCompatActivity() {
         sortItem = findViewById(R.id.sortButton)
         filterItem = findViewById(R.id.filterButton)
         sortItem.setOnClickListener{
-            val intent = Intent(this, SortActivity::class.java)
-            intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "sort" to sort, "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC)))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, SortActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "query" to query,
+                        "userID" to userID,
+                        "category" to category,
+                        "voivodeship" to voivodeship,
+                        "sort" to sort,
+                        "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC)
+                    )
+                )
+                startActivity(intent)
+            }
         }
 
         filterItem.setOnClickListener{
-            val intent = Intent(this, FilterActivity::class.java)
-            intent.putExtras(bundleOf("query" to query, "userID" to userID, "category" to category, "voivodeship" to voivodeship, "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC), "sort" to sort))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, FilterActivity::class.java)
+                intent.putExtras(
+                    bundleOf(
+                        "query" to query,
+                        "userID" to userID,
+                        "category" to category,
+                        "voivodeship" to voivodeship,
+                        "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC),
+                        "sort" to sort
+                    )
+                )
+                startActivity(intent)
+            }
         }
 
         resultRecyclerView = findViewById(R.id.resultsRecyclerView)
@@ -116,6 +152,11 @@ class ResultsSearchActivity : AppCompatActivity() {
             } else {
                 getResult(query, filterS, filterR, filterC)
             }
+            if(results.size == 0){
+                noResults.visibility = View.VISIBLE
+            } else {
+                noResults.visibility = View.GONE
+            }
             resultAdapter.dataset = results
             resultAdapter.notifyDataSetChanged()
         }
@@ -124,9 +165,23 @@ class ResultsSearchActivity : AppCompatActivity() {
 
         resultAdapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val intent = Intent(context, AdDetailsActivity::class.java)
-                intent.putExtras( bundleOf("userID" to userID, "profileID" to results[pos].user, "adID" to results[pos].ID))
-                startActivity(intent)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val intent = Intent(context, AdDetailsActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "userID" to userID,
+                            "profileID" to results[pos].user,
+                            "adID" to results[pos].ID
+                        )
+                    )
+                    startActivity(intent)
+                }
             }
         })
     }

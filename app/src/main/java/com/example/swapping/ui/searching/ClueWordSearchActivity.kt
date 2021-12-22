@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.home.HomeAdapter
+import com.google.android.material.snackbar.Snackbar
 
 class ClueWordSearchActivity : AppCompatActivity() {
     private lateinit var clueWordSearchView: SearchView
@@ -23,8 +25,8 @@ class ClueWordSearchActivity : AppCompatActivity() {
     private lateinit var resultAdapter: HomeAdapter
     private lateinit var results: Array<Ad>
 
-    private lateinit var sortItem: Button
-    private lateinit var filterItem: Button
+    private val networkConnection = NetworkConnection()
+
     private lateinit var noResults: TextView
 
     private val arguments: ClueWordSearchActivityArgs by navArgs()
@@ -67,41 +69,70 @@ class ClueWordSearchActivity : AppCompatActivity() {
         val con = this
         clueWordSearchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                if(p0 != null && p0 != "") {
-                    val intent = Intent(con, ResultsSearchActivity::class.java)
-                    intent.putExtras(bundleOf("query" to p0, "userID" to userID, "category" to "", "voivodeship" to "", "filter" to hashMapOf("R" to filterR, "S" to filterS, "C" to filterC), "sort" to sort))
-                    startActivity(intent)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 } else {
-                    results = emptyArray()
-                    resultAdapter.dataset = results
-                    resultAdapter.notifyDataSetChanged()
-                    if(results.isEmpty()){
-                        noResults.visibility = View.VISIBLE
+                    if (p0 != null && p0 != "") {
+                        val intent = Intent(con, ResultsSearchActivity::class.java)
+                        intent.putExtras(
+                            bundleOf(
+                                "query" to p0,
+                                "userID" to userID,
+                                "category" to "",
+                                "voivodeship" to "",
+                                "filter" to hashMapOf(
+                                    "R" to filterR,
+                                    "S" to filterS,
+                                    "C" to filterC
+                                ),
+                                "sort" to sort
+                            )
+                        )
+                        startActivity(intent)
                     } else {
-                        noResults.visibility = View.GONE
+                        results = emptyArray()
+                        resultAdapter.dataset = results
+                        resultAdapter.notifyDataSetChanged()
+                        if (results.isEmpty()) {
+                            noResults.visibility = View.VISIBLE
+                        } else {
+                            noResults.visibility = View.GONE
+                        }
                     }
                 }
                 return false
             }
 
             override fun onQueryTextChange(p0: String?): Boolean {
-                if(p0 != null && p0 != ""){
-                    results = dbHelper.findAds(p0, userID)
-                    resultAdapter.dataset = results
-                    resultAdapter.notifyDataSetChanged()
-                    if(results.isEmpty()){
-                        noResults.visibility = View.VISIBLE
-                    } else {
-                        noResults.visibility = View.GONE
-                    }
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
                 } else {
-                    results = emptyArray()
-                    resultAdapter.dataset = results
-                    resultAdapter.notifyDataSetChanged()
-                    if(results.isEmpty()){
-                        noResults.visibility = View.VISIBLE
+                    if (p0 != null && p0 != "") {
+                        results = dbHelper.findAds(p0, userID)
+                        resultAdapter.dataset = results
+                        resultAdapter.notifyDataSetChanged()
+                        if (results.isEmpty()) {
+                            noResults.visibility = View.VISIBLE
+                        } else {
+                            noResults.visibility = View.GONE
+                        }
                     } else {
-                        noResults.visibility = View.GONE
+                        results = emptyArray()
+                        resultAdapter.dataset = results
+                        resultAdapter.notifyDataSetChanged()
+                        if (results.isEmpty()) {
+                            noResults.visibility = View.VISIBLE
+                        } else {
+                            noResults.visibility = View.GONE
+                        }
                     }
                 }
                 return false
@@ -111,9 +142,23 @@ class ClueWordSearchActivity : AppCompatActivity() {
 
         resultAdapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val intent = Intent(context, AdDetailsActivity::class.java)
-                intent.putExtras( bundleOf("userID" to arguments.userID, "profileID" to results[pos].user, "adID" to results[pos].ID))
-                startActivity(intent)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val intent = Intent(context, AdDetailsActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "userID" to arguments.userID,
+                            "profileID" to results[pos].user,
+                            "adID" to results[pos].ID
+                        )
+                    )
+                    startActivity(intent)
+                }
             }
             })
     }

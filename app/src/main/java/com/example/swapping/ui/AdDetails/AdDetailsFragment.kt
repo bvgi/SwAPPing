@@ -12,10 +12,12 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentAdDetailsBinding
 import com.example.swapping.ui.profile.ProfileViewFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 
 class AdDetailsFragment : Fragment() {
@@ -42,6 +44,7 @@ class AdDetailsFragment : Fragment() {
 
     private lateinit var likeAd: MenuItem
     private lateinit var dbHelper : DataBaseHelper
+    private val networkConnection = NetworkConnection()
 
     var userID = 0
     var adID = 0
@@ -113,23 +116,29 @@ class AdDetailsFragment : Fragment() {
 
         goToProfile = view.findViewById(R.id.goToUserProfile)
         goToProfile.setOnClickListener {
-            if(prev == "Liked"){
-                val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationProfileView()
-                action.userID = userID
-                action.profileID = profileID
-                action.previous = "Liked"
-                action.adID = adID
-                findNavController().navigate(action)
-//                val profileViewFragment = ProfileViewFragment()
-//                profileViewFragment.arguments =
-//                    bundleOf("userID" to userID, "profileID" to profileID, "previous" to "Liked")
-//                fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, profileViewFragment)?.commit()
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
             } else {
-                val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationProfileView()
-                action.profileID = profileID
-                action.userID = userID
-                action.adID = adID
-                view.findNavController().navigate(action)
+                if (prev == "Liked") {
+                    val action =
+                        AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationProfileView()
+                    action.userID = userID
+                    action.profileID = profileID
+                    action.previous = "Liked"
+                    action.adID = adID
+                    findNavController().navigate(action)
+                } else {
+                    val action =
+                        AdDetailsFragmentDirections.actionAdDetailsFragmentToNavigationProfileView()
+                    action.profileID = profileID
+                    action.userID = userID
+                    action.adID = adID
+                    view.findNavController().navigate(action)
+                }
             }
 
         }
@@ -164,12 +173,21 @@ class AdDetailsFragment : Fragment() {
         if(dbHelper.getUserAnnouncements(userID).isEmpty() || isInNegotiation)
             startNegotiation.isEnabled = false
         startNegotiation.setOnClickListener {
-            if(ad.purchaser_id != userID){
-                val action = AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsActivity()
-                action.profileID = profileID
-                action.userID = userID
-                action.adID = adID
-                view.findNavController().navigate(action)
+            if (!networkConnection.isNetworkAvailable(view.context)) {
+                Snackbar.make(
+                    view.findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                if (ad.purchaser_id != userID) {
+                    val action =
+                        AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsActivity()
+                    action.profileID = profileID
+                    action.userID = userID
+                    action.adID = adID
+                    view.findNavController().navigate(action)
+                }
             }
         }
     }
@@ -195,6 +213,7 @@ class AdDetailsFragment : Fragment() {
                     val action =
                         AdDetailsFragmentDirections.actionAdDetailsFragmentToUserAdsFragment()
                     action.userID = userID
+                    action.profileID = userID
                     action.previousFragment = "Liked"
                     findNavController().navigate(action)
                 } else {

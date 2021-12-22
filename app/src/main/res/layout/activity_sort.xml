@@ -61,10 +61,6 @@
                     android:layout_margin="10dp"
                     android:text="Ocena malejąco" />
             </RadioGroup>
-
-
-
-
         </LinearLayout>
     </ScrollView>
     <Button

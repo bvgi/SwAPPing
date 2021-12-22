@@ -2,7 +2,6 @@ package com.example.swapping.ui.AdDetails
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.media.Image
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,24 +11,21 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import androidx.navigation.NavDeepLinkBuilder
-import androidx.navigation.findNavController
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
-import com.example.swapping.Models.User
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.profile.ProfileViewActivity
-import com.example.swapping.ui.profile.ProfileViewFragment
 import com.example.swapping.ui.userAds.UserAdsActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.snackbar.Snackbar
 
 class AdDetailsActivity : AppCompatActivity() {
 
     private lateinit var adDetailsViewModel: AdDetailsViewModel
     private lateinit var editAd: MenuItem
     private lateinit var deleteAd: MenuItem
-    private lateinit var purchased: MenuItem
-    private lateinit var title: TextView
+    private lateinit var adTitle: TextView
     private lateinit var adPhoto: ImageView
     private lateinit var name: TextView
     private lateinit var username: TextView
@@ -46,6 +42,7 @@ class AdDetailsActivity : AppCompatActivity() {
     private lateinit var publishedDate: TextView
     private lateinit var startNegotiation: FloatingActionButton
 
+    private val networkConnection = NetworkConnection()
     private lateinit var likeAd: MenuItem
 
     var userID = 0
@@ -80,8 +77,9 @@ class AdDetailsActivity : AppCompatActivity() {
         archived = ad.archived
         purchaser = ad.purchaser_id
 
-        title = findViewById(R.id.Title)
-        title.text = ad.title
+        adTitle = findViewById(R.id.Title)
+        adTitle.text = ad.title
+        title = ""
 
         adPhoto = findViewById(R.id.AdImage)
         adPhoto.setImageBitmap(photo)
@@ -109,14 +107,19 @@ class AdDetailsActivity : AppCompatActivity() {
 
         goToUserArrow = findViewById(R.id.goToUserArrow)
 
-        if(userID != profileID)
-            goToUserArrow.visibility = View.VISIBLE
-
         goToUser = findViewById(R.id.goToUser)
         goToUser.setOnClickListener {
-            val intent = Intent(this, ProfileViewActivity::class.java)
-            intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID))
-            startActivity(intent)
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                val intent = Intent(this, ProfileViewActivity::class.java)
+                intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID))
+                startActivity(intent)
+            }
         }
 
         location = findViewById(R.id.locationName)
@@ -132,6 +135,11 @@ class AdDetailsActivity : AppCompatActivity() {
         status.text = ad.status
 
         startNegotiation = findViewById(R.id.startNegotiationButton)
+        if(userID == profileID)
+            startNegotiation.visibility = View.GONE
+        else
+            startNegotiation.visibility = View.VISIBLE
+
         var isInNegotiation = false
         for(pair in userNegotiations){
             if(pair.second.adID == adID && pair.second.purchaserID == userID)
@@ -140,9 +148,23 @@ class AdDetailsActivity : AppCompatActivity() {
         if(dbHelper.getUserAnnouncements(userID).isEmpty() || isInNegotiation)
             startNegotiation.isEnabled = false
         startNegotiation.setOnClickListener {
-            if(ad.purchaser_id != userID){
-                val intent = Intent(this, UserAdsActivity::class.java)
-                intent.putExtras(bundleOf("profileID" to profileID, "userID" to userID, "adID" to adID))
+            if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                Snackbar.make(
+                    findViewById(R.id.noInternet),
+                    "Brak dostępu do Internetu",
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            } else {
+                if (ad.purchaser_id != userID) {
+                    val intent = Intent(this, UserAdsActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "profileID" to profileID,
+                            "userID" to userID,
+                            "adID" to adID
+                        )
+                    )
+                }
             }
         }
     }

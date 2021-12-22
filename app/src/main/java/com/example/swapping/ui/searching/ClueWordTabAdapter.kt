@@ -1,11 +1,6 @@
-import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import com.example.swapping.ui.searching.Ads
-import com.example.swapping.ui.searching.Categories
-import com.example.swapping.ui.searching.Localizations
-import com.example.swapping.ui.searching.Users
 
 @Suppress("DEPRECATION")
 internal class ClueWordTabAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {

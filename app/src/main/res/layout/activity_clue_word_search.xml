@@ -7,6 +7,7 @@
     android:orientation="vertical"
     tools:context=".ui.searching.ClueWordSearchActivity">
 
+
     <SearchView
         android:id="@+id/clueWord"
         android:layout_width="match_parent"
@@ -14,46 +15,6 @@
         android:queryHint="Znajdź..."
         android:iconifiedByDefault="false"/>
 
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_marginStart="5dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/filterButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:text="Filtruj"
-                    android:textColor="@color/black"
-                    android:textSize="13dp"
-                    android:backgroundTint="@color/gray"
-                    android:layout_weight="1"
-                    android:drawableLeft="@drawable/ic_baseline_filter_alt_24" />
-
-                <Button
-                    android:id="@+id/sortButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="10dp"
-                    android:text="Sortuj"
-                    android:textColor="@color/black"
-                    android:textSize="13dp"
-                    android:backgroundTint="@color/gray"
-                    android:layout_weight="1"
-                    android:drawableLeft="@drawable/ic_baseline_sort_24" />
-            </LinearLayout>
-        </LinearLayout>
-    </HorizontalScrollView>
     <TextView
         android:id="@+id/nothingFound"
         android:layout_width="wrap_content"
@@ -75,16 +36,14 @@
 
     </ScrollView>
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/noInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <!--    <com.google.android.material.tabs.TabLayout-->
-<!--        android:id="@+id/clueWordTabLayout"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content">-->
-<!--    </com.google.android.material.tabs.TabLayout>-->
-
-<!--    <androidx.viewpager.widget.ViewPager-->
-<!--        android:id="@+id/clueWordPager"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="match_parent" />-->
 
 </LinearLayout>

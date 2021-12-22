@@ -10,13 +10,16 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
+import com.google.android.material.snackbar.Snackbar
 
 class Categories : Fragment() {
     lateinit var adapter: SearchingListAdapter
     lateinit var categoriesRecyclerView: RecyclerView
     private lateinit var categories: Array<String>
     var userID = 0
+    private val networkConnection = NetworkConnection()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +55,23 @@ class Categories : Fragment() {
 
         adapter.setOnClickListener(object : SearchingListAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {
-                val intent = Intent(view.context, ResultsSearchActivity::class.java)
-                intent.putExtras( bundleOf("userID" to userID, "category" to categories[pos],"voivodeship" to ""))
-                startActivity(intent)
+                if (!networkConnection.isNetworkAvailable(view.context)) {
+                    Snackbar.make(
+                        view.findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val intent = Intent(view.context, ResultsSearchActivity::class.java)
+                    intent.putExtras(
+                        bundleOf(
+                            "userID" to userID,
+                            "category" to categories[pos],
+                            "voivodeship" to ""
+                        )
+                    )
+                    startActivity(intent)
+                }
             }
             })
     }

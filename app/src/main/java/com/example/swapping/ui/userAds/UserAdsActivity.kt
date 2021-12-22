@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBase.DataBaseHelper
 import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentHomeBinding
@@ -34,14 +35,16 @@ class UserAdsActivity : AppCompatActivity() {
     lateinit var ads: Array<Ad>
     lateinit var dbHelper: DataBaseHelper
 
-    val arguments: UserAdsActivityArgs by navArgs()
-    var userID = 0
-    var adID = 0
-    var profileID = 0
-    var prev = ""
-    var negotiationID = 0
-    var type = 0
+    private val arguments: UserAdsActivityArgs by navArgs()
+    private var userID = 0
+    private var adID = 0
+    private var profileID = 0
+    private var prev = ""
+    private var negotiationID = 0
+    private var type = 0
     private var chosedAds = mutableListOf<Int>()
+
+    private val networkConnection = NetworkConnection()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +72,6 @@ class UserAdsActivity : AppCompatActivity() {
         ads = homeViewModel.getNotArchivedAds(userID, this)
 
         adapter = UserAdsAdapter(arrayOf(), this)
-        println("USERADS::: Num of ads: ${ads.size}, userID: $userID")
         adsRecycler = findViewById(R.id.usersAds)
         adsRecycler.layoutManager = GridLayoutManager(this, 3)
         adsRecycler.adapter = adapter
@@ -78,11 +80,19 @@ class UserAdsActivity : AppCompatActivity() {
 
         adapter.setOnClickListener(object : UserAdsAdapter.ClickListener {
             override fun onClick(pos: Int, aView: View) {
-                val checkbox: CheckBox = aView as CheckBox
-                if(checkbox.isChecked)
-                    chosedAds.add(ads[pos].ID)
-                else
-                    chosedAds.remove(ads[pos].ID)
+                if (!networkConnection.isNetworkAvailable(applicationContext)) {
+                    Snackbar.make(
+                        findViewById(R.id.noInternet),
+                        "Brak dostępu do Internetu",
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    val checkbox: CheckBox = aView as CheckBox
+                    if (checkbox.isChecked)
+                        chosedAds.add(ads[pos].ID)
+                    else
+                        chosedAds.remove(ads[pos].ID)
+                }
             }
         })
     }

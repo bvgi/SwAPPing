@@ -12,23 +12,29 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity() {
-
-    // TODO: sprawdzanie internetu
-
     private lateinit var binding: ActivityMainBinding
     lateinit var DBHelper: DataBaseHelper
     lateinit var navView: BottomNavigationView
-    var userID = 0
-    var adID = 0
-    var exitCounter = 0
+    private var userID = 0
+    private var adID = 0
+    private var exitCounter = 0
+    private val networkConnection = NetworkConnection()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!networkConnection.isNetworkAvailable(applicationContext)) {
+            Snackbar.make(
+                findViewById(R.id.noInternet),
+                "Brak dostępu do internetu",
+                Snackbar.LENGTH_INDEFINITE
+            ).show()
+        }
         DBHelper = DataBaseHelper(applicationContext)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -90,16 +96,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             finishAffinity()
             exitCounter = 0
-//
-////            super.onBackPressed()
-////            val intent = Intent(Intent.ACTION_MAIN)
-////            intent.addCategory(Intent.CATEGORY_HOME)
-////            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-////            startActivity(intent)
         }
-    }
-
-    public fun setActionBarTitle(title: String){
-        setTitle(title)
     }
 }

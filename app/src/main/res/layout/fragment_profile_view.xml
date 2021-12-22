@@ -167,7 +167,8 @@
                     android:background="@color/gray"/>
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/goToUserAds"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
                     android:layout_gravity="start">
@@ -179,8 +180,17 @@
                         android:paddingTop="15dp"
                         android:paddingBottom="15dp"
                         android:paddingStart="15dp"
+                        android:layout_weight="1"
                         android:textColor="@color/black"
                         android:fontFamily="sans-serif-medium"/>
+                    <ImageView
+                        android:id="@+id/goToAds"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="100dp"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_baseline_keyboard_arrow_right_24"
+                        android:layout_gravity="right|center"/>
                 </LinearLayout>
 
                 <View
@@ -350,5 +360,12 @@
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/noInternet"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
