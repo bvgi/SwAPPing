@@ -5,11 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.widget.ProgressBar
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.userLogin.LoginActivity
-import com.google.android.material.snackbar.Snackbar
 
 class InternetConnectionActivity : AppCompatActivity() {
     private var connected = false

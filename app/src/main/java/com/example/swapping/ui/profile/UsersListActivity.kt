@@ -5,15 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
-import com.example.swapping.databinding.FragmentUsersListBinding
 import com.google.android.material.snackbar.Snackbar
 
 class UsersListActivity : AppCompatActivity() {

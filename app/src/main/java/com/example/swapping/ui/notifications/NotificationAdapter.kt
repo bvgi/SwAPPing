@@ -9,10 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.Models.Review
 import com.example.swapping.R
-import com.example.swapping.ui.profile.ReviewsAdapter
 
 class NotificationAdapter(var dataSet: Array<Triple<Pair<Int, String>, Pair<Int, String>, Int>>, val context: Context) : RecyclerView.Adapter<NotificationAdapter.ViewHolder>() {
 

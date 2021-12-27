@@ -4,15 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Review
 import com.example.swapping.R
-import com.example.swapping.ui.home.HomeAdapter
 
 class ReviewsAdapter(var dataSet: Pair<Int, Array<Review>>, val context: Context) : RecyclerView.Adapter<ReviewsAdapter.ViewHolder>(){
     /**

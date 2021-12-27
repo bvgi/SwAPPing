@@ -12,8 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
+import com.example.swapping.ui.MainActivity
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R

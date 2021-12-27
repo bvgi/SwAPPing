@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.R
 

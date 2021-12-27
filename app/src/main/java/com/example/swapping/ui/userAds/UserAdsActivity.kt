@@ -3,26 +3,19 @@ package com.example.swapping.ui.userAds
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.CheckBox
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.navArgs
 import androidx.navigation.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
-import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentHomeBinding
-import com.example.swapping.ui.home.HomeAdapter
-import com.example.swapping.ui.home.HomeFragmentArgs
 import com.example.swapping.ui.home.HomeViewModel
 import com.google.android.material.snackbar.Snackbar
 

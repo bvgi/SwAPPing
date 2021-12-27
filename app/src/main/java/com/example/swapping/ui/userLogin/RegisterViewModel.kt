@@ -1,13 +1,10 @@
 package com.example.swapping.ui.userLogin
 
-import android.content.Intent
-import android.text.Layout
 import android.widget.CheckBox
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
 import com.google.android.material.textfield.TextInputLayout
 
 class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {

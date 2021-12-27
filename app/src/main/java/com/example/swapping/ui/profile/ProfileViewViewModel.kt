@@ -1,12 +1,11 @@
 package com.example.swapping.ui.profile
 
 import android.content.Context
-import android.provider.ContactsContract
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Review
 import com.example.swapping.R
 

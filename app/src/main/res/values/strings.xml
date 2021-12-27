@@ -25,7 +25,9 @@
     <string name="addPhoto">Dodaj zdjęcie</string>
     <string name="addDescription">Opis <font color='#FF0000'>*</font></string>
     <string name="addLocationCity">Miasto</string>
-    <string name="addLocationVoivodeship">Województwo <font color='#FF0000'>*</font></string>
+    <string name="addLocationVoivodeship">Województwo: <font color='#FF0000'>*</font></string>
+    <string name="addCat">Kategoria: <font color='#FF0000'>*</font></string>
+    <string name="addSta">Stan zużycia: <font color='#FF0000'>*</font></string>
     <string name="addCategory">Kategoria:\t</string>
     <string name="radio_button">Radio Button</string>
     <string name="addState">Stan zużycia:\t</string>

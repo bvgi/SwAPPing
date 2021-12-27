@@ -3,7 +3,6 @@ package com.example.swapping.ui.searching
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -11,11 +10,11 @@ import androidx.core.os.bundleOf
 import androidx.navigation.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
-import com.example.swapping.ui.AdDetails.AdDetailsActivity
+import com.example.swapping.ui.adDetails.AdDetailsActivity
 import com.example.swapping.ui.home.HomeAdapter
 import com.google.android.material.snackbar.Snackbar
 

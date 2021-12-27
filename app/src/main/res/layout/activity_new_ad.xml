@@ -81,8 +81,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
                             android:hint="@string/addDescription"
-                            app:hintEnabled = "true"
-                            android:inputType="textNoSuggestions" />
+                            android:inputType="textNoSuggestions"
+                            app:hintEnabled="true" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -112,18 +112,15 @@
                         android:layout_marginTop="5dp"
                         app:boxBackgroundColor="#F3F3F3">
 
-                        <EditText
+                        <TextView
                             android:id="@+id/addLocationVoivodeship"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:hint="@string/addLocationVoivodeship"
-                            app:hintEnabled = "true"
+                            android:paddingTop="5dp"
+                            android:text="@string/addLocationVoivodeship"
+                            android:textColor="@color/black"
                             android:inputType="none"
-                            android:maxLines="1"
-                            android:singleLine="true"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"/>
+                            android:paddingStart="13dp"/>
                         <Spinner
                             android:id="@+id/spinnerVoivodeship"
                             android:layout_width="match_parent"
@@ -140,18 +137,17 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        app:boxBackgroundColor="#F3F3F3">
+                        android:orientation="vertical">
 
-                        <EditText
+                        <TextView
                             android:id="@+id/addCategory"
+                            android:textColor="@color/black"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:iconifiedByDefault="false"
-                            android:layout_marginTop="10dp"
-                            android:hint="@string/addCategory"
-                            android:inputType="none"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"/>
+                            android:layout_marginTop="5dp"
+                            android:text="@string/addCat"
+                            android:layout_marginStart="13dp"/>
 
                         <RadioGroup
                             android:id="@+id/radioGroupCategory"
@@ -204,16 +200,15 @@
                         android:layout_marginTop="5dp"
                         app:boxBackgroundColor="#F3F3F3">
 
-                        <EditText
+                        <TextView
                             android:id="@+id/addState"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:iconifiedByDefault="false"
-                            android:hint="@string/addState"
-                            android:layout_marginTop="10dp"
-                            android:inputType="none"
-                            android:focusable="false"
-                            android:focusableInTouchMode="false"/>
+                            android:text="@string/addSta"
+                            android:textColor="@color/black"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginStart="13dp"/>
 
                         <RadioGroup
                             android:id="@+id/radioGroupStatus"

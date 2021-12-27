@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
@@ -55,7 +55,7 @@ class ProfileFragment : Fragment() {
 
         dbHelper = DataBaseHelper(root.context)
 
-        if(previousFragment == "AdDetails"){
+        if(previousFragment == "adDetails"){
             val homeFragment = HomeFragment()
             homeFragment.setArguments(bundleOf("userID" to userID, "previousFragment" to "Profile"))
             fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()

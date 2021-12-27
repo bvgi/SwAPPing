@@ -1,33 +1,18 @@
 package com.example.swapping.ui.home
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.MainActivity
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentHomeBinding
-import com.example.swapping.ui.AdDetails.AdDetailsActivity
-import com.example.swapping.ui.AdDetails.AdDetailsFragment
-import com.example.swapping.ui.AdDetails.AdDetailsFragmentDirections
-import com.example.swapping.ui.profile.ProfileFragmentDirections
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
 import kotlin.random.Random
 
 class HomeFragment : Fragment() {
@@ -66,12 +51,8 @@ class HomeFragment : Fragment() {
         val tmp = homeViewModel.getFollowersAnnouncements(userID, root.context)
         if(tmp.isEmpty()) {
             val adsList =
-                homeViewModel.getAnnouncements(userID, root.context).toMutableList()
+                homeViewModel.getNotArchivedAds(userID, root.context)
             val randomAds = mutableListOf<Ad>()
-            for(ad in adsList){
-                if(ad.archived == 1)
-                    adsList.drop(adsList.indexOf(ad))
-            }
             var max = 20
             if(adsList.size < 10)
                  max = adsList.size

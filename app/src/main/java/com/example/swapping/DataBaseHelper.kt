@@ -1,4 +1,4 @@
-package com.example.swapping.DataBase
+package com.example.swapping
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
@@ -189,7 +189,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         values.put("Phone_number", newUser.phone_number)
         values.put("Password", newUser.password)
 
-        val result = db.update(USER_TABLE, values, "ID = ?",
+        val result = db.update(
+            USER_TABLE, values, "ID = ?",
             arrayOf(newUser.ID.toString())
         )
         db.close()
@@ -202,7 +203,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val values = ContentValues()
         values.put("Mean_rate", meanRate)
 
-        val result = db.update(USER_TABLE, values, "ID = ?",
+        val result = db.update(
+            USER_TABLE, values, "ID = ?",
             arrayOf(userId.toString())
         )
         db.close()
@@ -866,6 +868,76 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return announcements.toTypedArray()
     }
 
+    fun getNotArchivedAds(userId: Int) : Array<Ad> {
+        val db = this.readableDatabase
+        val announcements = mutableListOf<Ad>()
+        val cursor: Cursor?
+
+        val getAnnouncementsQuery = "SELECT * " +
+                "FROM $ADVERTISEMENT_TABLE " +
+                "WHERE User != $userId " +
+                "AND Archived = 0"
+
+        try{
+            cursor = db.rawQuery(getAnnouncementsQuery, null)
+        } catch (e: SQLiteException){
+            db.execSQL(getAnnouncementsQuery)
+            return emptyArray()
+        }
+
+        var id: Int
+        var user: Int
+        var title: String
+        var description: String
+        var voivodeship: String
+        var city: String
+        var category: String
+        var status: String
+        var archived: Int
+        var purchaserId: Int
+        var image: ByteArray
+        var publishedDate: Int
+
+        if(cursor.moveToFirst()){
+            do{
+                id = cursor.getInt(cursor.getColumnIndex("ID"))
+                user = cursor.getInt(cursor.getColumnIndex("User"))
+                title = cursor.getString(cursor.getColumnIndex("Title"))
+                description = cursor.getString(cursor.getColumnIndex("Description"))
+                voivodeship = getVoivodeshipName(cursor.getInt(cursor.getColumnIndex("Voivodeship")))
+                city = cursor.getString(cursor.getColumnIndex("City"))
+                category = getCategoryName(cursor.getInt(cursor.getColumnIndex("Category")))
+                status = getStatusName(cursor.getInt(cursor.getColumnIndex("Status")))
+                archived = cursor.getInt(cursor.getColumnIndex("Archived"))
+                purchaserId = cursor.getInt(cursor.getColumnIndex("Purchaser_id"))
+                image = cursor.getBlob(cursor.getColumnIndex("Image"))
+                publishedDate = cursor.getInt(cursor.getColumnIndex("Published_date"))
+
+                announcements.add(
+                    Ad(
+                        ID = id,
+                        user = user,
+                        title = title,
+                        description = description,
+                        voivodeship = voivodeship,
+                        city = city,
+                        category = category,
+                        status = status,
+                        archived = archived,
+                        purchaser_id = purchaserId,
+                        image = image,
+                        published_date = publishedDate
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+
+        return announcements.toTypedArray()
+    }
+
     fun getUserAnnouncementsNotArchived(userId: Int) : Array<Ad> {
         val db = this.readableDatabase
         val announcements = mutableListOf<Ad>()
@@ -1181,7 +1253,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         )
     }
 
-    fun deleteAnnouncement(id: Int) : Int {
+    fun deleteAd(id: Int) : Int {
         val db = this.writableDatabase
 
         val result = db.delete(ADVERTISEMENT_TABLE, "ID = ?", arrayOf(id.toString()))
@@ -3253,6 +3325,14 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
             offers = offers
         )
 
+    }
+
+    fun deleteNegotiation(adID: Int) : Int {
+        val db = this.writableDatabase
+        val result = db.delete(NEGOTIATION_TABLE, "Advertisement = ?", arrayOf(adID.toString()))
+        db.close()
+
+        return result
     }
 
 }

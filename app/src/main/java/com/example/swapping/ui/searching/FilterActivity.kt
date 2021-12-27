@@ -10,11 +10,9 @@ import android.view.View
 import android.widget.*
 import androidx.core.os.bundleOf
 import androidx.core.view.children
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
-import com.example.swapping.ui.AdDetails.EditAdActivity
 import com.google.android.material.snackbar.Snackbar
 
 class FilterActivity : AppCompatActivity() {

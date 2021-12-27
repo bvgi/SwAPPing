@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 
 class HomeViewModel : ViewModel() {
@@ -49,9 +49,16 @@ class HomeViewModel : ViewModel() {
         return ads
     }
 
-    fun getNotArchivedAds(userID: Int, context: Context) : Array<Ad> {
+    fun getNotArchivedUserAds(userID: Int, context: Context) : Array<Ad> {
         val dbHelper = DataBaseHelper(context)
         val ads = dbHelper.getUserAnnouncementsNotArchived(userID)
+
+        return ads
+    }
+
+    fun getNotArchivedAds(userID: Int, context: Context) : Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getNotArchivedAds(userID)
 
         return ads
     }

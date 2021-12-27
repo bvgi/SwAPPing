@@ -1,20 +1,9 @@
 package com.example.swapping.ui.profile
 
 import android.annotation.SuppressLint
-import android.graphics.Color
-import android.media.Image
-import android.opengl.Visibility
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.widget.*
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.ActionBar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.os.bundleOf
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -23,19 +12,12 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.Review
 import com.example.swapping.R
-import com.example.swapping.databinding.FragmentProfileBinding
 import com.example.swapping.databinding.FragmentProfileViewBinding
-import com.example.swapping.ui.AdDetails.AdDetailsFragment
-import com.example.swapping.ui.AdDetails.AdDetailsFragmentDirections
-import com.example.swapping.ui.home.HomeAdapter
-import com.example.swapping.ui.home.HomeFragmentDirections
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
-import org.w3c.dom.Text
 import kotlin.math.round
 
 // TODO: Dodawanie i usuwanie ocen
@@ -333,7 +315,7 @@ class ProfileViewFragment : Fragment() {
                     reviewsAdapter.notifyItemInserted(0)
                     reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
                     reviewsRecycler.adapter = reviewsAdapter
-                    val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                    val mean_rate = profileViewViewModel.getMeanRate(reviews)
                     dbHelper.updateMeanRate(profileID, mean_rate)
                     meanRate.text = mean_rate.toString()
                     Snackbar.make(
@@ -341,6 +323,10 @@ class ProfileViewFragment : Fragment() {
                         "Ocena została dodana",
                         Snackbar.LENGTH_SHORT
                     ).show()
+                    val action = ProfileViewFragmentDirections.actionNavigationProfileViewSelf()
+                    action.userID = userID
+                    action.profileID = userID
+                    view.findNavController().navigate(action)
                 } else {
                     alert.visibility = View.VISIBLE
                 }

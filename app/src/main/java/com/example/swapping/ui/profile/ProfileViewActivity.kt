@@ -1,6 +1,5 @@
 package com.example.swapping.ui.profile
 
-import android.*
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -12,11 +11,10 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.Review
 import com.example.swapping.R
-import com.example.swapping.databinding.ActivityProfileViewBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.round
 

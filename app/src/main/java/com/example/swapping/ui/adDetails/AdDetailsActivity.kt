@@ -1,4 +1,4 @@
-package com.example.swapping.ui.AdDetails
+package com.example.swapping.ui.adDetails
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -11,8 +11,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.profile.ProfileViewActivity
@@ -223,10 +222,9 @@ class AdDetailsActivity : AppCompatActivity() {
                 return true
             }
             R.id.menu_deleteAd -> {
-                dbHelper.deleteAnnouncement(adID)
-                val intent = Intent(this, MainActivity::class.java)
-                intent.putExtras( bundleOf("userID" to userID, "adID" to adID))
-                startActivity(intent)
+                dbHelper.deleteAd(adID)
+                dbHelper.deleteNegotiation(adID)
+                onBackPressed()
                 return true
             }
             R.id.menu_likeAd -> {

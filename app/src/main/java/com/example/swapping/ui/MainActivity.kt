@@ -1,9 +1,8 @@
 
-package com.example.swapping
+package com.example.swapping.ui
 
 import android.os.Bundle
 import android.os.Handler
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.NavArgument
@@ -11,8 +10,9 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.swapping.DataBase.DataBaseHelper
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
+import com.example.swapping.R
 import com.example.swapping.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -52,16 +52,21 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
 
         val appBarConfiguration = AppBarConfiguration(setOf(
-                R.id.navigation_home, R.id.navigation_search, R.id.navigation_new_announcement, R.id.navigation_notifications, R.id.navigation_profile))
+            R.id.navigation_home,
+            R.id.navigation_search,
+            R.id.navigation_new_announcement,
+            R.id.navigation_notifications,
+            R.id.navigation_profile
+        ))
 
         navController.setGraph(R.navigation.mobile_navigation, extras)
 
 
         if(adID != 0){
             if(adID == -1)
-                navController.navigate(R.id.navigation_search, bundleOf("userID" to userID, "previousFragment" to "AdDetails"))
+                navController.navigate(R.id.navigation_search, bundleOf("userID" to userID, "previousFragment" to "adDetails"))
             else
-                navController.navigate(R.id.navigation_profile, bundleOf("userID" to userID, "previousFragment" to "AdDetails"))
+                navController.navigate(R.id.navigation_profile, bundleOf("userID" to userID, "previousFragment" to "adDetails"))
         }
 
         navController.graph.findNode(R.id.navigation_new_announcement)

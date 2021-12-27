@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
+import com.example.swapping.ui.MainActivity
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.google.android.material.snackbar.Snackbar

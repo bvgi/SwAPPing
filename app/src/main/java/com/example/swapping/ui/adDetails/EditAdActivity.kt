@@ -1,4 +1,4 @@
-package com.example.swapping.ui.AdDetails
+package com.example.swapping.ui.adDetails
 
 import android.Manifest
 import android.content.ActivityNotFoundException
@@ -10,22 +10,18 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.core.view.children
-import com.example.swapping.DataBase.DataBaseHelper
-import com.example.swapping.MainActivity
+import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
-import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.google.android.material.snackbar.Snackbar
 import java.io.ByteArrayOutputStream
-import java.time.LocalDate
 
 class EditAdActivity : AppCompatActivity() {
     private var adID = 0
