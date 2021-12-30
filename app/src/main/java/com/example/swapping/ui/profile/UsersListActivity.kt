@@ -39,10 +39,8 @@ class UsersListActivity : AppCompatActivity() {
 
         if(listType == 0) { // 0 - followers, 1 - following
             users = dbHelper.getFollowers(profileID)
-            println("FOLLOWERS LIST::: ${users.size}")
         } else {
             users = dbHelper.getFollowing(profileID)
-            println("FOLLOWING LIST::: ${users.size}")
         }
 
         adapter = UsersListAdapter(users, this)

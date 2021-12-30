@@ -11,7 +11,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.Review
 import com.example.swapping.R
@@ -20,12 +19,9 @@ import kotlin.math.round
 
 class ProfileViewActivity : AppCompatActivity() {
 
-    var userID = 0
-    var profileID = 0
-    var prev = ""
+    private var userID = 0
+    private var profileID = 0
     private lateinit var profileViewViewModel: ProfileViewViewModel
-
-    private lateinit var dbHelper: DataBaseHelper
     private lateinit var username: TextView
     private lateinit var email: TextView
     private lateinit var phoneNumber: TextView
@@ -98,7 +94,6 @@ class ProfileViewActivity : AppCompatActivity() {
 
         if(profileViewViewModel.isFollower(userID, profileID, this)){
             observeButton.text = "Przestań obserwować"
-//                observeButton.setBackgroundColor(Color.GRAY)
         }
         else{
             observeButton.text = resources.getString(R.string.follow)
@@ -108,7 +103,6 @@ class ProfileViewActivity : AppCompatActivity() {
         if(profileViewViewModel.isReviewer(userID, profileID, this))
             addOpinionLayout.visibility = View.GONE
 
-        dbHelper = DataBaseHelper(this)
 
         reviewsRecycler = findViewById(R.id.reviews)
         reviewsRecycler.layoutManager = LinearLayoutManager(this)
@@ -127,11 +121,12 @@ class ProfileViewActivity : AppCompatActivity() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                 } else {
-                    dbHelper.deleteReview(profileID, userID)
+                    profileViewViewModel.deleteReview(profileID, userID, context)
                     reviews = profileViewViewModel.getReviews(profileID, context)
-                    dbHelper.updateMeanRate(
+                    profileViewViewModel.updateMeanRate(
                         profileID,
-                        round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                        round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0),
+                        context
                     )
                     reviewsAdapter.notifyItemRemoved(pos)
                     reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
@@ -139,7 +134,7 @@ class ProfileViewActivity : AppCompatActivity() {
             }
         })
 
-        val userData = dbHelper.getUserById(profileID)
+        val userData = profileViewViewModel.getUser(profileID, this)
 
         profileName = findViewById(R.id.profileName)
         profileName.text = userData.name
@@ -159,7 +154,7 @@ class ProfileViewActivity : AppCompatActivity() {
         followers = findViewById(R.id.followersNumber)
         following = findViewById(R.id.followingNumber)
 
-        followers.text = dbHelper.getFollowers(profileID).size.toString()
+        followers.text = profileViewViewModel.getFollowersSize(profileID, this).toString()
         followers.setOnClickListener {
             if (!networkConnection.isNetworkAvailable(applicationContext)) {
                 Snackbar.make(
@@ -179,7 +174,7 @@ class ProfileViewActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-        following.text = dbHelper.getFollowing(profileID).size.toString()
+        following.text = profileViewViewModel.getFollowingSize(profileID, this).toString()
         following.setOnClickListener {
             if (!networkConnection.isNetworkAvailable(applicationContext)) {
                 Snackbar.make(
@@ -209,14 +204,13 @@ class ProfileViewActivity : AppCompatActivity() {
                 ).show()
             } else {
                 if (!profileViewViewModel.isFollower(userID, profileID, context)) {
-                    dbHelper.addFollower(profileID, userID)
-                    println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
+                    profileViewViewModel.follow(profileID, userID, this)
                     observeButton.text = "Przestań obserwować"
-                    followers.text = dbHelper.getFollowers(profileID).size.toString()
+                    followers.text = profileViewViewModel.getFollowersSize(profileID, this).toString()
                 } else {
-                    dbHelper.deleteFollower(profileID, userID)
+                    profileViewViewModel.unfollow(profileID, userID, this)
                     observeButton.text = resources.getString(R.string.follow)
-                    followers.text = dbHelper.getFollowers(profileID).size.toString()
+                    followers.text = profileViewViewModel.getFollowersSize(profileID, this).toString()
                 }
             }
         }
@@ -259,7 +253,6 @@ class ProfileViewActivity : AppCompatActivity() {
         if (reviews.isNotEmpty())
             meanRate.text = countedMeanRate.toString()
 
-        println("Review: $profileID, $userID, $finalrate, ${rateDescription.text}")
 
         alert = findViewById(R.id.rateAlert)
 
@@ -281,20 +274,14 @@ class ProfileViewActivity : AppCompatActivity() {
                         rate = finalrate,
                         description = description
                     )
-                    dbHelper.addReview(review)
+                    profileViewViewModel.addReview(review, this)
                     reviews = mutableListOf(review).toTypedArray() + reviews
-                    println("Size: " + reviews.size)
                     reviewsAdapter.notifyItemInserted(0)
                     reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
                     reviewsRecycler.adapter = reviewsAdapter
-                    val mean_rate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
-                    dbHelper.updateMeanRate(profileID, mean_rate)
-                    meanRate.text = mean_rate.toString()
-                    Snackbar.make(
-                        findViewById(R.id.reviewInformation),
-                        "Ocena została dodana",
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    val meanRate = round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0)
+                    profileViewViewModel.updateMeanRate(profileID, meanRate, this)
+                    this.meanRate.text = meanRate.toString()
                 } else {
                     alert.visibility = View.VISIBLE
                 }

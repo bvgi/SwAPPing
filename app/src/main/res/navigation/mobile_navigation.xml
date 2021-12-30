@@ -246,7 +246,7 @@
     </activity>
     <activity
         android:id="@+id/adDetailsActivity"
-        android:name="com.example.swapping.ui.adDetails.AdDetailsActivity"
+        android:name="com.example.swapping.ui.AdDetails.AdDetailsActivity"
         android:label="Szczegóły ogłoszenia"
         tools:layout="@layout/activity_ad_details" >
         <argument
@@ -296,7 +296,7 @@
     </fragment>
     <fragment
         android:id="@+id/adDetailsFragment"
-        android:name="com.example.swapping.ui.adDetails.AdDetailsFragment"
+        android:name="com.example.swapping.ui.AdDetails.AdDetailsFragment"
         android:label="Szczegóły ogłoszenia"
         tools:layout="@layout/fragment_ad_details" >
         <argument

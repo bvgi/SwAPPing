@@ -51,17 +51,8 @@ class HomeFragment : Fragment() {
         val tmp = homeViewModel.getFollowersAnnouncements(userID, root.context)
         if(tmp.isEmpty()) {
             val adsList =
-                homeViewModel.getNotArchivedAds(userID, root.context)
-            val randomAds = mutableListOf<Ad>()
-            var max = 20
-            if(adsList.size < 10)
-                 max = adsList.size
-            for(i in 1..max){
-                val random = Random.nextInt(adsList.size)
-                if(!randomAds.contains(adsList[random]))
-                    randomAds.add(adsList[random])
-            }
-            ads = randomAds.toTypedArray()
+                homeViewModel.getNotArchivedAds(userID, root.context).toMutableList()
+            ads = adsList.shuffled().toTypedArray()
         }
         else
             ads = tmp

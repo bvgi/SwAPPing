@@ -1,19 +1,19 @@
-package com.example.swapping.ui.adDetails
+package com.example.swapping.ui.AdDetails
+
 
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.core.view.children
 import com.example.swapping.DataBaseHelper
@@ -21,7 +21,6 @@ import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.google.android.material.snackbar.Snackbar
-import java.io.ByteArrayOutputStream
 
 class EditAdActivity : AppCompatActivity() {
     private var adID = 0
@@ -29,7 +28,6 @@ class EditAdActivity : AppCompatActivity() {
     private lateinit var editAdViewModel: EditAdViewModel
 
     private lateinit var saveDataItem: MenuItem
-    private lateinit var dbHelper: DataBaseHelper
     private lateinit var addedPhoto: ImageView
     private lateinit var changePhotoButton: Button
     private lateinit var title: EditText
@@ -43,8 +41,8 @@ class EditAdActivity : AppCompatActivity() {
 
     private lateinit var adDetails: Ad
 
-    val REQUEST_IMAGE_CAPTURE = 1
-    val REQUEST_CAMERA = 1
+    private val REQUEST_IMAGE_CAPTURE = 1
+    private val REQUEST_CAMERA = 1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,10 +56,7 @@ class EditAdActivity : AppCompatActivity() {
             adID = extras.getInt("adID")
         }
 
-
-
-        dbHelper = DataBaseHelper(this)
-        adDetails = dbHelper.getAnnouncement(adID)
+        adDetails = editAdViewModel.getAd(adID, this)
         val photo = editAdViewModel.getImage(adDetails.image)
 
         changedPhoto = adDetails.image
@@ -88,14 +83,19 @@ class EditAdActivity : AppCompatActivity() {
 
 
         voivodeship = findViewById(R.id.spinnerVoivodeship)
-        val voivodeships = dbHelper.getVoivodeships()
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, voivodeships)
+        val voivodeships = editAdViewModel.getVoivodeships(this)
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            voivodeships)
         voivodeship.adapter = adapter
 
-        voivodeship.setSelection(adapter.getPosition(adDetails.voivodeship))
+        voivodeship.setSelection(
+            adapter.getPosition(adDetails.voivodeship)
+        )
 
         category = findViewById(R.id.editRadioGroupCategory)
-        val categories = dbHelper.getCategories()
+        val categories = editAdViewModel.getCategories(this)
         var catIndex = 0
         var currCheckedCategory = 0
 
@@ -109,7 +109,7 @@ class EditAdActivity : AppCompatActivity() {
         category.findViewById<RadioButton>(currCheckedCategory).isChecked = true
 
         status = findViewById(R.id.editRadioGroupStatus)
-        val statuses = dbHelper.getStatuses()
+        val statuses = editAdViewModel.getStatuses(this)
         var statIndex = 0
         var currCheckedStatus = 0
 
@@ -142,13 +142,9 @@ class EditAdActivity : AppCompatActivity() {
                     cityName = city.text.toString()
 
                 if(changedPhoto.isEmpty()){
-                    val nophoto = resources.getDrawable(R.drawable.ic_baseline_no_photography_24, null)
+                    val noPhoto = getDrawable(R.drawable.ic_baseline_no_photography_24)
                     addedPhoto.setImageResource(R.drawable.ic_baseline_no_photography_24)
-                    val bitmap =  addedPhoto.drawable.toBitmap(nophoto.intrinsicWidth, nophoto.intrinsicHeight)
-                    val stream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream)
-                    val bitmapdata = stream.toByteArray()
-                    changedPhoto = bitmapdata
+                    changedPhoto = editAdViewModel.getBytes(addedPhoto, noPhoto)
                 }
                 val ad = Ad(
                     ID = adDetails.ID,
@@ -173,13 +169,14 @@ class EditAdActivity : AppCompatActivity() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                 } else {
-                    dbHelper.updateAnnouncement(ad)
+                    editAdViewModel.updateAd(ad, this)
                     val intent = Intent(this, AdDetailsActivity::class.java)
                     intent.putExtras(
                         bundleOf(
                             "userID" to adDetails.user,
                             "profileID" to adDetails.user,
-                            "adID" to adDetails.ID
+                            "adID" to adDetails.ID,
+                            "previous" to "Edit"
                         )
                     )
                     startActivity(intent)
@@ -195,7 +192,10 @@ class EditAdActivity : AppCompatActivity() {
         try {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         } catch (e: ActivityNotFoundException) {
-            println("ERROR")
+            Toast.makeText(
+                this,
+                "Błąd podczas uruchamiania kamery",
+                Toast.LENGTH_LONG).show()
         }
 
 
@@ -219,16 +219,8 @@ class EditAdActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE && data != null){
             val imageBitmap = data.extras?.get("data") as Bitmap
             addedPhoto.setImageBitmap(imageBitmap)
-            changedPhoto = getBytes(imageBitmap)
-//            val compressed = imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, ByteArrayOutputStream)
+            changedPhoto = editAdViewModel.getBytes(addedPhoto, null)
         }
-    }
-
-    fun getBytes(bitmap: Bitmap): ByteArray {
-        val bitmap = addedPhoto.drawable.toBitmap(addedPhoto.drawable.intrinsicWidth, addedPhoto.drawable.intrinsicHeight)
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream)
-        return stream.toByteArray()
     }
 
     override fun onRequestPermissionsResult(
@@ -243,12 +235,21 @@ class EditAdActivity : AppCompatActivity() {
             }
             else
             {
-                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                    this,
+                    "Odmówiono dostępu do kamery",
+                    Toast.LENGTH_LONG).show()
             }
         }
     }
 
     override fun getParentActivityIntent(): Intent? {
-        return super.getParentActivityIntent()?.putExtras( bundleOf("userID" to adDetails.user, "profileID" to adDetails.user, "adID" to adDetails.ID))
+        return super.getParentActivityIntent()?.putExtras(
+            bundleOf(
+                "userID" to adDetails.user,
+                "profileID" to adDetails.user,
+                "adID" to adDetails.ID
+            )
+        )
     }
 }

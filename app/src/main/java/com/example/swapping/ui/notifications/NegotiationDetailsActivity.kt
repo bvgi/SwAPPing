@@ -8,17 +8,19 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.R
-import com.example.swapping.ui.adDetails.AdDetailsActivity
+import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.home.HomeAdapter
 import com.example.swapping.ui.profile.ProfileViewActivity
 import com.example.swapping.ui.userAds.UserAdsActivity
 import com.example.swapping.Models.NetworkConnection
+import com.example.swapping.ui.newAd.NewAdViewModel
 import com.google.android.material.snackbar.Snackbar
 
 
@@ -36,7 +38,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
     private var userID = 0
     private var negotiationID = 0
 
-    private lateinit var dbHelper: DataBaseHelper
+    private lateinit var negotiationDetailsViewModel: NegotiationDetailsViewModel
 
     private val arguments: NegotiationDetailsActivityArgs by navArgs()
 
@@ -49,7 +51,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
             negotiationID = it.negotiationID
         }
 
-        dbHelper = DataBaseHelper(this)
+        negotiationDetailsViewModel = ViewModelProvider(this).get(NegotiationDetailsViewModel::class.java)
 
         negotiationType = findViewById(R.id.negotiationType)
         title = findViewById(R.id.negotiationAdTitle)
@@ -59,7 +61,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
         rise = findViewById(R.id.riseNegotiation)
         reject = findViewById(R.id.rejectNegotitation)
 
-        val negotiation = dbHelper.getNegotiation(negotiationID)
+        val negotiation = negotiationDetailsViewModel.getNegotiation(negotiationID, this)
 
         negotiationType.text = when(negotiation.type){
             1 -> "Nowa negocjacja"
@@ -69,9 +71,9 @@ class NegotiationDetailsActivity : AppCompatActivity() {
             else -> "Brak danych"
         }
 
-        val ad = dbHelper.getAnnouncement(negotiation.adID)
-        val owner = dbHelper.getUserById(negotiation.ownerID)
-        val user = dbHelper.getUserById(negotiation.purchaserID)
+        val ad = negotiationDetailsViewModel.getAd(negotiation.adID, this)
+        val owner = negotiationDetailsViewModel.getUserById(negotiation.ownerID, this) // właściciel ogłoszenia
+        val user = negotiationDetailsViewModel.getUserById(negotiation.purchaserID, this) // ten który rozpoczął negocjację
 
         if(negotiation.ownerID == userID)
             username.text = user.username
@@ -117,7 +119,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
         val offersID = negotiation.offers.removeSurrounding("[", "]").split(", ").map { it.toInt() }
         val offersAd = mutableListOf<Ad>()
         for(id in offersID){
-            offersAd.add(dbHelper.getAnnouncement(id))
+            offersAd.add(negotiationDetailsViewModel.getAd(id, this))
         }
 
         adapter = HomeAdapter(offersAd.toTypedArray(), this)
@@ -151,13 +153,17 @@ class NegotiationDetailsActivity : AppCompatActivity() {
 
         if(user.ID == userID){
             accept.visibility = View.GONE
-            reject.visibility = View.GONE
+            if(negotiation.type != 3){
+                rise.visibility = View.GONE
+                reject.visibility = View.GONE
+            }
         }
         if(ad.archived == 1 || negotiation.type == 4){
             accept.visibility = View.GONE
             reject.visibility = View.GONE
             rise.visibility = View.GONE
         }
+
 
         accept.setOnClickListener {
             if (!networkConnection.isNetworkAvailable(applicationContext)) {
@@ -167,8 +173,14 @@ class NegotiationDetailsActivity : AppCompatActivity() {
                     Snackbar.LENGTH_SHORT
                 ).show()
             } else {
-                dbHelper.acceptNegotiation(ad.ID, userID, owner.ID)
-                dbHelper.archiveAd(ad.ID, userID)
+                negotiationDetailsViewModel.accept(negotiationID, this)
+                negotiationDetailsViewModel.archive(ad.ID, user.ID, this)
+                accept.isEnabled = false
+                reject.isEnabled = false
+                rise.isEnabled = false
+                for(offer in offersAd){
+                    negotiationDetailsViewModel.archive(offer.ID, userID, this)
+                }
             }
         }
 
@@ -180,7 +192,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
                     Snackbar.LENGTH_SHORT
                 ).show()
             } else {
-                dbHelper.rejectedNegotiation(negotiationID)
+                negotiationDetailsViewModel.reject(negotiationID, this)
             }
         }
 
@@ -205,7 +217,7 @@ class NegotiationDetailsActivity : AppCompatActivity() {
                     )
                     startActivity(intent)
                 } else {
-                    dbHelper.riseNegotiation(negotiationID)
+                    negotiationDetailsViewModel.rise(negotiationID, this)
                 }
             }
         }

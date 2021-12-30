@@ -7,6 +7,7 @@ import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,7 @@ import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
-import com.example.swapping.ui.adDetails.AdDetailsActivity
+import com.example.swapping.ui.AdDetails.AdDetailsActivity
 import com.example.swapping.ui.home.HomeAdapter
 import com.google.android.material.snackbar.Snackbar
 
@@ -27,6 +28,7 @@ class ClueWordSearchActivity : AppCompatActivity() {
     private val networkConnection = NetworkConnection()
 
     private lateinit var noResults: TextView
+    private lateinit var clueWordSearchViewModel: ClueWordSearchViewModel
 
     private val arguments: ClueWordSearchActivityArgs by navArgs()
     private var userID = 0
@@ -35,7 +37,6 @@ class ClueWordSearchActivity : AppCompatActivity() {
     private var filterC = ""
     private var filterR = ""
     private var query = ""
-    private lateinit var dbHelper : DataBaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +54,8 @@ class ClueWordSearchActivity : AppCompatActivity() {
             query = extras.getString("query").toString()
         }
 
-        dbHelper = DataBaseHelper(this)
+        clueWordSearchViewModel =
+            ViewModelProvider(this).get(ClueWordSearchViewModel::class.java)
 
         noResults = findViewById(R.id.nothingFound)
 
@@ -115,7 +117,7 @@ class ClueWordSearchActivity : AppCompatActivity() {
                     ).show()
                 } else {
                     if (p0 != null && p0 != "") {
-                        results = dbHelper.findAds(p0, userID)
+                        results = clueWordSearchViewModel.findAds(p0, userID, con)
                         resultAdapter.dataset = results
                         resultAdapter.notifyDataSetChanged()
                         if (results.isEmpty()) {
@@ -159,7 +161,7 @@ class ClueWordSearchActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
             }
-            })
+        })
     }
 
 

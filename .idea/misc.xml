@@ -5,6 +5,12 @@
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.2515625" />
         <entry key="../../Android/Sdk/platforms/android-30/data/res/layout/simple_spinner_dropdown_item.xml" value="0.4125" />
+        <entry key="..\:/Users/User/StudioProjects/SwAPPing/app/src/main/res/layout/activity_ad_details.xml" value="0.13171225937183384" />
+        <entry key="..\:/Users/User/StudioProjects/SwAPPing/app/src/main/res/layout/activity_new_ad.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/User/StudioProjects/SwAPPing/app/src/main/res/layout/fragment_ad_details.xml" value="0.14270833333333333" />
+        <entry key="..\:/Users/User/StudioProjects/SwAPPing/app/src/main/res/layout/fragment_home.xml" value="0.27291666666666664" />
+        <entry key="..\:/Users/User/StudioProjects/SwAPPing/app/src/main/res/layout/fragment_users_list.xml" value="0.1641337386018237" />
+        <entry key="..\:/Users/User/StudioProjects/SwAPPing/app/src/main/res/menu/ad_details_archived.xml" value="0.14270833333333333" />
         <entry key="app/src/main/res/drawable/ic_baseline_repeat_24.xml" value="0.15885416666666666" />
         <entry key="app/src/main/res/drawable/ic_baseline_search_24.xml" value="0.2526041666666667" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.42205128205128206" />

@@ -30,7 +30,6 @@ class NotificationsFragment : Fragment() {
     private val binding get() = _binding!!
     private val arguments: NotificationsFragmentArgs by navArgs()
 
-    private lateinit var dbHelper: DataBaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +48,6 @@ class NotificationsFragment : Fragment() {
 
         _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        dbHelper = DataBaseHelper(root.context)
 
         val ownedAds = notificationsViewModel.getNegotiations(userID, root.context)
 

@@ -40,10 +40,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    fun validateForm(username: String?, password: String?): Int {
-        val isValidUsername = username != null && username.isNotBlank() && DBHelper.getUserByUsername(username).ID > -1
-        val isValidPassword = password != null && password.isNotBlank() && password.length >= 6 && DBHelper.getUserByUsername(username!!).password == password
-        Log.d("Validate", isValidUsername.toString() + isValidPassword.toString())
+    private fun validateForm(username: String?, password: String?): Int {
+        val isValidUsername = username != null && username.isNotBlank()
+                && DBHelper.getUserByUsername(username).ID > -1
+        val isValidPassword = password != null && password.isNotBlank()
+                && password.length >= 6 && DBHelper.getUserByUsername(username!!).password == password
         return if (isValidUsername && isValidPassword) 0
         else if (!isValidPassword && !isValidUsername) 1
         else if (!isValidUsername) 2

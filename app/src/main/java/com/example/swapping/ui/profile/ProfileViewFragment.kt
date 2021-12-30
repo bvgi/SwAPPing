@@ -20,8 +20,6 @@ import com.example.swapping.databinding.FragmentProfileViewBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.round
 
-// TODO: Dodawanie i usuwanie ocen
-
 class ProfileViewFragment : Fragment() {
 
     var userID = 0
@@ -32,7 +30,6 @@ class ProfileViewFragment : Fragment() {
     private lateinit var profileViewViewModel: ProfileViewViewModel
     private var _binding: FragmentProfileViewBinding? = null
 
-    private lateinit var dbHelper: DataBaseHelper
 
     private lateinit var username: TextView
     private lateinit var email: TextView
@@ -126,8 +123,6 @@ class ProfileViewFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dbHelper = DataBaseHelper(view.context)
-
         reviewsRecycler = view.findViewById(R.id.reviews)
         reviewsRecycler.layoutManager = LinearLayoutManager(view.context)
         reviewsAdapter = ReviewsAdapter(Pair(userID, reviews), view.context)
@@ -140,23 +135,29 @@ class ProfileViewFragment : Fragment() {
 
         reviewsAdapter.setOnClickListener(object : ReviewsAdapter.ReviewsClickListener{
             override fun onClick(pos: Int, aView: View) {
-                dbHelper.deleteReview(profileID, userID)
+                profileViewViewModel.deleteReview(profileID, userID, view.context)
                 Snackbar.make(
                     view.findViewById(R.id.reviewInformation),
                     "Usunięto ocenę",
                     Snackbar.LENGTH_SHORT
                 ).show()
                 reviews = profileViewViewModel.getReviews(profileID, root.context)
-                println(reviews.size)
-                dbHelper.updateMeanRate(profileID, round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0))
+                profileViewViewModel.updateMeanRate(
+                    profileID,
+                    round(profileViewViewModel.getMeanRate(reviews) * 10.0 / 10.0),
+                    view.context
+                )
                 meanRate.text = profileViewViewModel.getMeanRate(reviews).toString()
                 reviewsAdapter.notifyItemRemoved(pos)
                 reviewsAdapter.notifyItemRangeChanged(pos, reviews.size)
                 reviewsAdapter.notifyDataSetChanged()
+                val action = ProfileViewFragmentDirections.actionNavigationProfileViewSelf()
+                action.userID = userID
+                action.profileID = profileID
             }
         })
 
-        val userData = dbHelper.getUserById(profileID)
+        val userData = profileViewViewModel.getUser(profileID, view.context)
 
         profileName = view.findViewById(R.id.profileName)
         profileName.text = userData.name
@@ -176,7 +177,7 @@ class ProfileViewFragment : Fragment() {
         followers = view.findViewById(R.id.followersNumber)
         following = view.findViewById(R.id.followingNumber)
 
-        followers.text = dbHelper.getFollowers(profileID).size.toString()
+        followers.text = profileViewViewModel.getFollowersSize(profileID, view.context).toString()
         followers.setOnClickListener {
             if (!networkConnection.isNetworkAvailable(view.context)) {
                 Snackbar.make(
@@ -194,7 +195,7 @@ class ProfileViewFragment : Fragment() {
                 findNavController().navigate(action)
             }
         }
-        following.text = dbHelper.getFollowing(profileID).size.toString()
+        following.text = profileViewViewModel.getFollowingSize(profileID, view.context).toString()
         following.setOnClickListener {
             if (!networkConnection.isNetworkAvailable(view.context)) {
                 Snackbar.make(
@@ -222,15 +223,13 @@ class ProfileViewFragment : Fragment() {
                 ).show()
             } else {
                 if (!profileViewViewModel.isFollower(userID, profileID, view.context)) {
-                    dbHelper.addFollower(profileID, userID)
-                    println("PROFILEVIEW::: Followers_size: ${dbHelper.getFollowers(profileID).size}")
+                    profileViewViewModel.follow(profileID, userID, view.context)
                     observeButton.text = "Przestań obserwować"
-                    followers.text = dbHelper.getFollowers(profileID).size.toString()
-
+                    followers.text = profileViewViewModel.getFollowersSize(profileID, view.context).toString()
                 } else {
-                    dbHelper.deleteFollower(profileID, userID)
+                    profileViewViewModel.unfollow(profileID, userID, view.context)
                     observeButton.text = getString(R.string.follow)
-                    followers.text = dbHelper.getFollowers(profileID).size.toString()
+                    followers.text = profileViewViewModel.getFollowersSize(profileID, view.context).toString()
                 }
             }
         }
@@ -310,13 +309,13 @@ class ProfileViewFragment : Fragment() {
                         rate = finalrate,
                         description = description
                     )
-                    dbHelper.addReview(review)
+                    profileViewViewModel.addReview(review, view.context)
                     reviews = mutableListOf(review).toTypedArray() + reviews
                     reviewsAdapter.notifyItemInserted(0)
                     reviewsAdapter.notifyItemRangeChanged(0, reviews.size)
                     reviewsRecycler.adapter = reviewsAdapter
                     val mean_rate = profileViewViewModel.getMeanRate(reviews)
-                    dbHelper.updateMeanRate(profileID, mean_rate)
+                    profileViewViewModel.updateMeanRate(profileID, mean_rate, view.context)
                     meanRate.text = mean_rate.toString()
                     Snackbar.make(
                         view.findViewById(R.id.reviewInformation),
@@ -325,7 +324,7 @@ class ProfileViewFragment : Fragment() {
                     ).show()
                     val action = ProfileViewFragmentDirections.actionNavigationProfileViewSelf()
                     action.userID = userID
-                    action.profileID = userID
+                    action.profileID = profileID
                     view.findNavController().navigate(action)
                 } else {
                     alert.visibility = View.VISIBLE

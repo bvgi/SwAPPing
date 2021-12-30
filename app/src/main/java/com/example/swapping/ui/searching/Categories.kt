@@ -6,12 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
+import com.example.swapping.ui.newAd.NewAdViewModel
 import com.google.android.material.snackbar.Snackbar
 
 class Categories : Fragment() {
@@ -20,6 +22,8 @@ class Categories : Fragment() {
     private lateinit var categories: Array<String>
     var userID = 0
     private val networkConnection = NetworkConnection()
+
+    private lateinit var categoriesViewModel: CategoriesViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,15 +37,14 @@ class Categories : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-
+        categoriesViewModel =
+            ViewModelProvider(this).get(CategoriesViewModel::class.java)
         return inflater.inflate(R.layout.fragment_categories, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dbHelper = DataBaseHelper(view.context)
-        categories = dbHelper.getCategories()
+        categories = categoriesViewModel.getCategories(view.context)
         adapter = SearchingListAdapter(arrayOf(), view.context)
         categoriesRecyclerView = view.findViewById(R.id.listOfCategories)
         categoriesRecyclerView.layoutManager = LinearLayoutManager(view.context)

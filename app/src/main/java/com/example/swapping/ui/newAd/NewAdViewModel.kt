@@ -1,23 +1,17 @@
 package com.example.swapping.ui.newAd
 
-import android.Manifest
-import android.app.Activity
 import android.content.Context
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.widget.ImageView
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModel
+import com.example.swapping.DataBaseHelper
+import com.example.swapping.Models.Ad
 import com.google.android.material.textfield.TextInputLayout
+import java.io.ByteArrayOutputStream
 
 class NewAdViewModel : ViewModel() {
-
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is new Ad Fragment"
-    }
-    val text: LiveData<String> = _text
 
     fun registerErrors(valid: HashMap<String, Boolean>, titleLayout: TextInputLayout, descriptionLayout: TextInputLayout, voivodeshipLayout: TextInputLayout, categoryLayout: TextInputLayout, statusLayout: TextInputLayout) : Boolean {
         for ((key, value) in valid.entries) {
@@ -70,17 +64,43 @@ class NewAdViewModel : ViewModel() {
         )
     }
 
-    fun cameraRequest(REQUEST_CAMERA: Int, context: Context, activity: Activity) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_DENIED
-        ) {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA
+    fun getBytes(imageView: ImageView, image: Drawable?): ByteArray {
+        val stream = ByteArrayOutputStream()
+        if(image == null) {
+            val bitmap = imageView.drawable.toBitmap(
+                imageView.drawable.intrinsicWidth,
+                imageView.drawable.intrinsicHeight
             )
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream)
+        } else {
+            val bitmap =  imageView.drawable.toBitmap(
+                image.intrinsicWidth,
+                image.intrinsicHeight
+            )
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream)
         }
+        return stream.toByteArray()
     }
 
 
+    fun getVoivodeships(context: Context) : Array<String> {
+        val dbHelper = DataBaseHelper(context)
+        return dbHelper.getVoivodeships()
+    }
+
+    fun getCategories(context: Context) : Array<String> {
+        val dbHelper = DataBaseHelper(context)
+        return dbHelper.getCategories()
+    }
+
+    fun getStatuses(context: Context) : Array<String> {
+        val dbHelper = DataBaseHelper(context)
+        return dbHelper.getStatuses()
+    }
+
+    fun addAd(ad: Ad, context: Context) {
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.addAnnouncement(ad)
+    }
 
 }

@@ -126,14 +126,14 @@ class UserAdsFragment : Fragment() {
                                 val action =
                                     UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsActivity()
                                 action.adID = ads[pos].ID
-                                action.profileID = userID
+                                action.profileID = ads[pos].user
                                 action.userID = userID
                                 findNavController().navigate(action)
                             } else {
                                 val action =
                                     UserAdsFragmentDirections.actionUserAdsFragmentToAdDetailsActivity()
                                 action.adID = ads[pos].ID
-                                action.profileID = profileID
+                                action.profileID = ads[pos].user
                                 action.userID = userID
                                 findNavController().navigate(action)
                             }

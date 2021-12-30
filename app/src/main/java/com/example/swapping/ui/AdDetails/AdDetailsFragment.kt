@@ -1,4 +1,5 @@
-package com.example.swapping.ui.adDetails
+package com.example.swapping.ui.AdDetails
+
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -47,6 +48,7 @@ class AdDetailsFragment : Fragment() {
     var adID = 0
     var profileID = 0
     var prev = ""
+    var archived = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,9 +70,6 @@ class AdDetailsFragment : Fragment() {
     ): View {
         super.onCreate(savedInstanceState)
         adDetailsViewModel = AdDetailsViewModel()
-
-
-        println("AD FRAGMENT: $userID, $adID, $profileID")
 
         _binding = FragmentAdDetailsBinding.inflate(inflater, container, false)
 
@@ -147,7 +146,6 @@ class AdDetailsFragment : Fragment() {
         val star5 = view.findViewById<ImageView>(R.id.adStar5)
         rateStars = arrayOf(star1, star2, star3, star4, star5)
         adDetailsViewModel.changeStars(rateStars, user.mean_rate)
-        println("AD::::${user.ID}, RATE: ${user.mean_rate}")
 
         location = view.findViewById(R.id.locationName)
         if (ad.city != "-")
@@ -192,7 +190,7 @@ class AdDetailsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_home_ad_details, menu)
         likeAd = menu.findItem(R.id.menu_likeAd)
-        if (isLiked())
+        if (adDetailsViewModel.isLiked(userID, adID, requireContext()))
             likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
     }
 
@@ -202,7 +200,7 @@ class AdDetailsFragment : Fragment() {
 
         when (item.itemId) {
             R.id.menu_likeAd -> {
-                addToLiked()
+                adDetailsViewModel.addToLiked(userID, adID, likeAd, requireContext())
                 return true
             }
             android.R.id.home -> {
@@ -223,30 +221,4 @@ class AdDetailsFragment : Fragment() {
         }
         return super.onOptionsItemSelected(item)
     }
-
-    private fun addToLiked(){
-        println("LIKED::: AdID: $adID, UserID: $userID")
-        if (isLiked()) {
-            dbHelper.deleteLiked(userID, adID)
-            likeAd.setIcon(R.drawable.ic_twotone_favorite_border_24)
-        } else {
-            dbHelper.addLiked(userID, adID)
-            likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
-        }
-    }
-
-    private fun isLiked() : Boolean {
-        val likedAds = dbHelper.getLiked(userID)
-        var exists = false
-        if(likedAds.isEmpty()){
-            exists = false
-        } else {
-            for (ad in likedAds) {
-                if (ad.ID == adID)
-                    exists = true
-            }
-        }
-        return exists
-    }
-
 }

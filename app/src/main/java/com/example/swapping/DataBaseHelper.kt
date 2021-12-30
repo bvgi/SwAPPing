@@ -88,8 +88,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "User INTEGER NOT NULL, " + // osoba wykonująca negocjację
                 "Type INTEGER NOT NULL, " +
                 "Offers STRING NOT NULL, " +
+                "FOREIGN KEY(Owner) REFERENCES $USER_TABLE(ID), " +
                 "FOREIGN KEY(User) REFERENCES $USER_TABLE(ID), " +
-                        "FOREIGN KEY(Advertisement) REFERENCES $ADVERTISEMENT_TABLE(ID))"
+                "FOREIGN KEY(Advertisement) REFERENCES $ADVERTISEMENT_TABLE(ID))"
         db.execSQL(SQL_CREATE_NEGOTIATIONS)
 
         val SQL_CREATE_VOIVODESHIPS = "CREATE TABLE $VOIVODESHIPS_TABLE (" +
@@ -785,12 +786,15 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
     fun updateAnnouncement(ad: Ad) : Int{
         val db = this.writableDatabase
         val values = ContentValues()
+        val categoryID = getCategoryID(ad.category)
+        val statusID = getStatusID(ad.status)
+        val voivodeshipID = getVoivodeshipID(ad.voivodeship)
         values.put("Title", ad.title)
         values.put("Description", ad.description)
         values.put("City", ad.city)
-        values.put("Voivodeship", ad.voivodeship)
-        values.put("Category", ad.category)
-        values.put("Status", ad.status)
+        values.put("Voivodeship", voivodeshipID)
+        values.put("Category", categoryID)
+        values.put("Status", statusID)
         values.put("Image", ad.image)
 
         val result = db.update(ADVERTISEMENT_TABLE, values, "ID = ?", arrayOf(ad.ID.toString()))
@@ -3201,12 +3205,12 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         return result
     }
 
-    fun acceptNegotiation(adID: Int, purchaserID: Int, ownerID: Int) : Int {
+    fun acceptNegotiation(negotiationID: Int) : Int {
         val db = this.writableDatabase
         val values = ContentValues()
         values.put("Type", 2)
 
-        val result = db.update(NEGOTIATION_TABLE, values, "Advertisement = ? AND User = ? AND Owner = ?", arrayOf(adID.toString(), purchaserID.toString(), ownerID.toString()))
+        val result = db.update(NEGOTIATION_TABLE, values, "ID = ?", arrayOf(negotiationID.toString()))
         db.close()
 
         return result

@@ -24,8 +24,6 @@ class NewAdFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -34,11 +32,6 @@ class NewAdFragment : Fragment() {
     ): View? {
         _binding = FragmentNewAdBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-//        val intent = Intent(activity, NewAdActivity::class.java)
-//        intent.putExtra("userid", args.userID)
-//        startActivity(intent)
-//        val view: View = inflater.inflate(R.layout.fragment_new_ad, container, false)
 
         return root
     }

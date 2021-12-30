@@ -62,7 +62,7 @@ class UserAdsActivity : AppCompatActivity() {
         homeViewModel =
             ViewModelProvider(this).get(HomeViewModel()::class.java)
 
-        ads = homeViewModel.getNotArchivedAds(userID, this)
+        ads = homeViewModel.getNotArchivedUserAds(userID, this)
 
         adapter = UserAdsAdapter(arrayOf(), this)
         adsRecycler = findViewById(R.id.usersAds)
@@ -111,6 +111,9 @@ class UserAdsActivity : AppCompatActivity() {
                     onBackPressed()
                 }
                 return true
+            }
+            android.R.id.home -> {
+                onBackPressed()
             }
         }
         return super.onOptionsItemSelected(item)

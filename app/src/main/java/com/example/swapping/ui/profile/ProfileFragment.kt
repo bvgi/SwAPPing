@@ -27,7 +27,6 @@ class ProfileFragment : Fragment() {
     private lateinit var profileViewModel: ProfileViewModel
     private var _binding: FragmentProfileBinding? = null
     private lateinit var logOutButton: FloatingActionButton
-    private lateinit var dbHelper: DataBaseHelper
     private lateinit var editTextView: TextView
     private lateinit var profileViewLayout: LinearLayout
     private lateinit var userAds: LinearLayout
@@ -53,12 +52,12 @@ class ProfileFragment : Fragment() {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        dbHelper = DataBaseHelper(root.context)
-
         if(previousFragment == "adDetails"){
-            val homeFragment = HomeFragment()
-            homeFragment.setArguments(bundleOf("userID" to userID, "previousFragment" to "Profile"))
-            fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, homeFragment)?.commit()
+            val action = ProfileFragmentDirections.actionNavigationProfileToUserAdsFragment()
+            action.previousFragment = "Profile"
+            action.userID = userID
+            action.profileID = userID
+            findNavController().navigate(action)
         }
 
         return root
@@ -87,7 +86,7 @@ class ProfileFragment : Fragment() {
 
         logOutButton = view.findViewById(R.id.logoutButton)
         logOutButton.setOnClickListener {
-            dbHelper.setLoggedOut(userID)
+            profileViewModel.logOut(userID, view.context)
             val action = ProfileFragmentDirections.actionNavigationProfileToLoginActivity().setUserID(userID)
             view.findNavController().navigate(action)
         }

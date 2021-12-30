@@ -21,11 +21,9 @@ import com.google.android.material.textfield.TextInputLayout
 class EditProfileActivity : AppCompatActivity() {
 
     private lateinit var editProfileViewModel: EditProfileViewModel
-    private var _binding: FragmentProfileBinding? = null
 
     private var userID: Int = 0
     private lateinit var userData: User
-    private lateinit var DBHelper: DataBaseHelper
     private val networkConnection = NetworkConnection()
 
     private lateinit var emailLayout: TextInputLayout
@@ -49,8 +47,6 @@ class EditProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
 
-        DBHelper = DataBaseHelper(applicationContext)
-
         emailLayout = findViewById(R.id.emailEditLayout)
         usernameLayout = findViewById(R.id.usernameEditLayout)
         passwordLayout = findViewById(R.id.passwordEditLayout)
@@ -59,7 +55,7 @@ class EditProfileActivity : AppCompatActivity() {
 
         userID = args.userID
 
-        userData = getUserData()
+        userData = editProfileViewModel.getUser(userID, this)
 
         email = findViewById(R.id.emailEdit)
         username = findViewById(R.id.usernameEdit)
@@ -79,9 +75,6 @@ class EditProfileActivity : AppCompatActivity() {
 
     }
 
-    private fun getUserData() : User {
-        return DBHelper.getUserById(userID)
-    }
 
     override fun getParentActivityIntent(): Intent? {
         return super.getParentActivityIntent()?.putExtra("userID", userID)
@@ -100,27 +93,18 @@ class EditProfileActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.menu_saveData -> {
-                val user: User
-                if(password.text.isNullOrBlank())
-                    user = User(
-                        ID = userID,
-                        email = email.text.toString(),
-                        username = username.text.toString(),
-                        name = name.text.toString(),
-                        password = userData.password,
-                        city = city.text.toString(),
-                        phone_number = phoneNumber.text.toString()
-                    )
-                else
-                    user = User(
-                        ID = userID,
-                        email = email.text.toString(),
-                        username = username.text.toString(),
-                        name = name.text.toString(),
-                        password = password.text.toString(),
-                        city = city.text.toString(),
-                        phone_number = phoneNumber.text.toString()
-                    )
+                var user: User
+                val currUser = User(
+                    ID = userID,
+                    email = email.text.toString(),
+                    username = username.text.toString(),
+                    name = name.text.toString(),
+                    password = password.text.toString(),
+                    city = city.text.toString(),
+                    phone_number = phoneNumber.text.toString())
+                user = editProfileViewModel.checkEmail(userData, currUser)
+                user = editProfileViewModel.checkPassword(userData, currUser)
+                user = editProfileViewModel.checkUsername(userData, currUser)
                 if (!networkConnection.isNetworkAvailable(applicationContext)) {
                     Snackbar.make(
                         findViewById(R.id.noInternet),
@@ -128,7 +112,7 @@ class EditProfileActivity : AppCompatActivity() {
                         Snackbar.LENGTH_SHORT
                     ).show()
                 } else {
-                    DBHelper.updateUser(user)
+                    editProfileViewModel.update(user, this)
                     onBackPressed()
                 }
                 return true

@@ -58,10 +58,8 @@ class UsersListFragment : Fragment() {
 
         if(listType == 0) { // 0 - followers, 1 - following
             users = dbHelper.getFollowers(profileID)
-            println("FOLLOWERS LIST::: ${users.size}")
         } else {
             users = dbHelper.getFollowing(profileID)
-            println("FOLLOWING LIST::: ${users.size}")
         }
 
         adapter = UsersListAdapter(users, root.context)
@@ -95,10 +93,6 @@ class UsersListFragment : Fragment() {
                         else
                             action.previous = "Following"
                         view.findNavController().navigate(action)
-//                    val profileViewFragment = ProfileViewFragment()
-//                    profileViewFragment.arguments =
-//                        bundleOf("userID" to userID, "profileID" to profileID, "previous" to "Liked")
-//                    fragmentManager?.beginTransaction()?.replace(R.id.nav_host_fragment_activity_main, profileViewFragment)?.commit()
                     } else {
                         val action =
                             UsersListFragmentDirections.actionUsersListFragmentToNavigationProfileView()

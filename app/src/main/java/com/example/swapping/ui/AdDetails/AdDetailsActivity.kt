@@ -1,4 +1,4 @@
-package com.example.swapping.ui.adDetails
+package com.example.swapping.ui.AdDetails
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -13,7 +13,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
+import com.example.swapping.Models.User
 import com.example.swapping.R
+import com.example.swapping.ui.MainActivity
 import com.example.swapping.ui.profile.ProfileViewActivity
 import com.example.swapping.ui.userAds.UserAdsActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,11 +45,14 @@ class AdDetailsActivity : AppCompatActivity() {
 
     private val networkConnection = NetworkConnection()
     private lateinit var likeAd: MenuItem
+    private lateinit var purchaseItem: MenuItem
 
-    var userID = 0
-    var adID = 0
-    var profileID = 0
-    var prev = ""
+    private var userID = 0
+    private var adID = 0
+    private var profileID = 0
+    private var prev = ""
+
+    private lateinit var user: User
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,13 +70,11 @@ class AdDetailsActivity : AppCompatActivity() {
             prev = extras.getString("previous").toString()
         }
 
-        val userNegotiations = dbHelper.getUserNegotiations(userID)
-
-        println("AD FRAGMENT: $userID, $adID, $profileID")
-
-        val user = adDetailsViewModel.getUserInfo(profileID, this)
+        val userNegotiations = adDetailsViewModel.getUserNegotiations(userID, this)
+        user = adDetailsViewModel.getUserInfo(profileID, this)
         val ad = adDetailsViewModel.getAd(adID, this)
         val photo = adDetailsViewModel.getImage(ad.image)
+        val ads = adDetailsViewModel.getUserAnnouncements(userID, this)
 
         archived = ad.archived
         purchaser = ad.purchaser_id
@@ -84,7 +87,9 @@ class AdDetailsActivity : AppCompatActivity() {
         adPhoto.setImageBitmap(photo)
 
         publishedDate = findViewById(R.id.publishedDate)
-        publishedDate.text = "${ad.published_date.toString().substring(6,8)}.${ad.published_date.toString().substring(4,6)}.${ad.published_date.toString().substring(0,4)}"
+        publishedDate.text = "${ad.published_date.toString().substring(6,8)}" +
+                ".${ad.published_date.toString().substring(4,6)}" +
+                ".${ad.published_date.toString().substring(0,4)}"
 
         description = findViewById(R.id.adDescription)
         description.text = ad.description
@@ -100,9 +105,9 @@ class AdDetailsActivity : AppCompatActivity() {
         val star3 = findViewById<ImageView>(R.id.adStar3)
         val star4 = findViewById<ImageView>(R.id.adStar4)
         val star5 = findViewById<ImageView>(R.id.adStar5)
+
         rateStars = arrayOf(star1, star2, star3, star4, star5)
         adDetailsViewModel.changeStars(rateStars, user.mean_rate)
-        println("AD::::${user.ID}, RATE: ${user.mean_rate}")
 
         goToUserArrow = findViewById(R.id.goToUserArrow)
 
@@ -116,7 +121,11 @@ class AdDetailsActivity : AppCompatActivity() {
                 ).show()
             } else {
                 val intent = Intent(this, ProfileViewActivity::class.java)
-                intent.putExtras(bundleOf("userID" to userID, "profileID" to profileID))
+                intent.putExtras(
+                    bundleOf(
+                        "userID" to userID,
+                        "profileID" to profileID)
+                )
                 startActivity(intent)
             }
         }
@@ -144,7 +153,7 @@ class AdDetailsActivity : AppCompatActivity() {
             if(pair.second.adID == adID && pair.second.purchaserID == userID)
                 isInNegotiation = true
         }
-        if(dbHelper.getUserAnnouncements(userID).isEmpty() || isInNegotiation)
+        if(ads.isEmpty() || isInNegotiation)
             startNegotiation.isEnabled = false
         startNegotiation.setOnClickListener {
             if (!networkConnection.isNetworkAvailable(applicationContext)) {
@@ -163,44 +172,25 @@ class AdDetailsActivity : AppCompatActivity() {
                             "adID" to adID
                         )
                     )
+                    startActivity(intent)
                 }
             }
         }
     }
 
-    private fun addToLiked(){
-        println("LIKED::: AdID: $adID, UserID: $userID")
-        if (isLiked()) {
-            dbHelper.deleteLiked(userID, adID)
-            likeAd.setIcon(R.drawable.ic_twotone_favorite_border_24)
-        } else {
-            dbHelper.addLiked(userID, adID)
-            likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
-        }
-    }
-
-    private fun isLiked() : Boolean {
-        val likedAds = dbHelper.getLiked(userID)
-        var exists = false
-        if(likedAds.isEmpty()){
-            exists = false
-        } else {
-            for (ad in likedAds) {
-                if (ad.ID == adID)
-                    exists = true
-            }
-        }
-        return exists
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if(archived == 1){
             menuInflater.inflate(R.menu.ad_details_archived, menu)
+            purchaseItem = menu!!.findItem(R.id.menu_purchased)
+            if(userID != profileID)
+                purchaseItem.setIcon(R.drawable.bought_icon)
+            else
+                purchaseItem.setIcon(R.drawable.ic_baseline_compare_arrows_24)
         } else {
             if(userID != profileID){
                 menuInflater.inflate(R.menu.menu_home_ad_details, menu)
                 likeAd = menu!!.findItem(R.id.menu_likeAd)
-                if (isLiked())
+                if (adDetailsViewModel.isLiked(userID, adID, this))
                     likeAd.setIcon(R.drawable.ic_baseline_favorite_24)
             } else {
                 menuInflater.inflate(R.menu.menu_ad_details, menu)
@@ -222,29 +212,27 @@ class AdDetailsActivity : AppCompatActivity() {
                 return true
             }
             R.id.menu_deleteAd -> {
-                dbHelper.deleteAd(adID)
-                dbHelper.deleteNegotiation(adID)
+                adDetailsViewModel.deleteAd(adID, this)
+                adDetailsViewModel.deleteNegotiation(adID, this)
                 onBackPressed()
                 return true
             }
             R.id.menu_likeAd -> {
-                addToLiked()
+                adDetailsViewModel.addToLiked(userID, adID, likeAd, this)
                 return true
             }
             android.R.id.home ->{
-                onBackPressed()
+                if(prev != "Edit")
+                    onBackPressed()
+                else {
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtras(bundleOf("userID" to userID, "adID" to adID))
+                    startActivity(intent)
+                }
+
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
-//    override fun getParentActivityIntent(): Intent? {
-//        return if(userID == profileID)
-//            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to adID))
-//        else
-//            super.getParentActivityIntent()?.putExtras( bundleOf("userID" to userID, "adID" to -1))
-//    }
-
-
 }

@@ -6,7 +6,6 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -16,28 +15,23 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.children
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.navArgs
-import com.example.swapping.DataBaseHelper
-import com.example.swapping.ui.MainActivity
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
-import com.example.swapping.databinding.FragmentNewAdBinding
+import com.example.swapping.ui.MainActivity
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import java.io.ByteArrayOutputStream
 import java.time.LocalDate
 
 
 class NewAdActivity : AppCompatActivity() {
     private lateinit var newAdViewModel: NewAdViewModel
-    private var _binding: FragmentNewAdBinding? = null
     val REQUEST_IMAGE_CAPTURE = 1
     val REQUEST_CAMERA = 1
     private lateinit var imageView: ImageView
@@ -104,7 +98,6 @@ class NewAdActivity : AppCompatActivity() {
 
     }
 
-    private val binding get() = _binding!!
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @RequiresApi(Build.VERSION_CODES.O)
@@ -114,8 +107,6 @@ class NewAdActivity : AppCompatActivity() {
 
         newAdViewModel =
             ViewModelProvider(this).get(NewAdViewModel::class.java)
-
-        val DBHelper = DataBaseHelper(applicationContext)
 
         val titleLayout = findViewById<TextInputLayout>(R.id.addTitleLayout)
         val descriptionLayout = findViewById<TextInputLayout>(R.id.addDescriptionLayout)
@@ -131,7 +122,6 @@ class NewAdActivity : AppCompatActivity() {
             descriptionLiveData.value = text?.toString()
         }
 
-
         val radioCategoryGroup = findViewById<RadioGroup>(R.id.radioGroupCategory)
         val radioStatusGroup = findViewById<RadioGroup>(R.id.radioGroupStatus)
         val title = findViewById<TextView>(R.id.addTitle)
@@ -142,7 +132,6 @@ class NewAdActivity : AppCompatActivity() {
 
         imageView = findViewById(R.id.addedPhoto)
         userID = arg.userID
-        println("AGRS $userID")
 
         image = byteArrayOf()
 
@@ -151,13 +140,17 @@ class NewAdActivity : AppCompatActivity() {
         }
 
         val dropdownVoivodeship: Spinner = findViewById(R.id.spinnerVoivodeship)
-        val voivodeships = DBHelper.getVoivodeships()
-        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, arrayOf<String>(" ", *voivodeships))
+        val voivodeships = newAdViewModel.getVoivodeships(this)
+        val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            arrayOf(" ", *voivodeships)
+        )
         dropdownVoivodeship.adapter = adapter
 
         voivodeshipLiveData.value = dropdownVoivodeship.selectedItem.toString()
 
-        val categories = DBHelper.getCategories()
+        val categories = newAdViewModel.getCategories(this)
         var catIndex = 0
 
         for(button in radioCategoryGroup.children){
@@ -165,7 +158,7 @@ class NewAdActivity : AppCompatActivity() {
             catIndex++
         }
 
-        val statuses = DBHelper.getStatuses()
+        val statuses = newAdViewModel.getStatuses(this)
         var statIndex = 0
 
         for(button in radioStatusGroup.children){
@@ -200,7 +193,6 @@ class NewAdActivity : AppCompatActivity() {
                         categoryLayout,
                         statusLayout
                     )
-                    println(" ${titleLiveData.value},  ${descriptionLiveData.value}, ${voivodeshipLiveData.value}, ${categoryLiveData.value}, ${statusLiveData.value}")
                 }
                 if (fine) {
                     var cityName = "-"
@@ -208,20 +200,12 @@ class NewAdActivity : AppCompatActivity() {
                         cityName = city.text.toString()
 
                     if (image.isEmpty()) {
-                        val nophoto =
+                        val noPhoto =
                             resources.getDrawable(R.drawable.ic_baseline_no_photography_24, null)
                         imageView.setImageResource(R.drawable.ic_baseline_no_photography_24)
-                        val bitmap = imageView.drawable.toBitmap(
-                            nophoto.intrinsicWidth,
-                            nophoto.intrinsicHeight
-                        )
-                        val stream = ByteArrayOutputStream()
-                        bitmap.compress(CompressFormat.PNG, 0, stream)
-                        val bitmapdata = stream.toByteArray()
-                        image = bitmapdata
-
+                        image = newAdViewModel.getBytes(imageView, noPhoto)
                     }
-                    val ann = Ad(
+                    val ad = Ad(
                         user = userID,
                         title = title.text.toString(),
                         description = description.text.toString(),
@@ -236,7 +220,7 @@ class NewAdActivity : AppCompatActivity() {
                         negotiation = 0,
                         archived = 0
                     )
-                    DBHelper.addAnnouncement(ann)
+                    newAdViewModel.addAd(ad, this)
 
                     Snackbar.make(
                         findViewById(R.id.myCoordinatorLayout),
@@ -257,7 +241,11 @@ class NewAdActivity : AppCompatActivity() {
         try {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
         } catch (e: ActivityNotFoundException) {
-            println("ERROR")
+            Snackbar.make(
+                findViewById(R.id.myCoordinatorLayout),
+                "Błąd podczas uruchamiania kamery",
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -267,30 +255,21 @@ class NewAdActivity : AppCompatActivity() {
         ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA
+                arrayOf(Manifest.permission.CAMERA), REQUEST_IMAGE_CAPTURE
             )
-        }
-        else
+        } else {
             startCamera()
-
+        }
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK && requestCode == REQUEST_IMAGE_CAPTURE && data != null){
             val imageBitmap = data.extras?.get("data") as Bitmap
             imageView.setImageBitmap(imageBitmap)
-            image = getBytes(imageBitmap)
+            image = newAdViewModel.getBytes(imageView, null)
             imageView.visibility = View.VISIBLE
         }
-    }
-
-    fun getBytes(bitmap: Bitmap): ByteArray {
-        val bitmap =  imageView.drawable.toBitmap(imageView.drawable.intrinsicWidth, imageView.drawable.intrinsicHeight)
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(CompressFormat.PNG, 0, stream)
-        return stream.toByteArray()
     }
 
     override fun onRequestPermissionsResult(
@@ -305,7 +284,11 @@ class NewAdActivity : AppCompatActivity() {
             }
             else
             {
-                Toast.makeText(this, "camera permission denied", Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                    this,
+                    "Odmówiono dostępu do aparatu",
+                    Toast.LENGTH_LONG)
+                    .show()
             }
         }
     }

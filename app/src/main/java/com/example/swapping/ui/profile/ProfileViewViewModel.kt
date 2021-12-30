@@ -7,14 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.Review
+import com.example.swapping.Models.User
 import com.example.swapping.R
+import kotlin.math.round
 
 class ProfileViewViewModel : ViewModel() {
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is profile Fragment"
-    }
-    val text: LiveData<String> = _text
 
     fun changeStars(starsArray: Array<ImageView>, starNumber: Int){
         for(i in 0 until starNumber) {
@@ -62,5 +59,48 @@ class ProfileViewViewModel : ViewModel() {
             contains = user.first == userID
         }
         return contains
+    }
+
+    fun addReview(review: Review, context: Context){
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.addReview(review)
+    }
+
+    fun deleteReview(profileID: Int, userID: Int, context: Context){
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.deleteReview(profileID, userID)
+    }
+
+    fun updateMeanRate(profileID: Int, meanRate: Double, context: Context) {
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.updateMeanRate(
+            profileID,
+            meanRate
+        )
+    }
+
+    fun getUser(ID: Int, context: Context) : User {
+        val dbHelper = DataBaseHelper(context)
+        return dbHelper.getUserById(ID)
+    }
+
+    fun getFollowersSize(ID: Int, context: Context) : Int {
+        val dbHelper = DataBaseHelper(context)
+        return dbHelper.getFollowers(ID).size
+    }
+
+    fun getFollowingSize(ID: Int, context: Context) : Int {
+        val dbHelper = DataBaseHelper(context)
+        return dbHelper.getFollowing(ID).size
+    }
+
+    fun follow(profile: Int, user: Int, context: Context) {
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.addFollower(profile, user)
+    }
+
+    fun unfollow(profile: Int, user: Int, context: Context) {
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.deleteFollower(profile, user)
     }
 }

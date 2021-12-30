@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.*
 import androidx.core.os.bundleOf
 import androidx.core.view.children
+import androidx.lifecycle.ViewModelProvider
 import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
@@ -33,6 +34,8 @@ class FilterActivity : AppCompatActivity() {
     private var sort = 0
     private var query = ""
 
+    private lateinit var filterViewModel: FilterViewModel
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,12 +51,13 @@ class FilterActivity : AppCompatActivity() {
             query = extras.getString("query").toString()
         }
 
-        val dbHelper = DataBaseHelper(this)
+        filterViewModel =
+            ViewModelProvider(this).get(FilterViewModel::class.java)
 
         statusTitle = findViewById(R.id.statusLayout)
         status = findViewById(R.id.status)
 
-        val statuses = dbHelper.getStatuses()
+        val statuses = filterViewModel.getStatuses(this)
         for(index in statuses.indices){
             val button = RadioButton(this)
             button.id = index
@@ -83,7 +87,7 @@ class FilterActivity : AppCompatActivity() {
         if (categoryList != "")
             categoryTitle.visibility = View.GONE
 
-        val categories = dbHelper.getCategories()
+        val categories = filterViewModel.getCategories(this)
         for(index in categories.indices){
             val button = RadioButton(this)
             button.id = index
