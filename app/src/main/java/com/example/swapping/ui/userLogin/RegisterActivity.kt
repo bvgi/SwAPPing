@@ -9,16 +9,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.User
 import com.example.swapping.R
+import com.example.swapping.ui.searching.CategoriesViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
 class RegisterActivity : AppCompatActivity() {
 
-    private lateinit var DBHelper: DataBaseHelper
     private lateinit var registerViewModel: RegisterViewModel
 
     private lateinit var emailLayout: TextInputLayout
@@ -55,7 +56,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission, applicationContext)
         }
 
         addSource(passwordLiveData) { password ->
@@ -63,7 +64,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission, applicationContext)
         }
 
         addSource(usernameLiveData) { username ->
@@ -71,7 +72,7 @@ class RegisterActivity : AppCompatActivity() {
             val password = passwordLiveData.value
             val birthDate = birthDateLiveData.value
             val permission = permissionLiveData.value
-            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission, applicationContext)
         }
 
         addSource(birthDateLiveData) { birthDate ->
@@ -79,7 +80,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val password = passwordLiveData.value
             val permission = permissionLiveData.value
-            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission, applicationContext)
         }
 
         addSource(permissionLiveData) { permission ->
@@ -87,7 +88,7 @@ class RegisterActivity : AppCompatActivity() {
             val username = usernameLiveData.value
             val password = passwordLiveData.value
             val birthDate = birthDateLiveData.value
-            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission)
+            this.value = registerViewModel.validateForm(email, password, username, birthDate, permission, applicationContext)
         }
 
     }
@@ -95,8 +96,7 @@ class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
-        DBHelper = DataBaseHelper(applicationContext)
-        registerViewModel = RegisterViewModel(DBHelper)
+        registerViewModel = ViewModelProvider(this).get(RegisterViewModel::class.java)
 
         emailLayout = findViewById(R.id.emailRegisterLayout)
         usernameLayout = findViewById(R.id.usernameRegisterLayout)
@@ -176,7 +176,7 @@ class RegisterActivity : AppCompatActivity() {
                         password = password.text.toString()
                     )
 
-                    DBHelper.addUser(user)
+                    registerViewModel.addUser(user, this)
 
                     val loginIntent = Intent(this, LoginActivity::class.java)
                     startActivity(loginIntent)

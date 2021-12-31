@@ -5,12 +5,12 @@ import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavArgument
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.swapping.DataBaseHelper
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.databinding.ActivityMainBinding
@@ -20,7 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    lateinit var DBHelper: DataBaseHelper
+    private lateinit var mainViewModel: MainViewModel
     lateinit var navView: BottomNavigationView
     private var userID = 0
     private var adID = 0
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                 Snackbar.LENGTH_INDEFINITE
             ).show()
         }
-        DBHelper = DataBaseHelper(applicationContext)
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         val extras: Bundle? = intent.extras
@@ -99,6 +99,7 @@ class MainActivity : AppCompatActivity() {
                                 exitCounter = 0
             }, 5000)
         } else {
+            mainViewModel.logOut(userID, this)
             finishAffinity()
             exitCounter = 0
         }

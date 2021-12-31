@@ -20,7 +20,6 @@ import com.google.android.material.tabs.TabLayout
 
 class SearchingFragment : Fragment() {
 
-    private lateinit var notificationsViewModel: SearchingViewModel
     private var _binding: FragmentSearchingBinding? = null
     private val arguments: SearchingFragmentArgs by navArgs()
     private var userID = 0
@@ -41,8 +40,6 @@ class SearchingFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        notificationsViewModel =
-            ViewModelProvider(this).get(SearchingViewModel::class.java)
 
         _binding = FragmentSearchingBinding.inflate(inflater, container, false)
 

@@ -21,12 +21,10 @@ import com.google.android.material.snackbar.Snackbar
 
 class UserAdsActivity : AppCompatActivity() {
 
-    private lateinit var homeViewModel: HomeViewModel
-    private var _binding: FragmentHomeBinding? = null
+    private lateinit var userAdsViewModel: UserAdsViewModel
     lateinit var adapter: UserAdsAdapter
     lateinit var adsRecycler: RecyclerView
     lateinit var ads: Array<Ad>
-    lateinit var dbHelper: DataBaseHelper
 
     private val arguments: UserAdsActivityArgs by navArgs()
     private var userID = 0
@@ -49,20 +47,18 @@ class UserAdsActivity : AppCompatActivity() {
         }
 
         val extras: Bundle? = intent.extras
-        if(extras != null){
+        if(extras != null) {
             prev = extras.getString("prev").toString()
             negotiationID = extras.getInt("negotiationID")
         }
 
-        dbHelper = DataBaseHelper(this)
-
-        val negotiation = dbHelper.getNegotiation(negotiationID)
+        val negotiation = userAdsViewModel.getNegotiation(negotiationID, this)
         type = negotiation.type
 
-        homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel()::class.java)
+        userAdsViewModel =
+            ViewModelProvider(this).get(UserAdsViewModel()::class.java)
 
-        ads = homeViewModel.getNotArchivedUserAds(userID, this)
+        ads = userAdsViewModel.getNotArchivedUserAds(userID, this)
 
         adapter = UserAdsAdapter(arrayOf(), this)
         adsRecycler = findViewById(R.id.usersAds)
@@ -99,14 +95,18 @@ class UserAdsActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.menu_saveData -> {
                 if(type == 3){
-                    dbHelper.updateNegotiation(negotiationID, chosedAds.toString())
+                    userAdsViewModel.updateNegotiation(
+                        negotiationID,
+                        chosedAds.toString(),
+                        this)
                     onBackPressed()
                 } else {
-                    dbHelper.startNegotiation(
+                    userAdsViewModel.startNegotiation(
                         adID,
                         profileID,
                         userID,
-                        chosedAds.toString()
+                        chosedAds.toString(),
+                        this
                     )
                     onBackPressed()
                 }

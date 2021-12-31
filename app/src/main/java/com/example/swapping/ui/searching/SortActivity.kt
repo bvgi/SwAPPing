@@ -46,7 +46,6 @@ class SortActivity : AppCompatActivity() {
             else
                 filter = hashMapOf()
         }
-        println(filter)
 
         dataASC = findViewById(R.id.dateASC)
         dataDESC = findViewById(R.id.dateDESC)

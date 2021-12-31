@@ -1,24 +1,26 @@
 package com.example.swapping.ui.searching
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.swapping.DataBaseHelper
-import com.example.swapping.ui.MainActivity
 import com.example.swapping.Models.Ad
 import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.R
 import com.example.swapping.ui.AdDetails.AdDetailsActivity
+import com.example.swapping.ui.MainActivity
 import com.example.swapping.ui.home.HomeAdapter
 import com.google.android.material.snackbar.Snackbar
 
 class ResultsSearchActivity : AppCompatActivity() {
 
+    private lateinit var resultsSearchViewModel: ResultsSearchViewModel
     private lateinit var resultRecyclerView: RecyclerView
     private lateinit var resultAdapter: HomeAdapter
     private lateinit var results: Array<Ad>
@@ -33,7 +35,6 @@ class ResultsSearchActivity : AppCompatActivity() {
     private var filterC = ""
     private var filterR = ""
     private var query = ""
-    private lateinit var dbHelper : DataBaseHelper
 
     private val networkConnection = NetworkConnection()
 
@@ -53,7 +54,8 @@ class ResultsSearchActivity : AppCompatActivity() {
             query = extras.getString("query").toString()
         }
 
-        dbHelper = DataBaseHelper(this)
+        resultsSearchViewModel =
+            ViewModelProvider(this).get(ResultsSearchViewModel::class.java)
 
         noResults = findViewById(R.id.nothingFound)
 
@@ -113,9 +115,9 @@ class ResultsSearchActivity : AppCompatActivity() {
         if(category != "") {
             title = "Kategoria: $category"
             if(sort != 0) {
-                results = getCategorySortResult(filterS, filterR, sort)
+                results = resultsSearchViewModel.getCategorySortResult(userID, category, filterS, filterR, sort, this)
             } else {
-                results = getCategoryResult(filterS, filterR)
+                results = resultsSearchViewModel.getCategoryResult(userID, category, filterS, filterR, this)
             }
             if(results.size == 0){
                 noResults.visibility = View.VISIBLE
@@ -130,10 +132,10 @@ class ResultsSearchActivity : AppCompatActivity() {
             title = "Województwo: $voivodeship"
             if(sort != 0) {
                 title = "Województwo: $voivodeship"
-                results = getVoivodeshipSortResult(filterS, filterR, filterC, sort)
+                results = resultsSearchViewModel.getVoivodeshipSortResult(userID, voivodeship, filterS, filterR, filterC, sort, this)
             } else {
                 title = "Województwo: $voivodeship"
-                results = getVoivodeshipResult(filterS, filterR, filterC)
+                results = resultsSearchViewModel.getVoivodeshipResult(userID, voivodeship, filterS, filterR, filterC, this)
             }
             resultAdapter.dataset = results
             resultAdapter.notifyDataSetChanged()
@@ -148,9 +150,9 @@ class ResultsSearchActivity : AppCompatActivity() {
         if(category == "" && voivodeship == ""){
             title = "Wyniki wyszukiwania"
             results = if(sort != 0) {
-                getSortResult(query, filterS, filterR, filterC, sort)
+                resultsSearchViewModel.getSortResult(userID, query, filterS, filterR, filterC, sort, this)
             } else {
-                getResult(query, filterS, filterR, filterC)
+                resultsSearchViewModel.getResult(userID, query, filterS, filterR, filterC, this)
             }
             if(results.size == 0){
                 noResults.visibility = View.VISIBLE
@@ -201,337 +203,5 @@ class ResultsSearchActivity : AppCompatActivity() {
     }
 
 
-
-    private fun getResult(text: String, filterS: String, filterR: String, filterC: String): Array<Ad> {
-        println("Status: $filterS, Rate: $filterR")
-        val result = if(filterS != "null" && filterR == "null" && filterC == "null") {
-            dbHelper.findAdsByStatus(text, userID, filterS)
-        } else if(filterS != "null" && filterR != "null" && filterC == "null"){
-            val statusResult = dbHelper.findAdsByStatus(text, userID, filterS)
-            val rateResult = dbHelper.findAdsByRate(text, userID, filterR)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC == "null"){
-            dbHelper.findAdsByRate(text, userID, filterR)
-        } else if(filterS == "null" && filterR == "null" && filterC != "null"){
-            dbHelper.findAdsCategory(text, userID, filterC)
-        } else if(filterS != "null" && filterR == "null" && filterC != "null"){
-            val statusResult = dbHelper.findAdsByStatus(text, userID, filterS)
-            val categoryResult = dbHelper.findAdsCategory(text, userID, filterC)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(c in categoryResult){
-                    if(s.ID == c.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC != "null"){
-            val rateResult = dbHelper.findAdsByRate(text, userID, filterR)
-            val categoryResult = dbHelper.findAdsCategory(text, userID, filterC)
-            val tmp = mutableListOf<Ad>()
-            for(r in rateResult){
-                for(c in categoryResult){
-                    if(c.ID == r.ID){
-                        tmp.add(c)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS != "null" && filterR != "null" && filterC != "null") {
-            val statusResult = dbHelper.findAdsByStatus(text, userID, filterS)
-            val rateResult = dbHelper.findAdsByRate(text, userID, filterR)
-            val categoryResult = dbHelper.findAdsCategory(text, userID, filterC)
-            val firstResult = mutableListOf<Ad>()
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        firstResult.add(s)
-                    }
-                }
-            }
-            for(f in firstResult){
-                for(c in categoryResult){
-                    if(f.ID == c.ID){
-                        tmp.add(f)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else {
-            dbHelper.findAds(text, userID)
-        }
-        return result
-    }
-
-    private fun getSortResult(text: String, filterS: String, filterR: String, filterC: String, sort: Int): Array<Ad> {
-        println("Status: $filterS, Rate: $filterR")
-        val result = if(filterS != "null" && filterR == "null" && filterC == "null") {
-            dbHelper.findAdsByStatus(text, userID, filterS, sort)
-        } else if(filterS != "null" && filterR != "null" && filterC == "null"){
-            val statusResult = dbHelper.findAdsByStatus(text, userID, filterS, sort)
-            val rateResult = dbHelper.findAdsByRate(text, userID, filterR, sort)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC == "null"){
-            dbHelper.findAdsByRate(text, userID, filterR, sort)
-        } else if(filterS == "null" && filterR == "null" && filterC != "null"){
-            dbHelper.findAdsCategory(text, userID, filterC, sort)
-        } else if(filterS != "null" && filterR == "null" && filterC != "null"){
-            val statusResult = dbHelper.findAdsByStatus(text, userID, filterS, sort)
-            val categoryResult = dbHelper.findAdsCategory(text, userID, filterC, sort)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(c in categoryResult){
-                    if(s.ID == c.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC != "null"){
-            val rateResult = dbHelper.findAdsByRate(text, userID, filterR, sort)
-            val categoryResult = dbHelper.findAdsCategory(text, userID, filterC, sort)
-            val tmp = mutableListOf<Ad>()
-            for(r in rateResult){
-                for(c in categoryResult){
-                    if(c.ID == r.ID){
-                        tmp.add(c)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS != "null" && filterR != "null" && filterC != "null") {
-            val statusResult = dbHelper.findAdsByStatus(text, userID, filterS, sort)
-            val rateResult = dbHelper.findAdsByRate(text, userID, filterR, sort)
-            val categoryResult = dbHelper.findAdsCategory(text, userID, filterC, sort)
-            val firstResult = mutableListOf<Ad>()
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        firstResult.add(s)
-                    }
-                }
-            }
-            for(f in firstResult){
-                for(c in categoryResult){
-                    if(f.ID == c.ID){
-                        tmp.add(f)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else {
-            dbHelper.findAds(text, userID, sort)
-        }
-        return result
-    }
-
-    private fun getCategorySortResult(filterS: String, filterR: String, sort: Int) : Array<Ad> {
-        println("Status: $filterS, Rate: $filterR")
-        val result = if(filterS != "null" && filterR == "null") {
-            dbHelper.findAdsByCategoryByStatus(category, userID, sort, filterS)
-        } else if(filterS != "null" && filterR != "null"){
-            val statusResult = dbHelper.findAdsByCategoryByStatus(category, userID, sort, filterS)
-            val rateResult = dbHelper.findAdsByCategoryByRate(category, userID, sort, filterR)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null"){
-            dbHelper.findAdsByCategoryByRate(category, userID, sort, filterR)
-        }  else {
-            dbHelper.findAdsByCategory(category, userID, sort)
-        }
-        return result
-    }
-
-    private fun getCategoryResult(filterS: String, filterR: String) : Array<Ad> {
-        println("Status: $filterS, Rate: $filterR")
-        val result = if(filterS != "null" && filterR == "null") {
-            dbHelper.findAdsByCategoryByStatus(category, userID, filterS)
-        } else if(filterS != "null" && filterR != "null"){
-            val statusResult = dbHelper.findAdsByCategoryByStatus(category, userID, filterS)
-            val rateResult = dbHelper.findAdsByCategoryByRate(category, userID, filterR)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null"){
-            dbHelper.findAdsByCategoryByRate(category, userID, filterR)
-        }  else {
-            dbHelper.findAdsByCategory(category, userID)
-        }
-        return result
-    }
-
-    private fun getVoivodeshipSortResult(filterS: String, filterR: String, filterC: String, sort: Int) : Array<Ad> {
-        println("Status: $filterS, Rate: $filterR")
-        val result = if(filterS != "null" && filterR == "null" && filterC == "null") {
-            dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
-        } else if(filterS != "null" && filterR != "null" && filterC == "null"){
-            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
-            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC == "null"){
-            dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
-        } else if(filterS == "null" && filterR == "null" && filterC != "null"){
-            dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
-        } else if(filterS != "null" && filterR == "null" && filterC != "null"){
-            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
-            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(c in categoryResult){
-                    if(s.ID == c.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC != "null"){
-            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
-            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
-            val tmp = mutableListOf<Ad>()
-            for(r in rateResult){
-                for(c in categoryResult){
-                    if(c.ID == r.ID){
-                        tmp.add(c)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS != "null" && filterR != "null" && filterC != "null") {
-            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, sort, filterS)
-            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, sort, filterR)
-            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, sort, filterC)
-            val firstResult = mutableListOf<Ad>()
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        firstResult.add(s)
-                    }
-                }
-            }
-            for(f in firstResult){
-                for(c in categoryResult){
-                    if(f.ID == c.ID){
-                        tmp.add(f)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else {
-            dbHelper.findAdsByVoivodeship(voivodeship, userID, sort)
-        }
-        return result
-    }
-
-    private fun getVoivodeshipResult(filterS: String, filterR: String, filterC: String) : Array<Ad> {
-        println("Status: $filterS, Rate: $filterR")
-        val result = if(filterS != "null" && filterR == "null" && filterC == "null") {
-            dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
-        } else if(filterS != "null" && filterR != "null" && filterC == "null"){
-            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
-            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC == "null"){
-            dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
-        } else if(filterS == "null" && filterR == "null" && filterC != "null"){
-            dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
-        } else if(filterS != "null" && filterR == "null" && filterC != "null"){
-            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
-            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(c in categoryResult){
-                    if(s.ID == c.ID){
-                        tmp.add(s)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS == "null" && filterR != "null" && filterC != "null"){
-            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
-            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
-            val tmp = mutableListOf<Ad>()
-            for(r in rateResult){
-                for(c in categoryResult){
-                    if(c.ID == r.ID){
-                        tmp.add(c)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else if(filterS != "null" && filterR != "null" && filterC != "null") {
-            val statusResult = dbHelper.findAdsByVoivodeshipByStatus(voivodeship, userID, filterS)
-            val rateResult = dbHelper.findAdsByVoivodeshipByRate(voivodeship, userID, filterR)
-            val categoryResult = dbHelper.findAdsByVoivodeshipByCategory(voivodeship, userID, filterC)
-            val firstResult = mutableListOf<Ad>()
-            val tmp = mutableListOf<Ad>()
-            for(s in statusResult){
-                for(r in rateResult){
-                    if(s.ID == r.ID){
-                        firstResult.add(s)
-                    }
-                }
-            }
-            for(f in firstResult){
-                for(c in categoryResult){
-                    if(f.ID == c.ID){
-                        tmp.add(f)
-                    }
-                }
-            }
-            tmp.toTypedArray()
-        } else {
-            dbHelper.findAdsByVoivodeship(voivodeship, userID)
-        }
-        return result
-    }
 
 }

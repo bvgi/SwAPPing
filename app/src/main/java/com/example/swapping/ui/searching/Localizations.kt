@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +17,7 @@ import com.example.swapping.R
 import com.google.android.material.snackbar.Snackbar
 
 class Localizations : Fragment() {
+    private lateinit var localizationsViewModel: LocalizationsViewModel
     lateinit var adapter: SearchingListAdapter
     lateinit var localizationsRecyclerView: RecyclerView
     private lateinit var localizations: Array<String>
@@ -36,13 +38,14 @@ class Localizations : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        localizationsViewModel =
+            ViewModelProvider(this).get(LocalizationsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_localizations, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val dbHelper = DataBaseHelper(view.context)
-        localizations = dbHelper.getVoivodeships()
+        localizations = localizationsViewModel.getVoivodeships(view.context)
 
         adapter = SearchingListAdapter(emptyArray(), view.context)
         localizationsRecyclerView = view.findViewById(R.id.listOfVoivodeships)

@@ -1,13 +1,15 @@
 package com.example.swapping.ui.userLogin
 
+import android.content.Context
 import android.widget.CheckBox
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.swapping.DataBaseHelper
+import com.example.swapping.Models.User
 import com.google.android.material.textfield.TextInputLayout
 
-class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {
+class RegisterViewModel() : ViewModel() {
     fun registerErrors(isValid: HashMap<String, Boolean>, birthCheckBox: CheckBox, permissionCheck: CheckBox, emailLayout: TextInputLayout, passwordLayout: TextInputLayout, usernameLayout: TextInputLayout) : Boolean {
         for((key,value) in isValid.entries) {
             when (key) {
@@ -41,13 +43,14 @@ class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {
         password: String?,
         username: String?,
         birthDate: Boolean?,
-        permission: Boolean?
+        permission: Boolean?,
+        context: Context
     ): HashMap<String, Boolean>  {
 
         val isValidEmail =
-            email != null && email.isNotBlank() && email.contains("@") && email.contains(".") && isEmailAvailable(email)
+            email != null && email.isNotBlank() && email.contains("@") && email.contains(".") && isEmailAvailable(email, context)
         val isValidPassword = password != null && password.isNotBlank() && password.length >= 6
-        val isValidNickName = username != null && username.isNotBlank() && isUsernameAvailable(username)
+        val isValidNickName = username != null && username.isNotBlank() && isUsernameAvailable(username, context)
         val isValidBirthDate = birthDate == true
         val isCheckedPermission = permission == true
         return hashMapOf(
@@ -59,8 +62,9 @@ class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {
         )
     }
 
-    private fun isUsernameAvailable(username: String) : Boolean {
-        val usersList = DBHelper.getAllUsers()
+    private fun isUsernameAvailable(username: String, context: Context) : Boolean {
+        val dbHelper = DataBaseHelper(context)
+        val usersList = dbHelper.getAllUsers()
         var contains = false
         for(data in usersList){
             if (data.first == username)
@@ -69,8 +73,9 @@ class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {
         return !contains
     }
 
-    private fun isEmailAvailable(email: String) : Boolean {
-        val usersList = DBHelper.getAllUsers()
+    private fun isEmailAvailable(email: String, context: Context) : Boolean {
+        val dbHelper = DataBaseHelper(context)
+        val usersList = dbHelper.getAllUsers()
         var contains = false
         for(data in usersList){
             if (data.second == email)
@@ -79,28 +84,8 @@ class RegisterViewModel(val DBHelper: DataBaseHelper) : ViewModel() {
         return !contains
     }
 
-
-    private val _text = MutableLiveData<String>().apply {
-        value = "This is home Fragment"
+    fun addUser(user: User, context: Context){
+        val dbHelper = DataBaseHelper(context)
+        dbHelper.addUser(user)
     }
-    val text: LiveData<String> = _text
-
-
-
-//    private fun makeRequest() {
-//        val queue = SingletonManager.queue
-//
-//        val url = "http://192.168.0.45:8000/Users"
-//
-//        val django = JsonObjectRequest(
-//            Request.Method.GET, url, null,
-//            { response ->
-//                Log.d("Response", response.toString())
-//            },
-//            { response ->
-//                Log.d("Error", response.toString())
-//            })
-//
-//        queue.add(django)
-//    }
 }
