@@ -142,7 +142,7 @@ class RegisterActivity : AppCompatActivity() {
             if (!networkConnection.isNetworkAvailable(applicationContext)) {
                 Snackbar.make(
                     findViewById(R.id.noInternet),
-                    "Brak dostępu do internetu",
+                    "Brak dostępu do Internetu",
                     Snackbar.LENGTH_INDEFINITE
                 ).show()
             } else {
