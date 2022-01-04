@@ -24,7 +24,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class UserAdsFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var homeViewModel: UserAdsViewModel
     private var _binding: FragmentHomeBinding? = null
     lateinit var adapter: HomeAdapter
     lateinit var homeRecycler: RecyclerView
@@ -68,13 +68,13 @@ class UserAdsFragment : Fragment() {
 
         val root: View = binding.root
         homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel()::class.java)
+            ViewModelProvider(this).get(UserAdsViewModel()::class.java)
         when(arguments.previousFragment){
             "Profile" ->
                 ads = if(userID == profileID)
-                    homeViewModel.getUserAnnouncements(userID, root.context) + homeViewModel.getPurchasedAnnouncements(userID, root.context)
+                    homeViewModel.getUserAds(userID, root.context) + homeViewModel.getPurchasedAds(userID, root.context)
                 else
-                    homeViewModel.getNotArchivedAds(profileID, root.context)
+                    homeViewModel.getNotArchivedUserAds(profileID, root.context)
 
             "Liked" -> {
                 ads = homeViewModel.getUserLiked(userID, root.context)
@@ -108,8 +108,6 @@ class UserAdsFragment : Fragment() {
 
     override fun onViewCreated(root: View, savedInstanceState: Bundle?) {
         super.onViewCreated(root, savedInstanceState)
-
-        println("USERSADS:::${arguments.previousFragment}")
 
         adapter.setOnClickListener(object : HomeAdapter.ClickListener{
             override fun onClick(pos: Int, aView: View) {

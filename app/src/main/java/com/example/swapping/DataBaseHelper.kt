@@ -1274,9 +1274,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val getAnnouncementQuery = "SELECT * " +
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
-                "AND User != $userId"
-
-        println(getAnnouncementQuery)
+                "AND User != $userId " +
+                "AND Archived = 0"
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -1341,25 +1340,28 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND User != $userId " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND User != $userId " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate ASC"
             else -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate DESC"
         }
 
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -1421,6 +1423,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                 "AND User != $userId " +
+                "AND Archived = 0 " +
                 "AND Status = $statusID"
 
         println(getAnnouncementQuery)
@@ -1490,12 +1493,14 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND User != $userId " +
                     "AND Status = $statusID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND User != $userId " +
                     "AND Status = $statusID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -1503,6 +1508,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                     "AND A.User != $userId " +
                     "AND A.Status = $statusID " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY U.Mean_rate ASC"
             else -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -1510,6 +1516,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                     "AND A.User != $userId " +
                     "AND A.Status = $statusID " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY U.Mean_rate DESC"
         }
 
@@ -1578,6 +1585,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "AND U.Mean_rate >= ${filter[0]}"
             else
                 "SELECT A.* " +
@@ -1585,6 +1593,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "AND U.Mean_rate = ${filter[0]}"
 
         println(getAnnouncementQuery)
@@ -1654,6 +1663,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date ASC"
                 else
                     "SELECT A.* " +
@@ -1662,6 +1672,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date ASC"
             }
             2 -> {
@@ -1672,6 +1683,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date DESC"
                 else
                     "SELECT A.* " +
@@ -1680,6 +1692,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date DESC"
             }
             3 -> {
@@ -1690,6 +1703,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate ASC"
                 else
                     "SELECT A.* " +
@@ -1698,6 +1712,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate ASC"
             }
             else ->
@@ -1708,6 +1723,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate DESC"
                 else
                     "SELECT A.* " +
@@ -1716,6 +1732,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate DESC"
         }
         println(getAnnouncementQuery)
@@ -1780,6 +1797,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                 "AND User != $userId " +
+                "AND Archived = 0 " +
                 "AND Status = $categoryID"
 
         println(getAnnouncementQuery)
@@ -1849,12 +1867,14 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND User != $userId " +
                     "AND Category = $categoryID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE (Title LIKE '%$string%' OR Description LIKE '%$string%') " +
                     "AND User != $userId " +
                     "AND Category = $categoryID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -1862,6 +1882,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                     "AND A.User != $userId " +
                     "AND A.Category = $categoryID " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate ASC"
             else -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -1869,6 +1890,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE (A.Title LIKE '%$string%' OR A.Description LIKE '%$string%') " +
                     "AND A.User != $userId " +
                     "AND A.Category = $categoryID " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate DESC"
         }
 
@@ -1931,8 +1953,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val ads = mutableListOf<Ad>()
 
         val categoryID = getCategoryID(categoryName)
-        println("CATEGORY ID : $categoryID")
-
         var getAnnouncementQuery = ""
 
         getAnnouncementQuery = when(sort){
@@ -1940,23 +1960,27 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE Category = $categoryID " +
                 "AND User != $userId " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Category = $categoryID " +
                     "AND User != $userId " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
                     "JOIN $USER_TABLE U ON A.User = U.ID " +
                     "WHERE A.Category = $categoryID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate ASC"
             else -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
                     "JOIN $USER_TABLE U ON A.User = U.ID " +
                     "WHERE A.Category = $categoryID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate DESC"
         }
 
@@ -2021,10 +2045,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         var getAnnouncementQuery = "SELECT * " +
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE Category = $categoryID " +
+                "AND Archived = 0 " +
                 "AND User != $userId"
 
-
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2080,7 +2103,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val ads = mutableListOf<Ad>()
 
         val categoryID = getCategoryID(categoryName)
-        println("CATEGORY ID : $categoryID")
 
         var getAnnouncementQuery = ""
         val statusID = getStatusID(filter)
@@ -2091,12 +2113,14 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE Category = $categoryID " +
                     "AND User != $userId " +
                     "AND Status = $statusID " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Category = $categoryID " +
                     "AND User != $userId " +
                     "AND Status = $statusID " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -2104,6 +2128,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE A.Category = $categoryID " +
                     "AND A.Status = $statusID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate ASC"
             else -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -2111,6 +2136,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE A.Category = $categoryID " +
                     "AND A.Status = $statusID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate DESC"
         }
 
@@ -2179,7 +2205,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Category = $categoryID " +
                     "AND User != $userId " +
-                    "AND Status = $statusID"
+                    "AND Status = $statusID " +
+                "AND Archived = 0"
 
         println(getAnnouncementQuery)
 
@@ -2246,6 +2273,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE A.Category = $categoryID " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "AND U.Mean_rate >= ${filter[0]}"
             else
                 "SELECT A.* " +
@@ -2253,6 +2281,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE A.Category = $categoryID " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "AND U.Mean_rate = ${filter[0]}"
 
         println(getAnnouncementQuery)
@@ -2322,6 +2351,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Category = $categoryID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date ASC"
                 else
                     "SELECT A.* " +
@@ -2330,6 +2360,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Category = $categoryID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date ASC"
             }
             2 -> {
@@ -2340,6 +2371,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "WHERE A.Category = $categoryID " +
                         "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                         "ORDER BY A.Published_date DESC"
                 else
                     "SELECT A.* " +
@@ -2348,6 +2380,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Category = $categoryID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date DESC"
             }
             3 -> {
@@ -2358,6 +2391,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Category = $categoryID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate ASC"
                 else
                     "SELECT A.* " +
@@ -2366,6 +2400,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Category = $categoryID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate ASC"
             }
             else ->
@@ -2376,6 +2411,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "WHERE A.Category = $categoryID " +
                         "AND A.User != $userId " +
                         "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                         "ORDER BY U.Mean_rate DESC"
                 else
                     "SELECT A.* " +
@@ -2384,10 +2420,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Category = $categoryID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate DESC"
         }
-
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2452,33 +2487,37 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "FROM $ADVERTISEMENT_TABLE " +
                         "WHERE Voivodeship = $voivodeshipID " +
                         "AND User != $userId " +
+                        "AND Archived = 0 " +
                         "ORDER BY Published_date ASC"
                 2 -> "SELECT * " +
                         "FROM $ADVERTISEMENT_TABLE " +
                         "WHERE Voivodeship = $voivodeshipID " +
                         "AND User != $userId " +
+                        "AND Archived = 0 " +
                         "ORDER BY Published_date DESC"
                 3 -> "SELECT A.* " +
                         "FROM $ADVERTISEMENT_TABLE A " +
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE A.Voivodeship = $voivodeshipID " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "ORDER BY Mean_rate ASC"
                 else -> "SELECT A.* " +
                         "FROM $ADVERTISEMENT_TABLE A " +
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE A.Voivodeship = $voivodeshipID " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "ORDER BY Mean_rate DESC"
             }
         } else {
             getAnnouncementQuery = "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Voivodeship = $voivodeshipID " +
+                    "AND Archived = 0 " +
                     "AND User != $userId"
         }
 
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2539,6 +2578,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val getAnnouncementQuery = "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Voivodeship = $voivodeshipID " +
+                    "AND Archived = 0 " +
                     "AND User != $userId"
 
         println(getAnnouncementQuery)
@@ -2607,12 +2647,14 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE Voivodeship = $voivodeshipID " +
                     "AND User != $userId " +
                     "AND Status = $statusID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Voivodeship = $voivodeshipID " +
                     "AND User != $userId " +
                     "AND Status = $statusID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -2620,6 +2662,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE A.Voivodeship = $voivodeshipID " +
                     "AND A.Status = $statusID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate ASC"
             else -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -2627,10 +2670,9 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE A.Voivodeship = $voivodeshipID " +
                     "AND A.Status = $statusID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate DESC"
         }
-
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2695,9 +2737,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE Voivodeship = $voivodeshipID " +
                 "AND User != $userId " +
+                "AND Archived = 0 " +
                 "AND Status = $statusID"
-
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2753,7 +2794,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val ads = mutableListOf<Ad>()
 
         val voivodeshipID = getVoivodeshipID(voivodeshipName)
-        println("CATEGORY ID : $voivodeshipID")
 
         var getAnnouncementQuery = ""
 
@@ -2764,6 +2804,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE A.Voivodeship = $voivodeshipID " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "AND U.Mean_rate >= ${filter[0]}"
             else
                 "SELECT A.* " +
@@ -2771,6 +2812,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                         "JOIN $USER_TABLE U ON A.User = U.ID " +
                         "WHERE A.Voivodeship = $voivodeshipID " +
                         "AND A.User != $userId " +
+                        "AND A.Archived = 0 " +
                         "AND U.Mean_rate = ${filter[0]}"
 
         println(getAnnouncementQuery)
@@ -2829,7 +2871,6 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
         val ads = mutableListOf<Ad>()
 
         val voivodeshipID = getCategoryID(voivodeshipName)
-        println("CATEGORY ID : $voivodeshipID")
 
         var getAnnouncementQuery = ""
 
@@ -2842,6 +2883,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date ASC"
                 else
                     "SELECT A.* " +
@@ -2850,6 +2892,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date ASC"
             }
             2 -> {
@@ -2860,6 +2903,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date DESC"
                 else
                     "SELECT A.* " +
@@ -2868,6 +2912,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY A.Published_date DESC"
             }
             3 -> {
@@ -2878,6 +2923,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate ASC"
                 else
                     "SELECT A.* " +
@@ -2886,6 +2932,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate ASC"
             }
             else ->
@@ -2896,6 +2943,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate >= ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate DESC"
                 else
                     "SELECT A.* " +
@@ -2904,10 +2952,10 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                             "WHERE A.Voivodeship = $voivodeshipID " +
                             "AND A.User != $userId " +
                             "AND U.Mean_rate = ${filter[0]} " +
+                            "AND A.Archived = 0 " +
                             "ORDER BY U.Mean_rate DESC"
         }
 
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 
@@ -2974,12 +3022,14 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE Voivodeship = $voivodeshipID " +
                     "AND User != $userId " +
                     "AND Category = $categoryID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date ASC"
             2 -> "SELECT * " +
                     "FROM $ADVERTISEMENT_TABLE " +
                     "WHERE Voivodeship = $voivodeshipID " +
                     "AND User != $userId " +
                     "AND Category = $categoryID " +
+                    "AND Archived = 0 " +
                     "ORDER BY Published_date DESC"
             3 -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -2987,6 +3037,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE A.Voivodeship = $voivodeshipID " +
                     "AND A.Category = $categoryID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate ASC"
             else -> "SELECT A.* " +
                     "FROM $ADVERTISEMENT_TABLE A " +
@@ -2994,6 +3045,7 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                     "WHERE A.Voivodeship = $voivodeshipID " +
                     "AND A.Category = $categoryID " +
                     "AND A.User != $userId " +
+                    "AND A.Archived = 0 " +
                     "ORDER BY Mean_rate DESC"
         }
 
@@ -3062,9 +3114,8 @@ class DataBaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_NAME
                 "FROM $ADVERTISEMENT_TABLE " +
                 "WHERE Voivodeship = $voivodeshipID " +
                 "AND User != $userId " +
+                "AND Archived = 0 " +
                 "AND Category = $categoryID"
-
-        println(getAnnouncementQuery)
 
         val cursor = db.rawQuery(getAnnouncementQuery, null)
 

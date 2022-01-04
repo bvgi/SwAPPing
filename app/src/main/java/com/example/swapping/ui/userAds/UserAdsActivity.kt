@@ -52,11 +52,11 @@ class UserAdsActivity : AppCompatActivity() {
             negotiationID = extras.getInt("negotiationID")
         }
 
-        val negotiation = userAdsViewModel.getNegotiation(negotiationID, this)
-        type = negotiation.type
-
         userAdsViewModel =
             ViewModelProvider(this).get(UserAdsViewModel()::class.java)
+
+        val negotiation = userAdsViewModel.getNegotiation(negotiationID, this)
+        type = negotiation.type
 
         ads = userAdsViewModel.getNotArchivedUserAds(userID, this)
 

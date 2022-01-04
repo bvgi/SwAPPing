@@ -15,6 +15,7 @@ import com.example.swapping.Models.NetworkConnection
 import com.example.swapping.Models.User
 import com.example.swapping.R
 import com.example.swapping.databinding.FragmentProfileBinding
+import com.example.swapping.ui.searching.LocalizationsViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 
@@ -46,6 +47,10 @@ class EditProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_profile)
+
+
+        editProfileViewModel =
+            ViewModelProvider(this).get(EditProfileViewModel::class.java)
 
         emailLayout = findViewById(R.id.emailEditLayout)
         usernameLayout = findViewById(R.id.usernameEditLayout)

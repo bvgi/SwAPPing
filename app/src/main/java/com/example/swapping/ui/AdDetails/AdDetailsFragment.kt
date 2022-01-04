@@ -97,7 +97,6 @@ class AdDetailsFragment : Fragment() {
         adPhoto.setImageBitmap(photo)
 
         publishedDate = view.findViewById(R.id.publishedDate)
-        println(ad.published_date)
         publishedDate.text = "${ad.published_date.toString().substring(6,8)}.${ad.published_date.toString().substring(4,6)}.${ad.published_date.toString().substring(0,4)}"
 
 

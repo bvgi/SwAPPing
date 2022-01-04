@@ -14,34 +14,6 @@ class HomeViewModel : ViewModel() {
     }
     val text: LiveData<String> = _text
 
-    fun getUserAnnouncements(userID: Int, context: Context): Array<Ad> {
-        val dbHelper = DataBaseHelper(context)
-        val ads = dbHelper.getUserAnnouncements(userID)
-        return ads
-    }
-
-    fun getAnnouncements(userID: Int, context: Context): Array<Ad> {
-        val dbHelper = DataBaseHelper(context)
-        val ads = dbHelper.getAnnouncements(userID)
-
-        return ads
-    }
-
-    fun getUserLiked(userID: Int, context: Context) : Array<Ad> {
-        val dbHelper = DataBaseHelper(context)
-        val ads = dbHelper.getLiked(userID)
-
-        return ads
-    }
-
-    fun getPurchasedAnnouncements(userID: Int, context: Context): Array<Ad> {
-        val dbHelper = DataBaseHelper(context)
-        val ads = dbHelper.getPurchasedAnnouncements(userID)
-
-
-        return ads
-    }
-
     fun getFollowersAnnouncements(userID: Int, context: Context): Array<Ad> {
         val dbHelper = DataBaseHelper(context)
         val ads = dbHelper.getFollowingAds(userID)
@@ -55,4 +27,5 @@ class HomeViewModel : ViewModel() {
 
         return ads
     }
+
 }

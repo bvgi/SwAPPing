@@ -34,4 +34,25 @@ class UserAdsViewModel : ViewModel(){
             offers
         )
     }
+
+    fun getUserLiked(userID: Int, context: Context) : Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getLiked(userID)
+
+        return ads
+    }
+
+    fun getPurchasedAds(userID: Int, context: Context): Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getPurchasedAnnouncements(userID)
+
+
+        return ads
+    }
+
+    fun getUserAds(userID: Int, context: Context): Array<Ad> {
+        val dbHelper = DataBaseHelper(context)
+        val ads = dbHelper.getUserAnnouncements(userID)
+        return ads
+    }
 }
